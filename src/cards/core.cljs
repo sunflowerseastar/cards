@@ -20,17 +20,40 @@
        [:path {:d ["M896" "1664q-26" "0-44-18l-624-602q-10-8-27.5-26t-55.5-65.5-68-97.5-53.5-121-23.5-138q0-220" "127-344t351-124q62" "0" "126.5" "21.5t120" "58" "95.5" "68.5" "76" "68q36-36" "76-68t95.5-68.5" "120-58" "126.5-21.5q224" "0" "351" "124t127" "344q0" "221-229" "450l-623" "600q-18" "18-44" "18z"]}]]
     "default"))
 
-(defn hello-world []
+(defn translated-rank-of [rank]
+  (case rank
+    11 'J
+    12 'Q
+    13 'K
+    14 'A
+    rank))
+
+(defn custom-zip
+  "Takes two lists and zips them"
+  [l m]
+  (flatten (map vector l m)))
+
+(defn my-shuffle [cards post-cut-fn]
+  (let [cut (+ (/ (count cards) 2) (- (rand-int 10) 5))
+        first-half (take cut cards)
+        second-half (drop cut cards)] (post-cut-fn first-half second-half)))
+
+(defn Card-list []
   [:div
    (svg-of 's)
    (svg-of 'c)
    (svg-of 'd)
    (svg-of 'h)
+   [:button {:on-click #(swap! @cards my-shuffle)} "shufflex"]
    [:ul
-    (for [card @cards] [:p (svg-of (:suit card)) " " (:rank card)])]])
+    (for [card @cards] [:p {:key (apply str [(:suit card) (:rank card)])}
+                        (svg-of (:suit card)) " " (translated-rank-of (:rank card))])]])
 
 (defn mount [el]
-  (reagent/render-component [hello-world] el))
+  (reagent/render-component [Card-list] el))
+
+(defn get-app-element []
+  (gdom/getElement "app"))
 
 (defn mount-app-element []
   (when-let [el (get-app-element)]

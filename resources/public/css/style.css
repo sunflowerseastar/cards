@@ -2,3 +2,6 @@ svg {
   width: 5vw;
   height: 5vw;
 }
+.club g {
+  transform: translate(0,1280px) scale(0.1,-0.1);
+}

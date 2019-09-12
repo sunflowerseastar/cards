@@ -1,0 +1,26 @@
+* other shuffles
+
+
+#+begin_src clojure
+(defn weighted-shuffle-orig [a b]
+  (loop [a a b b l [] probably-a 50]
+    (let [r (rand-int 100)]
+      (cond (and (empty? a) (empty? b)) l
+           (empty? a) (concat l b)
+           (empty? b) (concat l a)
+           (< r probably-a) (recur (rest a) b (conj l (first a)) r)
+           :else (recur a (rest b) (conj l (first b)) r)))))
+
+(defn every-other [a b]
+  (loop [a a b b l [] w 0]
+    (cond (and (empty? a) (empty? b)) l
+          (empty? a) (concat l b)
+          (empty? b) (concat l a)
+          (= w 0) (recur (rest a) b (conj l (first a)) 1)
+          (= w 1) (recur a (rest b) (conj l (first b)) 0))))
+
+(defn custom-zip
+  "Takes two lists and zips them"
+  [l m]
+  (flatten (map vector l m)))
+#+end_src

@@ -11,3 +11,6 @@ svg {
 .club g {
   transform: translate(0,1280px) scale(0.1,-0.1);
 }
+.heart, .diamond {
+  fill: red;
+}

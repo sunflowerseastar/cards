@@ -30,7 +30,7 @@
    (svgs/svg-of 'c)
    (svgs/svg-of 'd)
    (svgs/svg-of 'h)
-   [:button {:on-click #(swap! @cards (my-shuffle @cards custom-zip))} "shufflex"]
+   [:button {:on-click #(swap! cards my-shuffle custom-zip)} "shuffle"]
    [:ul
     (for [card @cards] [:p {:key (apply str [(:suit card) (:rank card)])}
                         (svgs/svg-of (:suit card)) " " (translated-rank-of (:rank card))])]])

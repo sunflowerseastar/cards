@@ -1,7 +1,7 @@
 (ns cards.deck)
 
 (defn generate-deck []
-  (for [suit ['s 'c 'd 'h] rank [2 3 4 5 6 7 8 9 10 11 12 13 14]] {:suit suit :rank rank}))
+  (vec (for [suit ['s 'c 'd 'h] rank [2 3 4 5 6 7 8 9 10 11 12 13 14]] {:suit suit :rank rank})))
 
 (def deck (atom (generate-deck)))
 
@@ -28,3 +28,6 @@
 
 (defn shuffler [deck shuffle-fn]
   (let [l-r-deck (divide-deck deck)] (shuffle-fn (first l-r-deck) (second l-r-deck))))
+
+(defn shuffle-deck [deck]
+  (vec (shuffler deck weighted-shuffle)))

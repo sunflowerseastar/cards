@@ -5,8 +5,9 @@ body {
 svg {
   position: relative;
   top: 7px;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
+  padding: 0 2px 0 12px;
 }
 .club g {
   transform: translate(0,1280px) scale(0.1,-0.1);

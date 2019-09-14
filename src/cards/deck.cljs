@@ -5,7 +5,7 @@
 
 (def deck (atom (generate-deck)))
 
-(defn translated-rank-of [rank]
+(defn translate-rank-of [rank]
   (case rank
     11 'J
     12 'Q

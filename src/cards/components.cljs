@@ -22,13 +22,19 @@
   (let [shoe (deck/shuffle-deck (deck/generate-deck))
         hands (atom (generate-hands shoe))
         draw-counter (atom 4)]
-    (letfn [(get-hit-card [player]
+    (letfn [(get-hit-card! [player]
               (let [top-card (shoe @draw-counter)]
                 (do
                   (println top-card)
                   (swap! draw-counter inc)
-                  top-card)))]
+                  top-card)))
+            (add-hit-card [player card]
+              (do
+                (println 3)
+                ;; (swap! hands assoc-in [player :hits] card)
+                ))]
       (do
+        (println hands)
         ;; (println (count shoe))
         ;; (println hands)
         [:div
@@ -49,7 +55,7 @@
                 {:key (apply str [(:suit hit-card) (:rank hit-card)])}
                 (svgs/svg-of (:suit hit-card))
                 (deck/translate-rank-of (:rank hit-card))])) ]]
-         [:button {:on-click #(get-hit-card :you)} "hit"]]))))
+         [:button {:on-click #(add-hit-card :you (get-hit-card! :you))} "hit"]]))))
 
 (defn card-list []
   (let [local-deck (atom (deck/generate-deck))]

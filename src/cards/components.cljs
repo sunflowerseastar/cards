@@ -4,11 +4,10 @@
    [cards.svgs :as svgs]
    [reagent.core :as reagent :refer [atom]]))
 
-(defn card [hands player up-or-down]
-  (let [{{{suit :suit, rank :rank} up-or-down} player} hands]
-    [:span
-     (svgs/svg-of suit)
-     (deck/translate-rank-of rank)]))
+(defn card [{:keys [suit rank]}]
+  [:span
+   (svgs/svg-of suit)
+   (deck/translate-rank-of rank)])
 
 (defn card-list []
   (let [local-deck (atom (deck/generate-deck))]

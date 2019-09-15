@@ -1,9 +1,9 @@
 (ns cards.blackjack
-(:require
- [cards.components :as components]
- [cards.deck :as deck]
- [cards.svgs :as svgs]
- [reagent.core :as reagent :refer [atom]]))
+  (:require
+   [cards.components :as components]
+   [cards.deck :as deck]
+   [cards.svgs :as svgs]
+   [reagent.core :as reagent :refer [atom]]))
 
 (def shoe (atom (deck/generate-shoe)))
 (def hands (atom (deck/generate-hands @shoe)))
@@ -24,23 +24,20 @@
 
 (defn blackjack []
   (do
-    (println "blackjack - hands" hands)
+    ;; (println "blackjack - hands" hands)
     [:div
      [:button {:on-click #(reset-state!)} "re-deal"]
      [:div.dealer
       [:p "dealer"]
-      [components/card @hands :dealer :down-card]
-      [components/card @hands :dealer :up-card]]
+      [components/card (-> @hands :dealer :down-card)]
+      [components/card (-> @hands :dealer :up-card)]]
      [:div.you
       [:p "you"]
-      [components/card @hands :you :down-1-card]
-      [components/card @hands :you :down-2-card]
+      [components/card (-> @hands :you :down-1-card)]
+      [components/card (-> @hands :you :down-2-card)]
       [:div
        (for [hit-card (-> @hands :you :hits)]
-         (do
-           (println "dfasdfasd")
-           [:span
-            {:key (rand-int 100000)}
-            (svgs/svg-of (:suit hit-card))
-            (deck/translate-rank-of (:rank hit-card))])) ]]
+         [:span
+          {:key (rand-int 100000)}
+          (components/card hit-card)])]]
      [:button {:on-click #(add-hit-card-to-hand! :you (draw-hit-card!))} "hit"]]))

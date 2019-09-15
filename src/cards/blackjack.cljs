@@ -1,7 +1,8 @@
 (ns cards.blackjack
   (:require
+   [cards.blackjack-helpers :refer [sum]]
    [cards.components :as components]
-   [cards.deck :as deck]
+   [cards.deck :refer [generate-shoe]]
    [cards.svgs :as svgs]
    [reagent.core :as reagent :refer [atom]]))
 
@@ -14,44 +15,35 @@
      :dealer {:card-1 d-d-card, :card-2 d-u-card}}))
 
 (def game (atom {:state :stopped :turn :you :dealer-wins 0 :you-wins 0} ))
-(def shoe (atom (deck/generate-shoe)))
+(def shoe (atom (generate-shoe)))
 (def hands (atom {}))
 (def draw-counter (atom 4))
+
+(defn start-game! []
+  (do
+    (reset! shoe (generate-shoe))
+    (reset! hands (generate-hands @shoe))
+    (reset! draw-counter 4)
+    (swap! game assoc :state :running)))
 
 (defn draw-hit-card! []
   (do
     (swap! draw-counter inc)
     (@shoe @draw-counter)))
 
-(defn cards-from-hand [hand]
-  (let [{:keys [card-1 card-2 hits]} hand]
-    (vec (filter not-empty (flatten (conj [card-1] [card-2] hits))))))
-
-(defn sum [player]
-  (let [t1 (map :rank (cards-from-hand (@hands player)))]
-    (reduce + (map :rank (cards-from-hand (@hands player))))))
-
 (defn update-game! []
-  (let [your-sum (sum :you)
-        dealer-sum (sum :dealer)]
+  (let [your-sum (sum :you @hands)
+        dealer-sum (sum :dealer @hands)]
     (cond (> your-sum 21)
           ;; bust
           (swap! game assoc :state :stopped :dealer-wins (inc (@game :dealer-wins))))))
-
-(defn end-turn! []
-  (swap! game assoc :turn :dealer))
 
 (defn add-hit-card-to-hand! [player card]
   (swap! hands assoc-in [player :hits] (vec (conj (-> @hands player :hits) card)))
   (update-game!))
 
-(defn start-game! []
-  (do
-    (reset! shoe (deck/shuffle-deck (deck/generate-deck)))
-    (reset! hands (generate-hands @shoe))
-    (reset! draw-counter 4)
-    (swap! game assoc :state :running)
-    ))
+(defn end-turn! []
+  (swap! game assoc :turn :dealer))
 
 (defn game-status [{:keys [state turn dealer-wins you-wins]} game]
   [:div

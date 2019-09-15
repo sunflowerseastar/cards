@@ -17,23 +17,19 @@
 (defn reset-state! []
   (reset! shoe (deck/shuffle-deck (deck/generate-deck)))
   (reset! hands (deck/generate-hands @shoe))
-  (reset! draw-counter (atom 4)))
+  (reset! draw-counter 4))
 
-(defn get-hit-card! [player]
-  (let [top-card (@shoe @draw-counter)]
-    (do
-      (println top-card)
-      (swap! draw-counter inc)
-      top-card)))
+(defn draw-hit-card! []
+  (do
+    (swap! draw-counter inc)
+    (@shoe @draw-counter)))
 
-(defn add-hit-card! [player card]
+(defn add-hit-card-to-hand! [player card]
   (swap! hands assoc-in [player :hits] (conj (-> @hands player :hits) card)))
 
 (defn blackjack []
   (do
-    ;; (println hands)
-    ;; (println (count shoe))
-    ;; (println hands)
+    (println "blackjack - hands" hands)
     [:div
      [:button {:on-click #(reset-state!)} "re-deal"]
      [:div.dealer
@@ -47,12 +43,12 @@
       [:div
        (for [hit-card (-> @hands :you :hits)]
          (do
-           ;; (println "dfasdfasd")
+           (println "dfasdfasd")
            [:span
             {:key (rand-int 100000)}
             (svgs/svg-of (:suit hit-card))
             (deck/translate-rank-of (:rank hit-card))])) ]]
-     [:button {:on-click #(add-hit-card! :you (get-hit-card! :you))} "hit"]]))
+     [:button {:on-click #(add-hit-card-to-hand! :you (draw-hit-card!))} "hit"]]))
 
 (defn card-list []
   (let [local-deck (atom (deck/generate-deck))]

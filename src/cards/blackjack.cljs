@@ -24,7 +24,7 @@
     (reset! shoe (generate-shoe))
     (reset! hands (generate-hands @shoe))
     (reset! draw-counter 4)
-    (swap! game assoc :state :running)))
+    (swap! game assoc :state :running :turn :you)))
 
 (defn draw-hit-card! []
   (do
@@ -34,16 +34,39 @@
 (defn update-game! []
   (let [your-sum (sum :you @hands)
         dealer-sum (sum :dealer @hands)]
-    (cond (> your-sum 21)
-          ;; bust
-          (swap! game assoc :state :stopped :dealer-wins (inc (@game :dealer-wins))))))
+    (do
+      (println "update-game!")
+      (cond (> your-sum 21)
+            ;; bust
+            (do (println "you bust")
+                (swap! game assoc :state :stopped :dealer-wins (inc (@game :dealer-wins))))
+            (> dealer-sum 21)
+            (do (println "dealer bust")
+                (swap! game assoc :state :stopped :you-wins (inc (@game :you-wins))))
+            (> dealer-sum your-sum)
+            (do (println "dealer wins higher sum")
+                (swap! game assoc :state :stopped :dealer-wins (inc (@game :dealer-wins))))
+            ))))
 
 (defn add-hit-card-to-hand! [player card]
-  (swap! hands assoc-in [player :hits] (vec (conj (-> @hands player :hits) card)))
-  (update-game!))
+  (do
+    ;; (println "add-hit-card-to-hand!")
+    (swap! hands assoc-in [player :hits] (vec (conj (-> @hands player :hits) card)))
+    (update-game!)))
 
 (defn end-turn! []
-  (swap! game assoc :turn :dealer))
+  (do
+    ;; (println "end-turn!")
+    (swap! game assoc :turn :dealer)
+    (while (= (@game :state) :running)
+      (do
+        ;; (swap! game assoc :state :stopped)
+        (if (< (sum :dealer @hands))
+          (add-hit-card-to-hand! :dealer (draw-hit-card!))
+          (do (println "dealer stuck at 17 or higher" (sum :dealer @hands))
+              (swap! game assoc :state :stopped :you-wins (inc (@game :you-wins))))
+          )
+        ))))
 
 (defn game-status [{:keys [state turn dealer-wins you-wins]} game]
   [:div
@@ -61,7 +84,11 @@
      [:div.dealer
       [:p "dealer"]
       [components/card (-> @hands :dealer :card-1)]
-      [components/card (-> @hands :dealer :card-2)]]
+      [components/card (-> @hands :dealer :card-2)]
+      (for [hit-card (-> @hands :dealer :hits)]
+        [:span
+         {:key (rand-int 100000)}
+         (components/card hit-card)])]
      [:div.you
       [:p "you"]
       [components/card (-> @hands :you :card-1)]

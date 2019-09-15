@@ -15,22 +15,41 @@
         y-d-2-card (second local-deck)
         d-d-card (local-deck 2)
         d-u-card (local-deck 3)]
-    {:you {:down-1-card y-d-1-card, :down-2-card y-d-2-card}
+    {:you {:down-1-card y-d-1-card, :down-2-card y-d-2-card :hits [{:suit 'h :rank 6}]}
      :dealer {:down-card d-d-card, :up-card d-u-card}}))
 
 (defn blackjack []
-  (let [hands (atom (generate-hands (deck/shuffle-deck (deck/generate-deck))))]
-    [:div
-     [:button {:on-click #(swap! hands (generate-hands (deck/shuffle-deck (deck/generate-deck))))} "re-deal"]
-     [:div.dealer
-      [:p "dealer"]
-      [card @hands :dealer :down-card]
-      [card @hands :dealer :up-card]]
-     [:div.you
-      [:p "you"]
-      [card @hands :you :down-1-card]
-      [card @hands :you :down-2-card]
-      ]]))
+  (let [shoe (deck/shuffle-deck (deck/generate-deck))
+        hands (atom (generate-hands shoe))
+        draw-counter (atom 4)]
+    (letfn [(get-hit-card [player]
+              (let [top-card (shoe @draw-counter)]
+                (do
+                  (println top-card)
+                  (swap! draw-counter inc)
+                  top-card)))]
+      (do
+        ;; (println (count shoe))
+        ;; (println hands)
+        [:div
+         [:button {:on-click #(swap! hands (generate-hands (deck/shuffle-deck (deck/generate-deck))))} "re-deal"]
+         [:div.dealer
+          [:p "dealer"]
+          [card @hands :dealer :down-card]
+          [card @hands :dealer :up-card]]
+         [:div.you
+          [:p "you"]
+          [card @hands :you :down-1-card]
+          [card @hands :you :down-2-card]
+          [:div
+           (for [hit-card (-> @hands :you :hits)]
+             (do
+               ;; (println "dfasdfasd")
+               [:span
+                {:key (apply str [(:suit hit-card) (:rank hit-card)])}
+                (svgs/svg-of (:suit hit-card))
+                (deck/translate-rank-of (:rank hit-card))])) ]]
+         [:button {:on-click #(get-hit-card :you)} "hit"]]))))
 
 (defn card-list []
   (let [local-deck (atom (deck/generate-deck))]

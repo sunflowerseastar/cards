@@ -35,10 +35,3 @@
 (defn generate-shoe []
   (shuffle-deck (generate-deck)))
 
-(defn generate-hands [local-deck]
-  (let [y-d-1-card (first local-deck)
-        y-d-2-card (second local-deck)
-        d-d-card (local-deck 2)
-        d-u-card (local-deck 3)]
-    {:you {:down-1-card y-d-1-card, :down-2-card y-d-2-card}
-     :dealer {:down-card d-d-card, :up-card d-u-card}}))

@@ -3,15 +3,16 @@
    [cards.components :as components]
    [cards.svgs :as svgs]
    [cards.deck :as deck]
+   [cards.blackjack :as blackjack]
    [goog.dom :as gdom]
    [reagent.core :as reagent :refer [atom]]))
 
-(def screen (atom components/blackjack))
+(def screen (atom blackjack/blackjack))
 
 (defn app []
   [:div
    [:button {:on-click #(reset! screen components/card-list)} "go to card-list"]
-   [:button {:on-click #(reset! screen components/blackjack)} "go to blackjack"]
+   [:button {:on-click #(reset! screen blackjack/blackjack)} "go to blackjack"]
    [@screen]])
 
 (defn mount [el]

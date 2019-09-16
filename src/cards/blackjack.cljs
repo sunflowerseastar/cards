@@ -8,12 +8,14 @@
 
 (def dealer-hit-cutoff 17)
 
-(def game (atom {:state :stopped
-                 :turn :you
-                 :current-split 0
-                 :dealer-wins 0
-                 :your-wins 0
-                 :result ""}))
+(def game-initial-state {:state :stopped
+                         :turn :none
+                         :current-split 0
+                         :dealer-wins 0
+                         :your-wins 0
+                         :result ""})
+
+(def game (atom game-initial-state))
 (def shoe (atom (generate-shoe)))
 (def hands (atom {}))
 (def draw-counter (atom 4))
@@ -26,12 +28,19 @@
     {:you [{:card-1 your-card-1, :card-2 your-card-2}]
      :dealer [{:card-1 dealer-card-1, :card-2 dealer-card-2}]}))
 
-(defn start-game! []
+(defn deal! []
   (do
     (reset! shoe (generate-shoe))
     (reset! hands (generate-hands @shoe))
     (reset! draw-counter 4)
     (swap! game assoc :state :running :turn :you :result "")))
+
+(defn reset-game! []
+  (do
+    (reset! shoe generate-shoe)
+    (reset! hands {})
+    (reset! draw-counter 4)
+    (reset! game game-initial-state)))
 
 (defn draw-hit-card! []
   (do
@@ -39,10 +48,10 @@
     (@shoe @draw-counter)))
 
 (defn you-win! []
-  (swap! game assoc :state :stopped :your-wins (inc (@game :your-wins))))
+  (swap! game assoc :state :stopped :turn :none :your-wins (inc (@game :your-wins))))
 
 (defn dealer-wins! []
-  (swap! game assoc :state :stopped :dealer-wins (inc (@game :dealer-wins))))
+  (swap! game assoc :state :stopped :turn :none :dealer-wins (inc (@game :dealer-wins))))
 
 (defn update-game! []
   (let [your-value (value (nth (@hands :you) (@game :current-split)))
@@ -89,7 +98,8 @@
 (defn blackjack []
   [:div
    [game-status @game]
-   [:button {:on-click #(start-game!)} "start game"]
+   [:button {:on-click #(deal!)} "deal"]
+   [:button {:on-click #(reset-game!)} "reset"]
    [:div.hand.dealer
     [:h2 "dealer"]
     (for [{:keys [card-1 card-2 hits]} (@hands :dealer)]

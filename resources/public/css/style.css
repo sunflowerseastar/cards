@@ -27,6 +27,7 @@ li {
 
 .hand {
   white-space: break-spaces;
+  min-height: 92px;
 }
 
 .card {

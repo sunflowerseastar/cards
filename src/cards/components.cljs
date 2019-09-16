@@ -10,11 +10,16 @@
    (deck/translate-rank-of rank)])
 
 (defn card-hand [card-1 card-2 hits]
-  [:div
+  [:div.card-hand
    [card card-1]
    [card card-2]
    (for [hit-card hits]
      (card hit-card))])
+
+(defn card-row [value hand card-1 card-2 hits]
+  [:div.card-row
+   [:p.val value]
+   [card-hand card-1 card-2 hits]])
 
 (defn card-list []
   (let [local-deck (atom (deck/generate-deck))]

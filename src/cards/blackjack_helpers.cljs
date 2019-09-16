@@ -9,5 +9,11 @@
         (< rank 14) 10
         (= rank 14) 11))
 
-(defn value [hand]
+(defn value-old [hand]
   (reduce + (map #(translate-rank-to-value (% :rank)) (cards-from-hand hand))))
+
+(defn value [hand]
+  (value-old hand))
+
+(defn values [hand]
+  (value hand))

@@ -1,7 +1,7 @@
 (ns cards.blackjack
   (:require
    [cards.blackjack-helpers :refer [value]]
-   [cards.components :refer [card-hand]]
+   [cards.components :refer [card-hand card-row]]
    [cards.deck :refer [generate-shoe]]
    [cards.svgs :as svgs]
    [reagent.core :as reagent :refer [atom]]))
@@ -103,14 +103,15 @@
     [:button {:class (if (= (@game :state) :stopped) "inactive") :on-click #(reset-game!)} "reset"]]
    [:div.hand.dealer
     [:h2 "dealer"]
-    (for [{:keys [card-1 card-2 hits]} (@hands :dealer)]
-      ^{:key card-1} [card-hand card-1 card-2 hits])]
+    (for [{:keys [card-1 card-2 hits] :as hand} (@hands :dealer)]
+      ^{:key card-1} [card-row (value hand) hand card-1 card-2 hits])]
    [:div.hand.you
     [:h2 "you"]
-    (for [{:keys [card-1 card-2 hits]} (@hands :you)]
-      ^{:key card-1} [card-hand card-1 card-2 hits])]
+    (for [{:keys [card-1 card-2 hits] :as hand} (@hands :you)]
+      ^{:key card-1} [card-row (value hand) hand card-1 card-2 hits])]
    (let [active-p (and (= (@game :turn) :you) (= (@game :state) :running))
-         {:keys [card-1 card-2], :or {card-1 {:suit 's :rank 2} card-2 {:suit 'c :rank 2}}} (nth (@hands :you) (@game :current-split))
+         {:keys [card-1 card-2], :or {card-1 {:suit 's :rank 2} card-2 {:suit 'c :rank 2}}}
+         (nth (@hands :you) (@game :current-split))
          can-split-p (= (card-1 :rank) (card-2 :rank))]
      [:div.controls {:class (if (not active-p) "inactive")}
       [:button {:on-click #(add-hit-card-to-hand! :you (draw-hit-card!))} "hit"]

@@ -51,6 +51,21 @@ li {
   height: 18px;
   padding-right: 3px;
 }
+.card-row {
+  display: flex;
+}
+.val {
+  position: relative;
+  top: -3px;
+  min-width: 20px;
+  padding-right: 5px;
+  font-size: 15px;
+  font-weight: 300;
+}
+.card-hand {
+  flex: 1;
+}
+
 
 button {
   flex: 1;

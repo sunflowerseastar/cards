@@ -10,6 +10,7 @@
 
 (def game (atom {:state :stopped
                  :turn :you
+                 :current-split 0
                  :dealer-wins 0
                  :your-wins 0
                  :result ""}))
@@ -22,8 +23,8 @@
         dealer-card-1 (second local-deck)
         your-card-2 (local-deck 2)
         dealer-card-2 (local-deck 3)]
-    {:you {:card-1 your-card-1, :card-2 your-card-2}
-     :dealer {:card-1 dealer-card-1, :card-2 dealer-card-2}}))
+    {:you [{:card-1 your-card-1, :card-2 your-card-2}]
+     :dealer [{:card-1 dealer-card-1, :card-2 dealer-card-2}]}))
 
 (defn start-game! []
   (do
@@ -44,8 +45,8 @@
   (swap! game assoc :state :stopped :dealer-wins (inc (@game :dealer-wins))))
 
 (defn update-game! []
-  (let [your-value (value :you @hands)
-        dealer-value (value :dealer @hands)
+  (let [your-value (value (nth (@hands :you) (@game :current-split)))
+        dealer-value (value (nth (@hands :dealer) (@game :current-split)))
         dealers-turn-p (= (@game :turn) :dealer)]
     (letfn [(update-result! [result-text]
               (swap! game assoc :result result-text))
@@ -61,16 +62,20 @@
 
 (defn add-hit-card-to-hand! [player card]
   (do
-    (swap! hands assoc-in [player :hits] (vec (conj (-> @hands player :hits) card)))
+    (swap! hands assoc-in [player (@game :current-split) :hits]
+           (vec (conj ((nth (@hands player) (@game :current-split)) :hits) card)))
     (update-game!)))
 
 (defn stand! []
   (do
     (swap! game assoc :turn :dealer)
     (while (= (@game :state) :running)
-      (if (< (value :dealer @hands) dealer-hit-cutoff)
+      (if (< (value (nth (:dealer @hands) (@game :current-split))) dealer-hit-cutoff)
         (add-hit-card-to-hand! :dealer (draw-hit-card!))
         (update-game!)))))
+
+(defn split! []
+  (println "split!"))
 
 (defn game-status [{:keys [state turn dealer-wins your-wins result]} game]
   [:div
@@ -86,14 +91,15 @@
    [game-status @game]
    [:button {:on-click #(start-game!)} "start game"]
    [:div.hand.dealer
-    [:h2 "dealer " (value :dealer @hands)]
-    (let [{{:keys [card-1 card-2 hits]} :dealer} @hands]
-      [card-hand card-1 card-2 hits])]
+    [:h2 "dealer"]
+    (for [{:keys [card-1 card-2 hits]} (@hands :dealer)]
+      ^{:key card-1} [card-hand card-1 card-2 hits])]
    [:div.hand.you
-    [:h2 "you " (value :you @hands)]
-    (let [{{:keys [card-1 card-2 hits]} :you} @hands]
-      [card-hand card-1 card-2 hits])]
+    [:h2 "you"]
+    (for [{:keys [card-1 card-2 hits]} (@hands :you)]
+      ^{:key card-1} [card-hand card-1 card-2 hits])]
    (let [active-p (and (= (@game :turn) :you) (= (@game :state) :running))]
      [:div.controls {:class (if (not active-p) "inactive")}
       [:button {:on-click #(add-hit-card-to-hand! :you (draw-hit-card!))} "hit"]
-      [:button {:on-click #(stand!)} "stand"]])])
+      [:button {:on-click #(stand!)} "stand"]
+      [:button {:on-click #(split!)} "split"]])])

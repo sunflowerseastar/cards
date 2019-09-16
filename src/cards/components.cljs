@@ -10,7 +10,7 @@
    (deck/translate-rank-of rank)])
 
 (defn card-hand [card-1 card-2 hits]
-  [:<>
+  [:div
    [card card-1]
    [card card-2]
    (for [hit-card hits]

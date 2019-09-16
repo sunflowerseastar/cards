@@ -33,5 +33,4 @@
   (vec (shuffler deck weighted-shuffle)))
 
 (defn generate-shoe []
-  (shuffle-deck (generate-deck)))
-
+  (let [d (generate-deck)] (nth (iterate shuffle d) 6)))

@@ -75,6 +75,7 @@ button + button {
 .controls {
   margin-top: 24px;
 }
+button.inactive,
 .inactive button {
   opacity: 0.2;
   cursor: default;

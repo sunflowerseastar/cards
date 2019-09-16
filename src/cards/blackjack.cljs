@@ -108,8 +108,10 @@
     [:h2 "you"]
     (for [{:keys [card-1 card-2 hits]} (@hands :you)]
       ^{:key card-1} [card-hand card-1 card-2 hits])]
-   (let [active-p (and (= (@game :turn) :you) (= (@game :state) :running))]
+   (let [active-p (and (= (@game :turn) :you) (= (@game :state) :running))
+         {:keys [card-1 card-2], :or {card-1 {:suit 's :rank 2} card-2 {:suit 'c :rank 2}}} (nth (@hands :you) (@game :current-split))
+         can-split-p (= (card-1 :rank) (card-2 :rank))]
      [:div.controls {:class (if (not active-p) "inactive")}
       [:button {:on-click #(add-hit-card-to-hand! :you (draw-hit-card!))} "hit"]
       [:button {:on-click #(stand!)} "stand"]
-      [:button {:on-click #(split!)} "split"]])])
+      [:button {:class (if (not can-split-p) "inactive") :on-click #(split!)} "split"]])])

@@ -5,9 +5,16 @@
    [reagent.core :as reagent :refer [atom]]))
 
 (defn card [{:keys [suit rank]}]
-  [:span
+  [:span.card {:key (str suit rank)}
    (svgs/svg-of suit)
    (deck/translate-rank-of rank)])
+
+(defn card-hand [card-1 card-2 hits]
+  [:<>
+   [card card-1]
+   [card card-2]
+   (for [hit-card hits]
+     (card hit-card))])
 
 (defn card-list []
   (let [local-deck (atom (deck/generate-deck))]

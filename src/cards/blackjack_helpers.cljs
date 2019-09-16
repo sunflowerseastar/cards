@@ -4,5 +4,10 @@
   (let [{:keys [card-1 card-2 hits]} hand]
     (vec (filter not-empty (flatten (conj [card-1] [card-2] hits))))))
 
-(defn sum [player hands]
-  (reduce + (map :rank (cards-from-hand (hands player)))))
+(defn translate-rank-to-value [rank]
+  (cond (< rank 11) rank
+        (< rank 14) 10
+        (= rank 14) 11))
+
+(defn value [player hands]
+  (reduce + (map #(translate-rank-to-value (% :rank)) (cards-from-hand (hands player)))))

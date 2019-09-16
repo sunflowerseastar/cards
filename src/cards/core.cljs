@@ -11,8 +11,9 @@
 
 (defn app []
   [:div
-   [:button {:on-click #(reset! screen components/card-list)} "go to card-list"]
-   [:button {:on-click #(reset! screen blackjack/blackjack)} "go to blackjack"]
+   [:div.two-button.white-bg
+    [:button {:on-click #(reset! screen components/card-list)} "card-list"]
+    [:button {:on-click #(reset! screen blackjack/blackjack)} "blackjack"]]
    [@screen]])
 
 (defn mount [el]

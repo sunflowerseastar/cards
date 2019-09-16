@@ -98,8 +98,9 @@
 (defn blackjack []
   [:div
    [game-status @game]
-   [:button {:on-click #(deal!)} "deal"]
-   [:button {:on-click #(reset-game!)} "reset"]
+   [:div.two-button
+    [:button {:on-click #(deal!)} "deal"]
+    [:button {:class (if (= (@game :state) :stopped) "inactive") :on-click #(reset-game!)} "reset"]]
    [:div.hand.dealer
     [:h2 "dealer"]
     (for [{:keys [card-1 card-2 hits]} (@hands :dealer)]

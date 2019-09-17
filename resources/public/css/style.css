@@ -52,13 +52,30 @@ li {
   padding-right: 3px;
 }
 .card-row {
+  position: relative;
   display: flex;
+  opacity: 0.85;
+}
+.card-row.active:after {
+  content: "";
+  width: 1px;
+  height: 96%;
+  background: #ddd;
+  position: absolute;
+  top: 0%;
+  left: 19px;
+}
+.card-row.active {
+  opacity: 1;
+}
+.card-row + .card-row {
+  margin-top: 8px;
 }
 .val {
   position: relative;
   top: -3px;
   min-width: 20px;
-  padding-right: 5px;
+  padding-right: 7px;
   font-size: 15px;
   font-weight: 300;
 }

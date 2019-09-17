@@ -12,12 +12,12 @@
 (defn card-hand [card-1 card-2 hits]
   [:div.card-hand
    [card card-1]
-   [card card-2]
+   (if card-2 [card card-2])
    (for [hit-card hits]
      (card hit-card))])
 
-(defn card-row [value hand card-1 card-2 hits]
-  [:div.card-row
+(defn card-row [value hand card-1 card-2 hits active-p]
+  [:div.card-row {:class (if active-p "active")}
    [:p.val value]
    [card-hand card-1 card-2 hits]])
 

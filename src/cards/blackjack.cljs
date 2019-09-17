@@ -72,8 +72,7 @@
 
 (defn conclude-game! []
   (let [your-values (map value (@hands :you))
-        dealer-value (value (nth (@hands :dealer) 0))
-        more-splits-remaining-p (> (- (count (@hands :you)) 1) (@game :current-split))]
+        dealer-value (value (nth (@hands :dealer) 0))]
     (do
       (doseq [your-value your-values]
         (cond (> your-value 21) (conclude :dealer "dealer wins - you bust")
@@ -122,7 +121,6 @@
   (do
     (add-hit-card-to-hand! :you (draw-hit-card!))
     (let [your-value (value (nth (@hands :you) (@game :current-split)))
-          dealer-value (value (nth (@hands :dealer) 0))
           more-splits-remaining-p (and (= (@game :turn) :you) (> (- (count (@hands :you)) 1) (@game :current-split)))]
       (cond (and more-splits-remaining-p (>= your-value 21)) (play-next-split!)
             (>= your-value 21) (dealer-plays!)))))

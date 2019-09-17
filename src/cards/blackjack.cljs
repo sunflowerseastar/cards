@@ -30,7 +30,8 @@
 
 (defn deal! []
   (do
-    (reset! shoe (generate-shoe))
+    ;; (reset! shoe (generate-shoe))
+    (reset! shoe (cards.deck/generate-specific-shoe [{:suit 's :rank 14} {:suit 'd :rank 2} {:suit 'c :rank 14}]))
     (reset! hands (generate-hands @shoe))
     (reset! draw-counter 4)
     (swap! game assoc :state :running :turn :you :result "")))

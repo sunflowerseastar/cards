@@ -34,3 +34,10 @@
 
 (defn generate-shoe []
   (let [d (generate-deck)] (nth (iterate shuffle d) 6)))
+
+(defn generate-specific-shoe [starting-cards]
+  (->> (generate-shoe)
+       (filter #(not ((into #{} [{:suit 's :rank 14} {:suit 'c :rank 14}]) %)))
+       (conj starting-cards)
+       flatten
+       vec))

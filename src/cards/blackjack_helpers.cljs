@@ -23,7 +23,15 @@
 (defn value-sum [hand translater]
   (reduce + (map #(translater (% :rank)) (cards-from-hand hand))))
 
+(defn value-soft [hand]
+  (let [cards (cards-from-hand hand)]
+    (loop [[{:keys [rank]} & xs] cards ace-p false acc 0]
+      (cond (nil? rank) acc
+            (and (not ace-p) (= rank 14)) (recur xs true (+ acc (translate-rank-soft rank)))
+            (and ace-p (= rank 14)) (recur xs true (+ acc (translate-rank-hard rank)))
+            :else (recur xs true (+ acc (translate-rank-hard rank)))))))
+
 (defn value [hand]
-  (let [soft (value-sum hand translate-rank-soft)
+  (let [soft (value-soft hand)
         hard (value-sum hand translate-rank-hard)]
     (if (has-ace-p hand) (choose-value soft hard) hard)))

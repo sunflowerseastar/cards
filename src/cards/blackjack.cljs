@@ -141,7 +141,7 @@
    [game-status @game]
    [:div.two-button
     [:button {:on-click #(deal!)} "deal"]
-    [:button {:class (if (= (@game :state) :stopped) "inactive") :on-click #(reset-game!)} "reset"]]
+    [:button {:on-click #(reset-game!)} "reset"]]
    [:div.hand.dealer
     [:h2 "dealer"]
     (doall (for [{:keys [card-1 card-2 hits] :as hand} (@hands :dealer)]

@@ -5,6 +5,14 @@
 
 (def deck (atom (generate-deck)))
 
+(defn translate-rank-of [rank]
+  (case rank
+    11 'J
+    12 'Q
+    13 'K
+    14 'A
+    rank))
+
 (defn weighted-shuffle [a b]
   (loop [a a b b l [] probably-a 50]
     (let [r (rand-int 100)]

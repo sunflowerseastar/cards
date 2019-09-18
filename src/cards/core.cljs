@@ -10,17 +10,17 @@
 (def screen (atom blackjack/blackjack))
 
 (defn app []
-  [:div
-   [:div.two-button.white-bg
-    [:button {:on-click #(reset! screen components/card-list)} "card-list"]
-    [:button {:on-click #(reset! screen blackjack/blackjack)} "blackjack"]]
+  [:div.app
+   ;; [:div.two-button.white-bg
+   ;;  [:button {:on-click #(reset! screen components/card-list)} "card-list"]
+   ;;  [:button {:on-click #(reset! screen blackjack/blackjack)} "blackjack"]]
    [@screen]])
 
 (defn mount [el]
   (reagent/render-component [app] el))
 
 (defn get-app-element []
-  (gdom/getElement "app"))
+  (gdom/getElement "app-container"))
 
 (defn mount-app-element []
   (when-let [el (get-app-element)]

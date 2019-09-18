@@ -24,10 +24,3 @@
   [l m]
   (flatten (map vector l m)))
 #+end_src
-
-* todos
-
-- add "push" for tie
-- make Aces high and low
-  - value will be highest non-busting variation (hard vs soft)
-- add split

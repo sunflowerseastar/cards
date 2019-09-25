@@ -1,7 +1,7 @@
 (ns cards.blackjack
   (:require
    [cards.blackjack-helpers :refer [value]]
-   [cards.components :refer [card-hand card-row]]
+   [cards.components :refer [game-status card-hand card-row]]
    [cards.deck :refer [generate-shoe]]
    [cards.svgs :as svgs]
    [reagent.core :as reagent :refer [atom]]))
@@ -126,17 +126,6 @@
           more-splits-remaining-p (and (= (@game :turn) :you) (> (- (count (@hands :you)) 1) (@game :current-split)))]
       (cond (and more-splits-remaining-p (>= your-value 21)) (play-next-split!)
             (>= your-value 21) (dealer-plays!)))))
-
-(defn game-status [{:keys [state turn your-wins dealer-wins pushes current-winner current-split results]} game]
-  [:ul.game-status
-   [:li "your wins: " your-wins]
-   [:li "dealer wins: " dealer-wins]
-   [:li "pushes: " pushes]
-   [:li "state: " state]
-   [:li "turn: " turn]
-   [:li "current-winner: " current-winner]
-   [:li "current-split: " current-split]
-   [:li "results: " (apply str (interpose ", " results))]])
 
 (defn blackjack []
   [:div.blackjack {:class (if (@game :show-stats) "stats-showing")}

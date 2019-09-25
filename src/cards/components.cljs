@@ -4,6 +4,17 @@
    [cards.svgs :as svgs]
    [reagent.core :as reagent :refer [atom]]))
 
+(defn game-status [{:keys [state turn your-wins dealer-wins pushes current-winner current-split results]} game]
+  [:ul.game-status
+   [:li "your wins: " your-wins]
+   [:li "dealer wins: " dealer-wins]
+   [:li "pushes: " pushes]
+   [:li "state: " state]
+   [:li "turn: " turn]
+   [:li "current-winner: " current-winner]
+   [:li "current-split: " current-split]
+   [:li "results: " (apply str (interpose ", " results))]])
+
 (defn card [{:keys [suit rank]} & [down-p]]
   (if down-p
     [:span.card {:key (str suit rank)} "X"]

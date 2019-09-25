@@ -4,22 +4,24 @@
    [cards.svgs :as svgs]
    [reagent.core :as reagent :refer [atom]]))
 
-(defn card [{:keys [suit rank]}]
-  [:span.card {:key (str suit rank)}
-   (svgs/svg-of suit)
-   (deck/translate-rank-of rank)])
+(defn card [{:keys [suit rank]} & [down-p]]
+  (if down-p
+    [:span.card {:key (str suit rank)} "X"]
+    [:span.card {:key (str suit rank)}
+     (svgs/svg-of suit)
+     (deck/translate-rank-of rank)]))
 
-(defn card-hand [card-1 card-2 hits]
+(defn card-hand [card-1 card-2 hits & [down-p]]
   [:div.card-hand
-   [card card-1]
+   [card card-1 down-p]
    (if card-2 [card card-2])
    (for [hit-card hits]
      (card hit-card))])
 
-(defn card-row [value hand card-1 card-2 hits active-p]
+(defn card-row [value hand card-1 card-2 hits active-p & [down-p]]
   [:div.card-row {:class (if active-p "active")}
-   [:p.val value]
-   [card-hand card-1 card-2 hits]])
+   (if (not down-p) [:p.val value])
+   [card-hand card-1 card-2 hits down-p]])
 
 (defn card-list []
   (let [local-deck (atom (deck/generate-deck))]

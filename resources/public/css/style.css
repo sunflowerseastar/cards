@@ -8,6 +8,7 @@ body {
 	font-family: 'iosevka ss05', Menlo, 'Andale Mono', monospace;
 	color: black;
 	font-weight: 500;
+  touch-action: manipulation;
 }
 h2 {
 	display: inline-block;

@@ -1,38 +1,30 @@
 (ns cards.blackjack-helpers
   (:require [tupelo.core :refer [spyx]]))
 
-(defn cards-from-hand [hand]
+(defn hand->flat-hand
+  "Take a player hand and return a 'flat-hand',
+  e.g. [{:card-1 ...} {:card-2 ...} {:hits [...]}] -> [{:suit 's :rank 14} ...]"
+  [hand]
   (let [{:keys [card-1 card-2 hits]} hand]
     (vec (filter not-empty (flatten (conj [card-1] [card-2] hits))))))
 
-(defn translate-rank-soft [rank]
-  (cond (< rank 11) rank
-        (< rank 14) 10
-        (= rank 14) 11))
-
-(defn translate-rank-hard [rank]
+(defn rank->value [rank]
   (cond (< rank 11) rank
         (< rank 14) 10
         (= rank 14) 1))
 
-(defn has-ace-p [hand]
-  (some #(= (% :rank) 14) (cards-from-hand hand)))
+(defn flat-hand->soft-value
+  "Calculate soft hand total (even if over 21)."
+  [flat-hand]
+  (loop [[{:keys [rank]} & xs] flat-hand is-first-ace-in-hand true acc 0]
+    (cond (nil? rank) acc
+          (and (= rank 14) is-first-ace-in-hand) (recur xs false (+ acc 11))
+          :else (recur xs is-first-ace-in-hand (+ acc (rank->value rank))))))
 
-(defn choose-value [soft hard]
-  (if (<= soft 21) soft hard))
-
-(defn value-sum [hand translater]
-  (reduce + (map #(translater (% :rank)) (cards-from-hand hand))))
-
-(defn value-soft [hand]
-  (let [cards (cards-from-hand hand)]
-    (loop [[{:keys [rank]} & xs] cards ace-p false acc 0]
-      (cond (nil? rank) acc
-            (and (not ace-p) (= rank 14)) (recur xs true (+ acc (translate-rank-soft rank)))
-            (and ace-p (= rank 14)) (recur xs true (+ acc (translate-rank-hard rank)))
-            :else (recur xs true (+ acc (translate-rank-hard rank)))))))
-
-(defn value [hand]
-  (let [soft (value-soft hand)
-        hard (value-sum hand translate-rank-hard)]
-    (if (has-ace-p hand) (choose-value soft hard) hard)))
+(defn value
+  "Determine hand value, which will be soft if possible."
+  [hand]
+  (let [flat-hand (hand->flat-hand hand)
+        soft-value (flat-hand->soft-value flat-hand)
+        hard-value (reduce + (map #(rank->value (% :rank)) flat-hand))]
+    (if (<= soft-value 21) soft-value hard-value)))

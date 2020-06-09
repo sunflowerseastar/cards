@@ -8,6 +8,7 @@
 
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.10.339"]
+                 [tupelo "0.9.212"]
                  [reagent "0.8.1"]]
 
   :source-paths ["src"]
@@ -18,6 +19,4 @@
             "fig:test"  ["run" "-m" "figwheel.main" "-co" "test.cljs.edn" "-m" cards.test-runner]}
 
   :profiles {:dev {:dependencies [[com.bhauman/figwheel-main "0.1.9"]
-                                  [com.bhauman/rebel-readline-cljs "0.1.4"]]
-                   }})
-
+                                  [com.bhauman/rebel-readline-cljs "0.1.4"]]}})

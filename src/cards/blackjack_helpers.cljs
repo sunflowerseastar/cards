@@ -1,4 +1,5 @@
-(ns cards.blackjack-helpers)
+(ns cards.blackjack-helpers
+  (:require [tupelo.core :refer [spyx]]))
 
 (defn cards-from-hand [hand]
   (let [{:keys [card-1 card-2 hits]} hand]

@@ -141,17 +141,17 @@
     [:h2 {:class (if (= (@game :current-winner) :dealer) "win")} "dealer"]
     (doall (for [{:keys [card-1 card-2 hits] :as hand} (@hands :dealer)]
              ^{:key card-1}
-             [card-row (value hand) hand card-1 card-2 hits
-              (= (@game :turn) :dealer)
-              (= (@game :turn) :you)]))]
+             (card-row (value hand) card-1 card-2 hits
+                       (= (@game :turn) :dealer)
+                       (= (@game :turn) :you))))]
    [:div.hand.you
     [:h2 {:class (if (= (@game :current-winner) :you) "win")} "you"]
     (doall (map-indexed
             (fn [index {:keys [card-1 card-2 hits] :as hand}]
-              ^{:key card-1} [card-row (value hand) hand card-1 card-2 hits
-                              (and (= (@game :turn) :you)
-                                   (> (count (@hands :you)) 1)
-                                   (= index (@game :current-split)))])
+              ^{:key card-1} (card-row (value hand) card-1 card-2 hits
+                                       (and (= (@game :turn) :you)
+                                            (> (count (@hands :you)) 1)
+                                            (= index (@game :current-split)))))
             (@hands :you)))]
    (let [active-p (and (= (@game :turn) :you) (= (@game :state) :running))
          {:keys [card-1 card-2 hits], :or {card-1 {} card-2 {} hits []}}

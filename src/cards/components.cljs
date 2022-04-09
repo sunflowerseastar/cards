@@ -29,10 +29,10 @@
    (for [hit-card hits]
      (card hit-card))])
 
-(defn card-row [value hand card-1 card-2 hits active-p & [down-p]]
+(defn card-row [value card-1 card-2 hits active-p & [down-p]]
   [:div.card-row {:class (if active-p "active")}
    (if (not down-p) [:p.val value])
-   [card-hand card-1 card-2 hits down-p]])
+   (card-hand card-1 card-2 hits down-p)])
 
 (defn card-list []
   (let [local-deck (atom (deck/generate-deck))]

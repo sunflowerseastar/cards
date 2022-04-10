@@ -30,15 +30,18 @@
           t-rank (deck/translate-rank-of rank)
           is-face (and (> rank 10) (< rank 14))
           is-ace (= rank 14)]
-      (cond
-        is-ace [:span.card-alt suit-svg t-rank]
-        is-face [:span.card-alt suit-svg t-rank]
-        :else
-        [:span.card-alt (repeat rank suit-svg) t-rank]))))
+      [:span.card-container
+       [:span.card-left (svgs/svg-number rank) suit-svg]
+       [:span.card-middle {:class ["suit-svgs" (str "rank-" rank)]}
+        (cond
+          is-ace [:span suit-svg]
+          is-face [:span suit-svg t-rank]
+          :else (into [:<>] (repeat rank suit-svg)))]
+       [:span.card-right (svgs/svg-number rank) suit-svg]])))
 
 (defn card-hand [card-1 card-2 hits & [down-p]]
   [:div.card-hand
-   [card-alt card-1 down-p]
+   (card-alt card-1 down-p)
    (if card-2 [card-alt card-2])
    (for [hit-card hits]
      (card-alt hit-card))])
@@ -49,24 +52,20 @@
    (card-hand card-1 card-2 hits down-p)])
 
 (defn card-list []
-  (let [local-deck (atom (deck/generate-deck))]
-    (fn []
-      [:div.card-list-container
-       [:div.card-list-2
-        "hi"
-        [:div.hand-2
-         (card-alt {:suit 's :rank 14})
-         (card-hand {:suit 'c :rank 2} {:suit 'd :rank 5} [])
-         ;; (card-row 10 {:suit 'h :rank 11} {:suit 'd :rank 4} [] nil)
-         ]]
+  (let [deck (deck/generate-deck)]
+    [:div.card-list-container
 
-       [:div.card-list
-        (svgs/svg-of 's)
-        (svgs/svg-of 'c)
-        (svgs/svg-of 'd)
-        (svgs/svg-of 'h)
-        [:button {:on-click #(swap! local-deck deck/shuffle-deck)} "shuffle"]
-        [:button {:on-click #(swap! local-deck deck/generate-deck)} "sort"]
-        [:ul
-         (for [current-card @local-deck] [:p {:key (apply str [(:suit current-card) (:rank current-card)])}
-                                          (svgs/svg-of (:suit current-card)) " " (deck/translate-rank-of (:rank current-card))])]]])))
+     [:div.card-list-controls
+      [:button {:on-click #(swap! deck deck/shuffle-deck)} "shuffle"]
+      [:button {:on-click #(swap! deck deck/generate-deck)} "sort"]]
+
+     ;; (card-alt (first deck))
+     ;; (->> deck (take 1) #(card-alt %))
+     (into [:div.card-list] (map card-alt deck))
+     ;; (into [:div.card-list] (map card-alt (take 9 deck)))
+
+     [:div
+      (svgs/svg-of 's)
+      (svgs/svg-of 'c)
+      (svgs/svg-of 'd)
+      (svgs/svg-of 'h)]]))

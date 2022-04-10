@@ -7,7 +7,8 @@
    [goog.dom :as gdom]
    [reagent.core :as reagent :refer [atom create-class]]))
 
-(def screen (atom blackjack/blackjack))
+;; (def screen (atom blackjack/blackjack))
+(def screen (atom components/card-list))
 
 (defonce has-initially-loaded (atom false))
 
@@ -18,9 +19,9 @@
     :reagent-render
     (fn [this]
       [:div.app.fade-in-1 {:class [(if @has-initially-loaded "has-initially-loaded")]}
-       ;; [:div.two-button.white-bg
-       ;;  [:button {:on-click #(reset! screen components/card-list)} "card-list"]
-       ;;  [:button {:on-click #(reset! screen blackjack/blackjack)} "blackjack"]]
+       [:div.two-button.white-bg
+        [:button {:on-click #(reset! screen components/card-list)} "card-list"]
+        [:button {:on-click #(reset! screen blackjack/blackjack)} "blackjack"]]
        [@screen]])}))
 
 (defn mount [el]

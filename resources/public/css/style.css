@@ -23,6 +23,9 @@ img {
   top: 50%;
   transform: translateY(-42%);
 }
+svg {
+  max-width: 100px;
+}
 @media (min-width: 1080px) {
   img {
     transform: translateY(-60%);
@@ -275,4 +278,21 @@ button.inactive,
 .has-initially-loaded,
 .has-initially-loaded .fade-in-1 {
   opacity: 1;
+}
+
+/* card-list */
+
+.card-list svg {
+  max-width: 20px;
+}
+.card-list-2 {
+  border: 1px solid red;
+}
+.hand-2 {
+
+}
+.card-alt {
+  border: 1px solid cyan;
+  max-width: 80px;
+
 }

@@ -316,8 +316,11 @@ button.inactive,
      after its rotate(180deg) */
   padding-right: calc(var(--card-width) * 0.028);
 }
-.card-left .number {
+.number {
   padding-bottom: calc(var(--card-width) * 0.03);
+}
+.number.red {
+  fill: red;
 }
 .card-right {
   transform: rotate(180deg);
@@ -476,7 +479,6 @@ button.inactive,
 .card-middle-right svg:nth-child(n + 3),
 .card-middle-middle svg:nth-child(n + 2) {
   transform: scaleY(-1);
-
 }
 .card-middle-left {
   align-items: flex-start;

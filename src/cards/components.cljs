@@ -32,7 +32,7 @@
           is-ace (= rank 14)
           is-red (or (= suit 'diamond) (= suit 'heart))]
       [:span.card-container
-       [:span.card-left (svgs/svg-number rank is-red) suit-svg]
+       [:span.card-left (svgs/svg-rank rank is-red) suit-svg]
        [:span.card-middle {:class ["suit-svgs" (str "rank-" rank)]}
         (cond
           is-ace [:span suit-svg]
@@ -49,7 +49,7 @@
                        (into [:span.card-middle-middle] (repeat 2 suit-svg))
                        (into [:span.card-middle-right] (repeat 4 suit-svg))]
           :else (into [:<>] (repeat rank suit-svg)))]
-       [:span.card-right (svgs/svg-number rank is-red) suit-svg]])))
+       [:span.card-right (svgs/svg-rank rank is-red) suit-svg]])))
 
 (defn card-hand [card-1 card-2 hits & [down-p]]
   [:div.card-hand

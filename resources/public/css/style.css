@@ -303,8 +303,8 @@ button.inactive,
   justify-content: space-between;
   width: var(--card-width);
   height: calc(1.37 * var(--card-width));
-  border: 1px solid #eee;
-  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+  border: 1px solid #f1f1f1;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.11), 1px 1px 0 rgba(0, 0, 0, 0.13);
   padding: calc(var(--card-width) * 0.04) calc(var(--card-width) * 0.037);
   border-radius: calc(var(--card-width) * 0.05);
   margin: 20px;

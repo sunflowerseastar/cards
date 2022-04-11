@@ -36,6 +36,14 @@
         (cond
           is-ace [:span suit-svg]
           is-face [:span suit-svg t-rank]
+          (= rank 9) [:<>
+                      (into [:span.card-middle-left] (repeat 4 suit-svg))
+                      [:span.card-middle-middle suit-svg]
+                      (into [:span.card-middle-right] (repeat 4 suit-svg))]
+          (= rank 10) [:<>
+                       (into [:span.card-middle-left] (repeat 4 suit-svg))
+                       (into [:span.card-middle-middle] (repeat 2 suit-svg))
+                       (into [:span.card-middle-right] (repeat 4 suit-svg))]
           :else (into [:<>] (repeat rank suit-svg)))]
        [:span.card-right (svgs/svg-number rank) suit-svg]])))
 

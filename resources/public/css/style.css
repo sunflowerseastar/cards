@@ -1,5 +1,12 @@
 :root {
-  --card-width: 110px;
+  /* --card-width: 500px; */
+  /* --card-width: 310px; */
+  /* --card-width: 200px; */
+  --card-width: 100px;
+}
+
+svg {
+  /* max-width: 200px; */
 }
 
 html,
@@ -26,9 +33,6 @@ img {
   position: relative;
   top: 50%;
   transform: translateY(-42%);
-}
-svg {
-  max-width: 200px;
 }
 @media (min-width: 1080px) {
   img {
@@ -299,7 +303,8 @@ button.inactive,
   justify-content: space-between;
   width: var(--card-width);
   height: calc(1.37 * var(--card-width));
-  border: 1px solid #ccc;
+  border: 1px solid #eee;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
   padding: calc(var(--card-width) * 0.04) calc(var(--card-width) * 0.037);
   border-radius: calc(var(--card-width) * 0.05);
   margin: 20px;
@@ -340,6 +345,7 @@ button.inactive,
   justify-content: space-between;
   align-items: center;
 }
+.card-middle.rank-2 .suit-svg:last-child,
 .card-middle.rank-3 .suit-svg:last-child {
   transform: scaleY(-1);
 }
@@ -499,4 +505,33 @@ button.inactive,
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.card-middle {
+  /* border: 1px solid cyan; */
+}
+.svg-face {
+  /* border: 1px solid; */
+  /* transform-origin: 50%; */
+  /* transform: scale(1, 1) !important; */
+  /* transform-origin: 0% 0% !important; */
+}
+.face-card-middle {
+  position: relative;
+  display: flex;
+  height: 100%;
+}
+.face-card-suit-left {
+  position: absolute;
+  left: 1%;
+  top: 0.6%;
+  transform: scale(0.83);
+  transform-origin: 50%;
+}
+.face-card-suit-right {
+  position: absolute;
+  right: 1%;
+  bottom: 0.6%;
+  transform: scale(0.83) scaleY(-1);
+  transform-origin: 50%;
 }

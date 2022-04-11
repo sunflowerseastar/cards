@@ -36,7 +36,10 @@
        [:span.card-middle {:class ["suit-svgs" (str "rank-" rank)]}
         (cond
           is-ace [:span suit-svg]
-          is-face [:span suit-svg t-rank]
+          is-face [:span.face-card-middle
+                   (svgs/svg-face suit rank)
+                   [:span.face-card-suit-left suit-svg]
+                   [:span.face-card-suit-right suit-svg]]
           (= rank 9) [:<>
                       (into [:span.card-middle-left] (repeat 4 suit-svg))
                       [:span.card-middle-middle suit-svg]
@@ -69,6 +72,7 @@
       [:button {:on-click #(swap! deck deck/generate-deck)} "sort"]]
 
      ;; (card-alt (first deck))
+     ;; (card-alt {:suit 'spade :rank 12})
      ;; (->> deck (take 1) #(card-alt %))
      (into [:div.card-list] (map card-alt deck))
      ;; (into [:div.card-list] (map card-alt (take 9 deck)))

@@ -71,12 +71,22 @@ svg {
   height: 50px;
   background: #eee;
 }
-.is-modal-showing > div {
-  opacity: 0.1;
-  filter: blur(2px);
+.blocker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  opacity: 0;
   pointer-events: none;
+  background: rgba(0, 0, 0, 0);
 }
-.stats {
+.blocker.is-modal-showing {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.3);
+}
+.modal {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -84,23 +94,23 @@ svg {
   right: 0;
   display: flex;
   padding: 0 var(--space-md);
-  border: 1px solid #888;
   opacity: 0;
   pointer-events: none;
+  z-index: 2;
 }
-.stats.active {
+.modal.is-modal-showing {
   flex: 1;
-  opacity: 1 !important;
-  pointer-events: initial !important;
-  filter: blur(0) !important;
+  opacity: 1;
+  pointer-events: initial;
 }
-.game-status {
+.game-state-component {
   flex: 1;
   align-self: center;
   max-width: 320px;
   margin: 0 auto;
   padding: var(--space-md);
   border: 1px solid #bbb;
+  background: #fff;
 }
 
 /* card display */
@@ -145,27 +155,22 @@ svg {
 .player-container {
 }
 
-.hand.is-hand-active:after {
-  content: '';
-  width: 1px;
-  height: 96%;
-  background: #ddd;
-  position: absolute;
-  top: 0%;
-  left: 19px;
+.hand {
+  position: relative;
+  padding: var(--space-sm);
+  margin: 0 calc(var(--space-sm) * -1);
 }
 .hand.is-hand-active {
   opacity: 1;
-  border: 3px solid red !important;
+  background: #f4f4f4;
 }
-.val {
-  position: relative;
-  top: -3px;
-  min-width: 20px;
-  padding-right: 7px;
+.hand-meta {
+  position: absolute;
+  top: 0;
+  right: 0;
   font-size: 15px;
   font-weight: 300;
-  border: 1px solid cyan;
+  border: 1px solid magenta;
 }
 
 .hands {
@@ -266,28 +271,6 @@ button.inactive,
 .diamond {
   fill: red;
 }
-.card {
-  display: inline-block;
-  min-width: 36px;
-  min-height: 34px;
-  font-size: 24px;
-  text-align: center;
-  color: black;
-  font-weight: 800;
-  border: 1px solid #ddd;
-  padding: 6px 10px 6px 6px;
-  border: 1px solid magenta;
-}
-.card + .card {
-  margin-left: 8px;
-}
-.card svg {
-  position: relative;
-  width: 20px;
-  height: 18px;
-  padding-right: 3px;
-}
-
 .card-container {
   /* display: flex; */
   display: inline-flex;
@@ -299,6 +282,7 @@ button.inactive,
   padding: calc(var(--card-width) * 0.04) calc(var(--card-width) * 0.037);
   border-radius: calc(var(--card-width) * 0.05);
   margin: 5px;
+  background: #fff;
 }
 .card-left,
 .card-right {
@@ -530,7 +514,7 @@ button.inactive,
 /* utility */
 
 .fade-in-1 {
-  transition: opacity 1.2s ease-in-out;
+  transition: opacity 0.6s ease-in-out;
   opacity: 0;
 }
 .has-initially-loaded,

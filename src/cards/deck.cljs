@@ -39,6 +39,7 @@
 
 (defn generate-specific-deck [starting-cards]
   (->> (generate-deck)
+       ;; TODO fix this
        (filter #(not ((into #{} [{:suit 's :rank 14} {:suit 'c :rank 14}]) %)))
        (conj starting-cards)
        flatten

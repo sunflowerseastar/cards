@@ -4,16 +4,9 @@
    [cards.svgs :as svgs]
    [reagent.core :as reagent :refer [atom]]))
 
-(defn game-status [{:keys [state turn your-wins dealer-wins pushes current-winner current-split results]} game]
-  [:div.game-status
-   [:p "your wins: " your-wins]
-   [:p "dealer wins: " dealer-wins]
-   [:p "pushes: " pushes]
-   [:p "state: " state]
-   [:p "turn: " turn]
-   [:p "current-winner: " current-winner]
-   [:p "current-split: " current-split]
-   [:p "results: " (apply str (interpose ", " results))]])
+;; --------------------
+;; game play components
+;; --------------------
 
 (defn card-component
   "Given a 'card' state, return markup of that card."
@@ -21,7 +14,8 @@
   (if down-p
     ;; TODO make the back of card
     ;; TODO move the back of card to a different function (lift down-p)
-    [:span.card "X"]
+    ;; TODO make dealer's card face-down to start
+    [:span.card-container "X"]
     (let [suit-svg (svgs/svg-of suit)
           t-rank (deck/translate-rank-of rank)
           is-face (and (> rank 10) (< rank 14))
@@ -48,16 +42,16 @@
        [:span.card-right (svgs/svg-rank rank is-red) suit-svg]])))
 
 (defn hand-component
-  "Given a hand, show hand meta (state) and the cards themselves."
-  [{:keys [card-1 card-2 hits] :as hand} is-active]
-  [:div.hand {:class (if is-active "is-hand-active")}
-   (card-component card-1)
-   (when card-2 (card-component card-2))
-   (into [:<>] (map #(card-component %) hits))])
+  "Given a hand, show hand meta (state), and the cards themselves."
+  [hand hand-value is-active]
+  [:div.hand {:class (when is-active "is-hand-active")}
+   [:div.hand-meta
+    [:span hand-value]]
+   (into [:<>] (map #(card-component %) hand))])
 
-;; --------------------------------
-;; DISPLAY is not part of game play
-;; --------------------------------
+;; ----------------
+;; other components
+;; ----------------
 
 (defn card-display []
   (let [local-deck (atom (deck/generate-deck))]
@@ -70,3 +64,15 @@
             ;; (card-component (first local-deck))
             ;; (card-component {:suit 'spade :rank 12})
             (into [:div.card-display] (map card-component @local-deck))])))
+
+(defn game-state-component [{:keys [state turn your-wins dealer-wins pushes current-winner current-split results]} reset-modal-fn]
+  [:div.game-state-component
+   [:p "your wins: " your-wins]
+   [:p "dealer wins: " dealer-wins]
+   [:p "pushes: " pushes]
+   [:p "state: " state]
+   [:p "turn: " turn]
+   [:p "current-winner: " current-winner]
+   [:p "current-split: " current-split]
+   [:p "results: " (apply str (interpose ", " results))]
+   [:button {:on-click #(reset-modal-fn)} "reset"]])

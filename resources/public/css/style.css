@@ -2,7 +2,10 @@
   /* --card-width: 500px; */
   /* --card-width: 310px; */
   /* --card-width: 200px; */
-  --card-width: 100px;
+  /* --card-width: 100px; */
+  --card-width: 60px;
+
+  --green: #b1e597;
 }
 
 svg {
@@ -40,10 +43,11 @@ img {
   }
 }
 
-.logo-container {
-  display: flex;
-  padding: 3em 0 2em;
-  text-align: center;
+.logo-container a {
+  display: block;
+  width: 50px;
+  height: 50px;
+  background: #eee;
 }
 .stats {
   position: absolute;
@@ -68,27 +72,15 @@ img {
   align-self: center;
   max-width: 320px;
   margin: 0 auto;
-  padding: 1em 30px 1.4em 40px;
-  min-height: 16.5vh;
+  padding: 2em;
   border: 1px solid #bbb;
-}
-@media (min-width: 768px) {
-  .game-status {
-    padding: 15px 30px 18px 40px;
-    margin-bottom: 0.8em;
-  }
-}
-.game-status li {
-  font-size: 11px;
-  list-style: square;
-  text-align: left;
 }
 
 .app {
   height: 100vh;
 }
 
-.blackjack {
+.main {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -98,36 +90,20 @@ img {
   margin: 0 auto;
   padding: 4vw 6vw;
 }
-.blackjack > div {
-  transition: all 0.6s cubic-bezier(0.3, 0.8, 0.1, 0.95);
-}
-.blackjack.stats-showing > div {
+.main.stats-showing > div {
   opacity: 0.1;
   filter: blur(2px);
   pointer-events: none;
 }
 @media (min-width: 768px) {
-  .blackjack {
+  .main {
     padding: 2em 4em;
   }
 }
 
-.club g {
-  transform: translate(0, 1280px) scale(0.1, -0.1);
-}
-.heart,
-.diamond {
-  fill: red;
-}
 
 .hand {
-  white-space: break-spaces;
-}
-.hand.dealer {
-  min-height: 120px;
-}
-.hand.you {
-  min-height: 27vh;
+  border: 1px solid magenta;
 }
 .win {
   position: relative;
@@ -140,9 +116,17 @@ img {
   bottom: -6px;
   width: 100%;
   height: 1px;
-  background: #bbb;
+  background: var(--green);
 }
 
+.club g {
+  /* TODO - do I still need this? */
+  transform: translate(0, 1280px) scale(0.1, -0.1);
+}
+.heart,
+.diamond {
+  fill: red;
+}
 .card {
   display: inline-block;
   min-width: 36px;
@@ -192,6 +176,7 @@ img {
   padding-right: 7px;
   font-size: 15px;
   font-weight: 300;
+  border: 1px solid cyan;
 }
 .card-hand {
   flex: 1;
@@ -307,7 +292,7 @@ button.inactive,
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.11), 1px 1px 0 rgba(0, 0, 0, 0.13);
   padding: calc(var(--card-width) * 0.04) calc(var(--card-width) * 0.037);
   border-radius: calc(var(--card-width) * 0.05);
-  margin: 20px;
+  margin: 5px;
 }
 .card-left,
 .card-right {

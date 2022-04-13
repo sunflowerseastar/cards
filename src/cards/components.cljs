@@ -5,24 +5,24 @@
    [reagent.core :as reagent :refer [atom]]))
 
 (defn game-status [{:keys [state turn your-wins dealer-wins pushes current-winner current-split results]} game]
-  [:ul.game-status
-   [:li "your wins: " your-wins]
-   [:li "dealer wins: " dealer-wins]
-   [:li "pushes: " pushes]
-   [:li "state: " state]
-   [:li "turn: " turn]
-   [:li "current-winner: " current-winner]
-   [:li "current-split: " current-split]
-   [:li "results: " (apply str (interpose ", " results))]])
+  [:div.game-status
+   [:p "your wins: " your-wins]
+   [:p "dealer wins: " dealer-wins]
+   [:p "pushes: " pushes]
+   [:p "state: " state]
+   [:p "turn: " turn]
+   [:p "current-winner: " current-winner]
+   [:p "current-split: " current-split]
+   [:p "results: " (apply str (interpose ", " results))]])
 
-(defn card [{:keys [suit rank]} & [down-p]]
-  (if down-p
-    [:span.card {:key (str suit rank)} "X"]
-    [:span.card {:key (str suit rank)}
-     (svgs/svg-of suit)
-     (deck/translate-rank-of rank)]))
+;; (defn card-component [{:keys [suit rank]} & [down-p]]
+;;   (if down-p
+;;     [:span.card {:key (str suit rank)} "X"]
+;;     [:span.card {:key (str suit rank)}
+;;      (svgs/svg-of suit)
+;;      (deck/translate-rank-of rank)]))
 
-(defn card-alt [{:keys [suit rank]} & [down-p]]
+(defn card-component [{:keys [suit rank]} & [down-p]]
   (if down-p
     ;; TODO make the back of card
     [:span.card "X"]
@@ -51,17 +51,33 @@
           :else (into [:<>] (repeat rank suit-svg)))]
        [:span.card-right (svgs/svg-rank rank is-red) suit-svg]])))
 
-(defn card-hand [card-1 card-2 hits & [down-p]]
+(defn card-hand-old [card-1 card-2 hits & [down-p]]
   [:div.card-hand
-   (card-alt card-1 down-p)
-   (if card-2 [card-alt card-2])
-   (for [hit-card hits]
-     (card-alt hit-card))])
+   (card-component card-1 down-p)
+   ;; (when card-2 [card card-2])
+   ;; (for [hit-card hits]
+   ;;   (card-component hit-card))
+   ])
+
+(defn hand-component [{:keys [card-1 card-2 hits] :as hand}]
+  [:div.card-hand
+   ;; "hi"
+   (card-component card-1)
+   (when card-2 (card-component card-2))
+   ;; (for [hit-card hits] (card-component hit-card))
+   ])
+;; (defn card-hand [{:keys [card-1 card-2 hits]} & [down-p]]
+;;   [:div.card-hand
+;;    (card-component card-1 down-p)
+;;    (if card-2 [card-component card-2])
+;;    (for [hit-card hits]
+;;      (card-component hit-card))])
 
 (defn card-row [value card-1 card-2 hits active-p & [down-p]]
   [:div.card-row {:class (if active-p "active")}
-   (if (not down-p) [:p.val value])
-   (card-hand card-1 card-2 hits down-p)])
+   (when (not down-p) [:p.val value])
+   ;; (card-hand-old card-1 card-2 hits down-p)
+   ])
 
 (defn card-list []
   (let [deck (deck/generate-deck)]
@@ -71,11 +87,11 @@
       [:button {:on-click #(swap! deck deck/shuffle-deck)} "shuffle"]
       [:button {:on-click #(swap! deck deck/generate-deck)} "sort"]]
 
-     ;; (card-alt (first deck))
-     ;; (card-alt {:suit 'spade :rank 12})
-     ;; (->> deck (take 1) #(card-alt %))
-     (into [:div.card-list] (map card-alt deck))
-     ;; (into [:div.card-list] (map card-alt (take 9 deck)))
+     ;; (card-component (first deck))
+     ;; (card-component {:suit 'spade :rank 12})
+     ;; (->> deck (take 1) #(card-component %))
+     (into [:div.card-list] (map card-component deck))
+     ;; (into [:div.card-list] (map card-component (take 9 deck)))
 
      [:div
       (svgs/svg-of 's)

@@ -7,8 +7,8 @@
    [goog.dom :as gdom]
    [reagent.core :as reagent :refer [atom create-class]]))
 
-;; (def screen (atom blackjack/blackjack))
-(def screen (atom components/card-list))
+(def screen (atom blackjack/blackjack))
+;; (def screen (atom components/card-list))
 
 (defonce has-initially-loaded (atom false))
 

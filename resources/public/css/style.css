@@ -3,7 +3,7 @@
   /* --card-width: 310px; */
   /* --card-width: 200px; */
   /* --card-width: 100px; */
-  --card-width: 60px;
+  --card-width: 67px;
 
   --green: #b1e597;
 
@@ -28,6 +28,7 @@ body {
 h2 {
   display: inline-block;
   font-size: 16px;
+  color: #333;
   margin: var(--space-md) 0 var(--space-sm);
   font-weight: normal;
 }
@@ -159,22 +160,31 @@ svg {
   position: relative;
   padding: var(--space-sm);
   margin: 0 calc(var(--space-sm) * -1);
+  background: linear-gradient(38deg, #fcfcfc, #fff);
+  border-width: 1px;
+  border-style: solid;
+  border-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0)) 1 100%;
 }
 .hand.is-hand-active {
-  opacity: 1;
-  background: #f4f4f4;
+  background: linear-gradient(38deg, #fdfdfd, #f8f8f8, #fff);
+  border-width: 1px;
+  border-style: solid;
+  border-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0)) 1 100%;
 }
 .hand-meta {
+  padding: var(--space-sm);
   position: absolute;
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  justify-content: center;
+  height: 100%;
+  box-sizing: border-box;
   top: 0;
   right: 0;
   font-weight: 300;
-  border: 1px solid magenta;
 }
 
-.hands {
-  border: 2px solid yellowd;
-}
 .hand {
   flex: 1;
   white-space: nowrap;
@@ -252,7 +262,6 @@ button.inactive,
   fill: red;
 }
 .card-container {
-  /* display: flex; */
   display: inline-flex;
   justify-content: space-between;
   width: var(--card-width);

@@ -10,10 +10,10 @@
 
 (defn card-component
   "Given a 'card' state, return markup of that card."
+  ;; TODO change [down-p] -> down-p
   [{:keys [suit rank]} & [down-p]]
   (if down-p
     ;; TODO make the back of card
-    ;; TODO move the back of card to a different function (lift down-p)
     ;; TODO make dealer's card face-down to start
     [:span.card-container "X"]
     (let [suit-svg (svgs/svg-of suit)
@@ -43,6 +43,7 @@
 
 (defn hand-component
   "Given a hand, show hand meta (state), and the cards themselves."
+  ;; TODO show which hands win, lose, or both (ex. dealer wins against one split and loses against one)
   [hand hand-value is-active]
   [:div.hand {:class (when is-active "is-hand-active")}
    [:div.hand-meta

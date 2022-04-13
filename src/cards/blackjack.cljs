@@ -149,15 +149,14 @@
 
        [:div.player-container.dealer
         [:h2 {:class (if (= (:current-winner @game) :dealer) "win")} "dealer"]
-        [:div.hands
-         (let [hand (first (:dealer @hands))
-               value (hand->value hand)
-               is-active false]
-           (when hand (hand-component hand (hand->value hand) is-active)))]]
+        (let [hand (first (:dealer @hands))
+              value (hand->value hand)
+              is-active false]
+          (hand-component hand (hand->value hand) is-active))]
 
        [:div.player-container.you
         [:h2 {:class (if (= (:current-winner @game) :you) "win")} "you"]
-        (into [:div.hands]
+        (into [:<>]
               (->> (@hands :you)
                    (map-indexed
                     (fn [i hand]

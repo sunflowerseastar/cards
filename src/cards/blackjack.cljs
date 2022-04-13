@@ -2,7 +2,7 @@
   (:require
    [cards.blackjack-helpers :refer [hand->value]]
    [cards.components :refer [game-status hand-component card-row]]
-   [cards.deck :refer [generate-shoe]]
+   [cards.deck :refer [generate-shuffled-deck]]
    [cards.svgs :as svgs]
    [reagent.core :as reagent :refer [atom]]))
 
@@ -23,7 +23,8 @@
                          :results []})
 
 (def game (atom game-initial-state))
-(def shoe (atom (generate-shoe)))
+;; TODO actually use the shoe... this is a deck, not a shoe
+(def deck (atom (generate-shuffled-deck)))
 ;; Ex. {:you [{:card-1 {:suit diamond, :rank 7}, :card-2 {:suit diamond, :rank 14}}],
 ;;      :dealer [{:card-1 {:suit heart, :rank 2}, :card-2 {:suit heart, :rank 8}}]}
 ;; Dealer gets a vector of hands, although in practice the dealer always has only one hand.
@@ -40,7 +41,7 @@
 
 (defn reset-game! []
   (do
-    (reset! shoe generate-shoe)
+    (reset! deck generate-shuffled-deck)
     (reset! hands {})
     (reset! draw-counter 4)
     (reset! game game-initial-state)))
@@ -48,7 +49,7 @@
 (defn draw-hit-card! []
   (do
     (swap! draw-counter inc)
-    (@shoe @draw-counter)))
+    (@deck @draw-counter)))
 
 (defn end-game! []
   (swap! game assoc :state :stopped :turn :none))
@@ -109,9 +110,9 @@
 
 (defn deal! []
   (do
-    (reset! shoe (generate-shoe))
-    ;; (reset! shoe (cards.deck/generate-specific-shoe [{:suit 's :rank 14} {:suit 'd :rank 2} {:suit 'c :rank 14}]))
-    (reset! hands (generate-hands @shoe))
+    (reset! deck (generate-shuffled-deck))
+    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 's :rank 14} {:suit 'd :rank 2} {:suit 'c :rank 14}]))
+    (reset! hands (generate-hands @deck))
     (reset! draw-counter 4)
     (swap! game assoc :state :running :turn :you :current-split 0 :current-winner nil :results [])
     (if (= (hand->value (nth (@hands :you) (@game :current-split))) 21) (dealer-plays!))))

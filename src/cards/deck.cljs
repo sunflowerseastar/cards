@@ -32,11 +32,13 @@
 (defn shuffle-deck [deck]
   (vec (shuffler deck weighted-shuffle)))
 
-(defn generate-shoe []
+(defn generate-shuffled-deck
+  "Return a deck that is shuffled."
+  []
   (let [d (generate-deck)] (nth (iterate shuffle d) 6)))
 
-(defn generate-specific-shoe [starting-cards]
-  (->> (generate-shoe)
+(defn generate-specific-deck [starting-cards]
+  (->> (generate-deck)
        (filter #(not ((into #{} [{:suit 's :rank 14} {:suit 'c :rank 14}]) %)))
        (conj starting-cards)
        flatten

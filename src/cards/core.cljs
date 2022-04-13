@@ -19,9 +19,9 @@
     :reagent-render
     (fn [this]
       [:div.app.fade-in-1 {:class [(if @has-initially-loaded "has-initially-loaded")]}
-       [:div.two-button.white-bg
-        [:button {:on-click #(reset! screen components/card-display)} "card-display"]
-        [:button {:on-click #(reset! screen blackjack/blackjack)} "blackjack"]]
+       ;; [:div.two-button.white-bg
+       ;;  [:button {:on-click #(reset! screen components/card-display)} "card-display"]
+       ;;  [:button {:on-click #(reset! screen blackjack/blackjack)} "blackjack"]]
        [@screen]])}))
 
 (defn mount [el]

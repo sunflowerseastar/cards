@@ -12,6 +12,8 @@
 ;; State variables get the "normal" name, and components get the cumbersome long
 ;; name. Ex. (hand-component hand) is the `hand-component` function receiving a
 ;; piece of game state called `hand`.
+
+
 (def game-initial-state {:state :stopped
                          :turn :none
                          :current-split 0
@@ -136,63 +138,39 @@
             (>= your-value 21) (dealer-plays!)))))
 
 (defn blackjack []
-  [:div.main {:class (if (@game :is-modal-showing) "stats-showing")}
+  [:div.main.blackjack-container {:class (if (@game :is-modal-showing) "is-modal-showing")}
+
    [:div.stats {:class (if (@game :is-modal-showing) "active")
                 :on-click #(swap! game assoc :is-modal-showing (not (@game :is-modal-showing)))}
     [game-status ^{:class "stats"} @game]]
-   [:div.logo-container [:a {:on-click #(swap! game assoc :is-modal-showing (not (@game :is-modal-showing)))}
+   [:a.modal-a {:on-click #(swap! game assoc :is-modal-showing (not (@game :is-modal-showing)))}]
 
-     ]]
    [:div.two-button
     [:button {:on-click #(deal!)} "deal"]
     [:button {:on-click #(reset-game!)} "reset"]]
 
    [:div.card-play-area
-    [:div.player-container.dealer
+    (when (not (empty? @hands))
+      [:<>
 
-    [:h2 {:class (if (= (@game :current-winner) :dealer) "win")} "dealer"]
+       [:div.player-container.dealer
+        [:h2 {:class (if (= (@game :current-winner) :dealer) "win")} "dealer"]
+        [:div.hands
+         (let [hand (first (:dealer @hands))
+               value (hand->value hand)
+               is-active false]
+           (when hand (hand-component hand is-active)))]]
 
-    [:div.hands
-     (let [hand (first (:dealer @hands))
-           value (hand->value hand)
-           is-active false]
-       (do
-         (println hand)
-         (when hand (hand-component hand is-active))))]
-
-    ]
-
-   [:div.player-container.you
-
-    [:h2 {:class (if (= (@game :current-winner) :you) "win")} "you"]
-
-    (into [:div.hands] (map-indexed
-
-                        (fn [i hand]
-                          (let [is-active (and (= (@game :turn) :you)
-                                               ;; (> (count (@hands :you)) 1)
-                                               ;; (= i (@game :current-split))
-                                               )
-                                ]
-                            (hand-component hand is-active))
-                           ;; (card-row (hand->value hand) card-1 card-2 hits
-                                                   ;; (and (= (@game :turn) :you)
-                                                   ;;      (> (count (@hands :you)) 1)
-                                                   ;;      (= index (@game :current-split))))
-                          )
-
-                        (@hands :you)))
-
-    ;; (into [:div.hands] (map-indexed
-    ;;         (fn [index {:keys [card-1 card-2 hits] :as hand}]
-    ;;           ^{:key card-1} (card-row (hand->value hand) card-1 card-2 hits
-    ;;                                    (and (= (@game :turn) :you)
-    ;;                                         (> (count (@hands :you)) 1)
-    ;;                                         (= index (@game :current-split)))))
-    ;;         (@hands :you)))
-
-    ]]
-
+       [:div.player-container.you
+        [:h2 {:class (if (= (@game :current-winner) :you) "win")} "you"]
+        (into [:div.hands]
+              (->> (@hands :you)
+                   (map-indexed
+                    (fn [i hand]
+                      (let [is-active (and (= (@game :turn) :you)
+                                           (or (= (count (@hands :you)) 1)
+                                               (= (@game :current-split) i)))]
+                        (hand-component hand is-active))))))]])]
 
    (let [active-p (and (= (@game :turn) :you) (= (@game :state) :running))
          {:keys [card-1 card-2 hits], :or {card-1 {} card-2 {} hits []}}

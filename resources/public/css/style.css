@@ -7,12 +7,12 @@
 
   --green: #b1e597;
 
-  --space-vertical-md: 2em;
+  --space-sm: 1em;
+  --space-md: 2em;
+  --space-lg: 4em;
 }
 
-svg {
-  /* max-width: 200px; */
-}
+/* general html */
 
 html,
 body,
@@ -44,12 +44,37 @@ img {
     transform: translateY(-60%);
   }
 }
+svg {
+  /* max-width: 200px; */
+}
 
-.logo-container a {
+/* app */
+
+.app {
+  height: 100vh;
+}
+
+.main {
+  padding: var(--space-sm) var(--space-md);
+}
+@media (min-width: 768px) {
+  .main {
+    padding: var(--space-md) var(--space-lg);
+  }
+}
+
+/* modal */
+
+.modal-a {
   display: block;
   width: 50px;
   height: 50px;
   background: #eee;
+}
+.is-modal-showing > div {
+  opacity: 0.1;
+  filter: blur(2px);
+  pointer-events: none;
 }
 .stats {
   position: absolute;
@@ -58,7 +83,7 @@ img {
   left: 0;
   right: 0;
   display: flex;
-  padding: 0 var(--space-vertical-md);
+  padding: 0 var(--space-md);
   border: 1px solid #888;
   opacity: 0;
   pointer-events: none;
@@ -74,33 +99,30 @@ img {
   align-self: center;
   max-width: 320px;
   margin: 0 auto;
-  padding: var(--space-vertical-md);
+  padding: var(--space-md);
   border: 1px solid #bbb;
 }
 
-.app {
-  height: 100vh;
+/* card display */
+
+.card-display {
+  margin-bottom: var(--space-md);
+}
+.card-display svg {
+}
+.card-display-controls {
+  margin-bottom: var(--space-md);
 }
 
-.main {
+/* blackjack game play */
+
+.blackjack-container {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   max-width: 600px;
   height: 100vh;
   margin: 0 auto;
-  padding: 4vw 6vw;
-}
-.main.stats-showing > div {
-  opacity: 0.1;
-  filter: blur(2px);
-  pointer-events: none;
-}
-@media (min-width: 768px) {
-  .main {
-    padding: var(--space-vertical-md) 4em;
-  }
 }
 
 .win {
@@ -115,6 +137,12 @@ img {
   width: 100%;
   height: 1px;
   background: var(--green);
+}
+
+.card-play-area {
+  flex: 1;
+}
+.player-container {
 }
 
 .card-row {
@@ -150,9 +178,6 @@ img {
   border: 1px solid cyan;
 }
 
-.player-container {
-  border: 1px solid magenta;
-}
 .hands {
   border: 2px solid yellowd;
 }
@@ -208,6 +233,7 @@ button + button {
 .two-button,
 .three-button {
   display: flex;
+  margin: var(--space-md) 0;
 }
 .white-bg button {
   color: black;
@@ -241,18 +267,8 @@ button.inactive,
   }
 }
 
-/* fade */
-
-.fade-in-1 {
-  transition: opacity 1.2s ease-in-out;
-  opacity: 0;
-}
-.has-initially-loaded,
-.has-initially-loaded .fade-in-1 {
-  opacity: 1;
-}
-
 /* cards */
+
 .club g {
   /* TODO - do I still need this? */
   transform: translate(0, 1280px) scale(0.1, -0.1);
@@ -522,13 +538,13 @@ button.inactive,
   transform-origin: 50%;
 }
 
-/* card-display */
+/* utility */
 
-.card-display {
-  margin-bottom: var(--space-vertical-md);
+.fade-in-1 {
+  transition: opacity 1.2s ease-in-out;
+  opacity: 0;
 }
-.card-display svg {
-}
-.card-display-controls {
-  margin-bottom: var(--space-vertical-md);
+.has-initially-loaded,
+.has-initially-loaded .fade-in-1 {
+  opacity: 1;
 }

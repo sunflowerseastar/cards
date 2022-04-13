@@ -144,7 +144,7 @@
     [game-status ^{:class "stats"} @game]]
    [:a.modal-a {:on-click #(swap! game assoc :is-modal-showing (not (@game :is-modal-showing)))}]
 
-   [:div.two-button
+   [:div.button-group
     [:button {:on-click #(deal!)} "deal"]
     [:button {:on-click #(reset-game!)} "reset"]]
 
@@ -176,7 +176,7 @@
          (nth (@hands :you) (@game :current-split))
          can-stand-p (not-empty card-2)
          can-split-p (and (= (card-1 :rank) (card-2 :rank)) (empty? hits))]
-     [:div.three-button {:class (if (not active-p) "inactive")}
+     [:div.button-group {:class (if (not active-p) "inactive")}
       [:button {:on-click #(hit!)} "hit"]
       [:button {:class (if (not can-stand-p) "inactive") :on-click #(stand!)} "stand"]
       [:button {:class (if (not can-split-p) "inactive") :on-click #(split!)} "split"]])])

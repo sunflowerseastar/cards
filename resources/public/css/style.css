@@ -220,8 +220,7 @@ button + button {
     margin-left: 3vw;
   }
 }
-.two-button,
-.three-button {
+.button-group {
   display: flex;
   margin: var(--space-md) 0;
 }
@@ -236,11 +235,11 @@ button + button {
   }
 }
 
-.three-button {
+.button-group {
   margin-top: 24px;
 }
 @media (min-width: 1080px) {
-  .three-button {
+  .button-group {
     margin-top: 0;
   }
 }

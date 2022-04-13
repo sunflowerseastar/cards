@@ -17,7 +17,7 @@
     :reagent-render
     (fn [this]
       [:div.app.fade-in-1 {:class [(if @has-initially-loaded "has-initially-loaded")]}
-       ;; [:div.two-button.white-bg
+       ;; [:div.button-group.white-bg
        ;;  [:button {:on-click #(reset! screen card-display)} "card-display"]
        ;;  [:button {:on-click #(reset! screen blackjack)} "blackjack"]]
        [@screen]])}))

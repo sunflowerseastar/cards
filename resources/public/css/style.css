@@ -145,16 +145,6 @@ svg {
 .player-container {
 }
 
-.card-row {
-  position: relative;
-  display: flex;
-  opacity: 0.85;
-  overflow: scroll;
-}
-.card-row + .card-row {
-  margin-top: 10px;
-}
-
 .hand.is-hand-active:after {
   content: '';
   width: 1px;

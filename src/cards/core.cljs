@@ -1,14 +1,12 @@
 (ns ^:figwheel-hooks cards.core
   (:require
-   [cards.components :as components]
-   [cards.svgs :as svgs]
-   [cards.deck :as deck]
-   [cards.blackjack :as blackjack]
+   [cards.components :refer [card-display]]
+   [cards.blackjack :refer [blackjack]]
    [goog.dom :as gdom]
    [reagent.core :as reagent :refer [atom create-class]]))
 
-(def screen (atom blackjack/blackjack))
-;; (def screen (atom components/card-display))
+(def screen (atom blackjack))
+;; (def screen (atom card-display))
 
 (defonce has-initially-loaded (atom false))
 
@@ -20,8 +18,8 @@
     (fn [this]
       [:div.app.fade-in-1 {:class [(if @has-initially-loaded "has-initially-loaded")]}
        ;; [:div.two-button.white-bg
-       ;;  [:button {:on-click #(reset! screen components/card-display)} "card-display"]
-       ;;  [:button {:on-click #(reset! screen blackjack/blackjack)} "blackjack"]]
+       ;;  [:button {:on-click #(reset! screen card-display)} "card-display"]
+       ;;  [:button {:on-click #(reset! screen blackjack)} "blackjack"]]
        [@screen]])}))
 
 (defn mount [el]

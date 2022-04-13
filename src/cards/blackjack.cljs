@@ -1,9 +1,8 @@
 (ns cards.blackjack
   (:require
    [cards.blackjack-helpers :refer [hand->value]]
-   [cards.components :refer [game-status hand-component card-row]]
+   [cards.components :refer [game-status hand-component]]
    [cards.deck :refer [generate-shuffled-deck]]
-   [cards.svgs :as svgs]
    [reagent.core :as reagent :refer [atom]]))
 
 (def dealer-hit-cutoff 17)

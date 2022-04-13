@@ -47,14 +47,6 @@
           :else (into [:<>] (repeat rank suit-svg)))]
        [:span.card-right (svgs/svg-rank rank is-red) suit-svg]])))
 
-(defn hand-old [card-1 card-2 hits & [down-p]]
-  [:div.hand
-   (card-component card-1 down-p)
-   ;; (when card-2 [card card-2])
-   ;; (for [hit-card hits]
-   ;;   (card-component hit-card))
-   ])
-
 (defn hand-component
   "Given a hand, show hand meta (state) and the cards themselves."
   [{:keys [card-1 card-2 hits] :as hand} is-active]
@@ -62,12 +54,6 @@
    (card-component card-1)
    (when card-2 (card-component card-2))
    (into [:<>] (map #(card-component %) hits))])
-
-(defn card-row [value card-1 card-2 hits active-p & [down-p]]
-  [:div.card-row {:class (if active-p "active")}
-   (when (not down-p) [:p.val value])
-   ;; (hand-old card-1 card-2 hits down-p)
-   ])
 
 ;; --------------------------------
 ;; DISPLAY is not part of game play

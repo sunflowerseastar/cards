@@ -102,9 +102,6 @@ img {
 }
 
 
-.hand {
-  border: 1px solid magenta;
-}
 .win {
   position: relative;
   /* color: green; */
@@ -119,42 +116,18 @@ img {
   background: var(--green);
 }
 
-.club g {
-  /* TODO - do I still need this? */
-  transform: translate(0, 1280px) scale(0.1, -0.1);
-}
-.heart,
-.diamond {
-  fill: red;
-}
-.card {
-  display: inline-block;
-  min-width: 36px;
-  min-height: 34px;
-  font-size: 24px;
-  text-align: center;
-  color: black;
-  font-weight: 800;
-  border: 1px solid #ddd;
-  padding: 6px 10px 6px 6px;
-  border: 1px solid magenta;
-}
-.card + .card {
-  margin-left: 8px;
-}
-.card svg {
-  position: relative;
-  width: 20px;
-  height: 18px;
-  padding-right: 3px;
-}
+
 .card-row {
   position: relative;
   display: flex;
   opacity: 0.85;
   overflow: scroll;
 }
-.card-row.active:after {
+.card-row + .card-row {
+  margin-top: 10px;
+}
+
+.hand.is-hand-active:after {
   content: '';
   width: 1px;
   height: 96%;
@@ -163,11 +136,9 @@ img {
   top: 0%;
   left: 19px;
 }
-.card-row.active {
+.hand.is-hand-active {
   opacity: 1;
-}
-.card-row + .card-row {
-  margin-top: 10px;
+  border: 3px solid red !important;
 }
 .val {
   position: relative;
@@ -178,7 +149,15 @@ img {
   font-weight: 300;
   border: 1px solid cyan;
 }
-.card-hand {
+
+.player-container {
+  border: 1px solid magenta;
+
+}
+.hands {
+  border: 2px solid yellowd;
+}
+.hand {
   flex: 1;
   white-space: nowrap;
 }
@@ -274,14 +253,46 @@ button.inactive,
   opacity: 1;
 }
 
-/* card-list */
+/* card-display */
 
-.card-list {
+.card-display {
   /* border: 1px solid yellow; */
 }
-.card-list svg {
+.card-display svg {
   /* max-width: 20px; */
 }
+
+.club g {
+  /* TODO - do I still need this? */
+  transform: translate(0, 1280px) scale(0.1, -0.1);
+}
+.heart,
+.diamond {
+  fill: red;
+}
+.card {
+  display: inline-block;
+  min-width: 36px;
+  min-height: 34px;
+  font-size: 24px;
+  text-align: center;
+  color: black;
+  font-weight: 800;
+  border: 1px solid #ddd;
+  padding: 6px 10px 6px 6px;
+  border: 1px solid magenta;
+}
+.card + .card {
+  margin-left: 8px;
+}
+.card svg {
+  position: relative;
+  width: 20px;
+  height: 18px;
+  padding-right: 3px;
+}
+
+
 .card-container {
   /* display: flex; */
   display: inline-flex;

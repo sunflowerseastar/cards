@@ -147,38 +147,48 @@
     [:button {:on-click #(reset-game!)} "reset"]]
 
    [:div.card-play-area
-    [:div.hands-container.dealer
+    [:div.player-container.dealer
 
     [:h2 {:class (if (= (@game :current-winner) :dealer) "win")} "dealer"]
 
     [:div.hands
      (let [hand (first (:dealer @hands))
-           value (hand->value hand)]
+           value (hand->value hand)
+           is-active false]
        (do
          (println hand)
-         (when hand (hand-component hand))
-         )
-       )
-     ]
+         (when hand (hand-component hand is-active))))]
 
-    ;; (doall (for [{:keys [card-1 card-2 hits] :as hand} (:dealer @hands)]
-    ;;          ^{:key card-1}
-    ;;          (card-row (hand->value hand) card-1 card-2 hits
-    ;;                    (= (@game :turn) :dealer)
-    ;;                    (= (@game :turn) :you))))
     ]
 
-   [:div.hands-container.you
+   [:div.player-container.you
 
     [:h2 {:class (if (= (@game :current-winner) :you) "win")} "you"]
 
     (into [:div.hands] (map-indexed
-            (fn [index {:keys [card-1 card-2 hits] :as hand}]
-              ^{:key card-1} (card-row (hand->value hand) card-1 card-2 hits
-                                       (and (= (@game :turn) :you)
-                                            (> (count (@hands :you)) 1)
-                                            (= index (@game :current-split)))))
-            (@hands :you)))
+
+                        (fn [i hand]
+                          (let [is-active (and (= (@game :turn) :you)
+                                               ;; (> (count (@hands :you)) 1)
+                                               ;; (= i (@game :current-split))
+                                               )
+                                ]
+                            (hand-component hand is-active))
+                           ;; (card-row (hand->value hand) card-1 card-2 hits
+                                                   ;; (and (= (@game :turn) :you)
+                                                   ;;      (> (count (@hands :you)) 1)
+                                                   ;;      (= index (@game :current-split))))
+                          )
+
+                        (@hands :you)))
+
+    ;; (into [:div.hands] (map-indexed
+    ;;         (fn [index {:keys [card-1 card-2 hits] :as hand}]
+    ;;           ^{:key card-1} (card-row (hand->value hand) card-1 card-2 hits
+    ;;                                    (and (= (@game :turn) :you)
+    ;;                                         (> (count (@hands :you)) 1)
+    ;;                                         (= index (@game :current-split)))))
+    ;;         (@hands :you)))
 
     ]]
 

@@ -8,7 +8,7 @@
    [reagent.core :as reagent :refer [atom create-class]]))
 
 (def screen (atom blackjack/blackjack))
-;; (def screen (atom components/card-list))
+;; (def screen (atom components/card-display))
 
 (defonce has-initially-loaded (atom false))
 
@@ -20,7 +20,7 @@
     (fn [this]
       [:div.app.fade-in-1 {:class [(if @has-initially-loaded "has-initially-loaded")]}
        [:div.two-button.white-bg
-        [:button {:on-click #(reset! screen components/card-list)} "card-list"]
+        [:button {:on-click #(reset! screen components/card-display)} "card-display"]
         [:button {:on-click #(reset! screen blackjack/blackjack)} "blackjack"]]
        [@screen]])}))
 

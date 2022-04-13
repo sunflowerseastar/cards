@@ -69,22 +69,18 @@
    ;; (hand-old card-1 card-2 hits down-p)
    ])
 
+;; --------------------------------
+;; DISPLAY is not part of game play
+;; --------------------------------
+
 (defn card-display []
-  (let [deck (deck/generate-deck)]
-    [:div.card-display-container
+  (let [local-deck (atom (deck/generate-deck))]
+    (fn [] [:div.main.card-display
 
-     [:div.card-display-controls
-      [:button {:on-click #(swap! deck deck/shuffle-deck)} "shuffle"]
-      [:button {:on-click #(swap! deck deck/generate-deck)} "sort"]]
+            [:div.card-display-controls
+             [:button {:on-click #(swap! local-deck deck/shuffle-deck)} "shuffle"]
+             [:button {:on-click #(reset! local-deck (deck/generate-deck))} "sort"]]
 
-     ;; (card-component (first deck))
-     ;; (card-component {:suit 'spade :rank 12})
-     ;; (->> deck (take 1) #(card-component %))
-     (into [:div.card-display] (map card-component deck))
-     ;; (into [:div.card-display] (map card-component (take 9 deck)))
-
-     [:div
-      (svgs/svg-of 's)
-      (svgs/svg-of 'c)
-      (svgs/svg-of 'd)
-      (svgs/svg-of 'h)]]))
+            ;; (card-component (first local-deck))
+            ;; (card-component {:suit 'spade :rank 12})
+            (into [:div.card-display] (map card-component @local-deck))])))

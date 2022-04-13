@@ -6,6 +6,8 @@
   --card-width: 60px;
 
   --green: #b1e597;
+
+  --space-vertical-md: 2em;
 }
 
 svg {
@@ -56,7 +58,7 @@ img {
   left: 0;
   right: 0;
   display: flex;
-  padding: 0 2em;
+  padding: 0 var(--space-vertical-md);
   border: 1px solid #888;
   opacity: 0;
   pointer-events: none;
@@ -72,7 +74,7 @@ img {
   align-self: center;
   max-width: 320px;
   margin: 0 auto;
-  padding: 2em;
+  padding: var(--space-vertical-md);
   border: 1px solid #bbb;
 }
 
@@ -97,10 +99,9 @@ img {
 }
 @media (min-width: 768px) {
   .main {
-    padding: 2em 4em;
+    padding: var(--space-vertical-md) 4em;
   }
 }
-
 
 .win {
   position: relative;
@@ -115,7 +116,6 @@ img {
   height: 1px;
   background: var(--green);
 }
-
 
 .card-row {
   position: relative;
@@ -152,7 +152,6 @@ img {
 
 .player-container {
   border: 1px solid magenta;
-
 }
 .hands {
   border: 2px solid yellowd;
@@ -253,15 +252,7 @@ button.inactive,
   opacity: 1;
 }
 
-/* card-display */
-
-.card-display {
-  /* border: 1px solid yellow; */
-}
-.card-display svg {
-  /* max-width: 20px; */
-}
-
+/* cards */
 .club g {
   /* TODO - do I still need this? */
   transform: translate(0, 1280px) scale(0.1, -0.1);
@@ -291,7 +282,6 @@ button.inactive,
   height: 18px;
   padding-right: 3px;
 }
-
 
 .card-container {
   /* display: flex; */
@@ -530,4 +520,15 @@ button.inactive,
   bottom: 0.6%;
   transform: scale(0.83) scaleY(-1);
   transform-origin: 50%;
+}
+
+/* card-display */
+
+.card-display {
+  margin-bottom: var(--space-vertical-md);
+}
+.card-display svg {
+}
+.card-display-controls {
+  margin-bottom: var(--space-vertical-md);
 }

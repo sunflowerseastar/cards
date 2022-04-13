@@ -13,15 +13,16 @@
 ;; piece of game state called `hand`.
 
 
-(def game-initial-state {:state :stopped
-                         :turn :none
-                         :current-split 0
-                         :dealer-wins 0
-                         :your-wins 0
-                         :current-winner nil
-                         :pushes 0
+(def game-initial-state {:state :stopped ;; stopped | running
+                         :turn :none ;; none | you | dealer
+                         :current-split 0 ;; hand index of current split
+                         :dealer-wins 0 ;; number of wins for dealer
+                         :your-wins 0 ;; number of wins for you
+                         :pushes 0 ;; number of pushes
+                         :current-winner nil ;; who just won the finished hand
                          :is-modal-showing false
-                         :results []})
+                         :results [] ;; explanation of who won & why
+                         })
 
 (def game (atom game-initial-state))
 ;; TODO actually use the shoe... this is a deck, not a shoe
@@ -32,13 +33,19 @@
 (def hands (atom {}))
 (def draw-counter (atom 4))
 
-(defn generate-hands [local-deck]
+(defn deal-hands [local-deck]
   (let [your-card-1 (first local-deck)
         dealer-card-1 (second local-deck)
         your-card-2 (local-deck 2)
         dealer-card-2 (local-deck 3)]
+
+    ;; {:you [your-card-1 your-card-2]
+    ;;  :dealer [dealer-card-1 dealer-card-2]}
+
     {:you [{:card-1 your-card-1, :card-2 your-card-2}]
-     :dealer [{:card-1 dealer-card-1, :card-2 dealer-card-2}]}))
+     :dealer [{:card-1 dealer-card-1, :card-2 dealer-card-2}]}
+
+    ))
 
 (defn reset-game! []
   (do
@@ -59,16 +66,16 @@
   (swap! game assoc win-count (inc (@game win-count))))
 
 (defn you-win! []
-  (swap! game assoc :your-wins (inc (@game :your-wins)) :current-winner :you))
+  (swap! game assoc :your-wins (inc (:your-wins @game)) :current-winner :you))
 
 (defn dealer-wins! []
-  (swap! game assoc :dealer-wins (inc (@game :dealer-wins)) :current-winner :dealer))
+  (swap! game assoc :dealer-wins (inc (:dealer-wins @game)) :current-winner :dealer))
 
 (defn push! []
   (increment-wins! :pushes))
 
 (defn update-result! [result-text]
-  (swap! game assoc :results (conj (@game :results) result-text)))
+  (swap! game assoc :results (conj (:results @game) result-text)))
 
 (defn conclude [winner result-text]
   (do
@@ -79,11 +86,11 @@
       (you-win!))))
 
 (defn play-next-split! []
-  (swap! game assoc :current-split (inc (@game :current-split))))
+  (swap! game assoc :current-split (inc (:current-split @game))))
 
 (defn conclude-game! []
-  (let [your-values (map hand->value (@hands :you))
-        dealer-value (hand->value (nth (@hands :dealer) 0))]
+  (let [your-values (map hand->value (:you @hands))
+        dealer-value (hand->value (nth (:dealer @hands) 0))]
     (do
       (doseq [your-value your-values]
         (cond (> your-value 21) (conclude :dealer "dealer wins - you bust")
@@ -96,53 +103,54 @@
       (end-game!))))
 
 (defn add-hit-card-to-hand! [player card]
-  (if (and (= (@game :turn) :you) (nil? ((nth (@hands :you) (@game :current-split)) :card-2)))
-    (swap! hands assoc-in [player (@game :current-split) :card-2] card)
-    (swap! hands assoc-in [player (@game :current-split) :hits]
-           (vec (conj ((nth (@hands player) (@game :current-split)) :hits) card)))))
+  (if (and (= (:turn @game) :you)
+           (nil? ((nth (@hands :you) (:current-split @game)) :card-2)))
+    (swap! hands assoc-in [player (:current-split @game) :card-2] card)
+    (swap! hands assoc-in [player (:current-split @game) :hits]
+           (vec (conj ((nth (@hands player) (:current-split @game)) :hits) card)))))
 
 (defn dealer-plays! []
   (do
     (swap! game assoc :turn :dealer :current-split 0)
-    (while (= (@game :state) :running)
+    (while (= (:state @game) :running)
       (if (< (hand->value (nth (:dealer @hands) 0)) dealer-hit-cutoff)
         (add-hit-card-to-hand! :dealer (draw-hit-card!))
         (conclude-game!)))))
 
 (defn deal! []
   (do
-    (reset! deck (generate-shuffled-deck))
-    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 's :rank 14} {:suit 'd :rank 2} {:suit 'c :rank 14}]))
-    (reset! hands (generate-hands @deck))
+    ;; (reset! deck (generate-shuffled-deck))
+    (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 2} {:suit 'club :rank 14}]))
+    (reset! hands (deal-hands @deck))
     (reset! draw-counter 4)
     (swap! game assoc :state :running :turn :you :current-split 0 :current-winner nil :results [])
-    (if (= (hand->value (nth (@hands :you) (@game :current-split))) 21) (dealer-plays!))))
+    (if (= (hand->value (nth (:you @hands) (:current-split @game))) 21) (dealer-plays!))))
 
 (defn stand! []
-  (if (> (- (count (@hands :you)) 1) (@game :current-split))
+  (if (> (- (count (:you @hands)) 1) (:current-split @game))
     (play-next-split!)
     (dealer-plays!)))
 
 (defn split! []
   (do
-    (swap! hands assoc-in [:you (+ (@game :current-split) 1) :card-1] ((nth (@hands :you) (@game :current-split)) :card-2))
-    (swap! hands update-in [:you (@game :current-split)] dissoc :card-2)))
+    (swap! hands assoc-in [:you (+ (:current-split @game) 1) :card-1] ((nth (:you @hands) (:current-split @game)) :card-2))
+    (swap! hands update-in [:you (:current-split @game)] dissoc :card-2)))
 
 (defn hit! []
   (do
     (add-hit-card-to-hand! :you (draw-hit-card!))
-    (let [your-value (hand->value (nth (@hands :you) (@game :current-split)))
-          more-splits-remaining-p (and (= (@game :turn) :you) (> (- (count (@hands :you)) 1) (@game :current-split)))]
+    (let [your-value (hand->value (nth (:you @hands) (:current-split @game)))
+          more-splits-remaining-p (and (= (:turn @game) :you) (> (- (count (:you @hands)) 1) (:current-split @game)))]
       (cond (and more-splits-remaining-p (>= your-value 21)) (play-next-split!)
             (>= your-value 21) (dealer-plays!)))))
 
 (defn blackjack []
-  [:div.main.blackjack-container {:class (if (@game :is-modal-showing) "is-modal-showing")}
+  [:div.main.blackjack-container {:class (if (:is-modal-showing @game) "is-modal-showing")}
 
-   [:div.stats {:class (if (@game :is-modal-showing) "active")
-                :on-click #(swap! game assoc :is-modal-showing (not (@game :is-modal-showing)))}
+   [:div.stats {:class (if (:is-modal-showing @game) "active")
+                :on-click #(swap! game assoc :is-modal-showing (not (:is-modal-showing @game)))}
     [game-status ^{:class "stats"} @game]]
-   [:a.modal-a {:on-click #(swap! game assoc :is-modal-showing (not (@game :is-modal-showing)))}]
+   [:a.modal-a {:on-click #(swap! game assoc :is-modal-showing (not (:is-modal-showing @game)))}]
 
    [:div.button-group
     [:button {:on-click #(deal!)} "deal"]
@@ -153,7 +161,7 @@
       [:<>
 
        [:div.player-container.dealer
-        [:h2 {:class (if (= (@game :current-winner) :dealer) "win")} "dealer"]
+        [:h2 {:class (if (= (:current-winner @game) :dealer) "win")} "dealer"]
         [:div.hands
          (let [hand (first (:dealer @hands))
                value (hand->value hand)
@@ -161,21 +169,21 @@
            (when hand (hand-component hand is-active)))]]
 
        [:div.player-container.you
-        [:h2 {:class (if (= (@game :current-winner) :you) "win")} "you"]
+        [:h2 {:class (if (= (:current-winner @game) :you) "win")} "you"]
         (into [:div.hands]
               (->> (@hands :you)
                    (map-indexed
                     (fn [i hand]
-                      (let [is-active (and (= (@game :turn) :you)
-                                           (or (= (count (@hands :you)) 1)
-                                               (= (@game :current-split) i)))]
+                      (let [is-active (and (= (:turn @game) :you)
+                                           (or (= (count (:you @hands)) 1)
+                                               (= (:current-split @game) i)))]
                         (hand-component hand is-active))))))]])]
 
-   (let [active-p (and (= (@game :turn) :you) (= (@game :state) :running))
+   (let [active-p (and (= (:turn @game) :you) (= (:state @game) :running))
          {:keys [card-1 card-2 hits], :or {card-1 {} card-2 {} hits []}}
-         (nth (@hands :you) (@game :current-split))
+         (nth (@hands :you) (:current-split @game))
          can-stand-p (not-empty card-2)
-         can-split-p (and (= (card-1 :rank) (card-2 :rank)) (empty? hits))]
+         can-split-p (and (= (:rank card-1) (:rank card-2)) (empty? hits))]
      [:div.button-group {:class (if (not active-p) "inactive")}
       [:button {:on-click #(hit!)} "hit"]
       [:button {:class (if (not can-stand-p) "inactive") :on-click #(stand!)} "stand"]

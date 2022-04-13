@@ -23,13 +23,18 @@ body {
   margin: 0;
   font-family: 'iosevka ss05', Menlo, 'Andale Mono', monospace;
   color: black;
-  font-weight: 500;
   touch-action: manipulation;
 }
 h2 {
   display: inline-block;
-  font-size: 20px;
-  margin: 1.3em 0 0.8em;
+  font-size: 16px;
+  margin: var(--space-md) 0 var(--space-sm);
+  font-weight: normal;
+}
+@media (min-width: 992px) {
+  h2 {
+    font-size: 17px;
+  }
 }
 img {
   object-fit: contain;
@@ -56,11 +61,6 @@ svg {
 
 .main {
   padding: var(--space-sm) var(--space-md);
-}
-@media (min-width: 768px) {
-  .main {
-    padding: var(--space-md) var(--space-lg);
-  }
 }
 
 /* modal */
@@ -168,7 +168,6 @@ svg {
   position: absolute;
   top: 0;
   right: 0;
-  font-size: 15px;
   font-weight: 300;
   border: 1px solid magenta;
 }
@@ -210,20 +209,13 @@ button:focus:after {
     font-size: 12px;
   }
 }
-@media (hover: hover) {
-  button:hover {
-    color: black;
-    background: white;
-    cursor: pointer;
-  }
+button:hover {
+  color: black;
+  background: white;
+  cursor: pointer;
 }
 button + button {
-  margin-left: calc(3vw * 1.5);
-}
-@media (min-width: 480px) {
-  button + button {
-    margin-left: 3vw;
-  }
+  margin-left: var(--space-md);
 }
 .button-group {
   display: flex;
@@ -233,32 +225,20 @@ button + button {
   color: black;
   background: white;
 }
-@media (hover: hover) {
-  .white-bg button:hover {
-    color: white;
-    background: black;
-  }
+.white-bg button:hover {
+  color: white;
+  background: black;
 }
 
-.button-group {
-  margin-top: 24px;
-}
-@media (min-width: 1080px) {
-  .button-group {
-    margin-top: 0;
-  }
-}
 button.inactive,
 .inactive button {
   opacity: 0.2;
   cursor: default;
   pointer-events: none;
 }
-@media (hover: hover) {
-  .inactive button:hover {
-    color: white;
-    background: black;
-  }
+.inactive button:hover {
+  color: white;
+  background: black;
 }
 
 /* cards */

@@ -166,6 +166,8 @@
                                                (= (:current-split @game) i)))]
                         (hand-component hand (hand->value hand) is-active))))))]])]
 
+   [:div.results (apply str (interpose ", " (:results @game)))]
+
    (let [active-p (and (= (:turn @game) :you) (= (:state @game) :running))
          [card-1 card-2 & hits] (nth (:you @hands) (:current-split @game))
          can-stand-p (some? card-2)

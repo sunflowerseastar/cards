@@ -72,7 +72,7 @@
    [:p "pushes: " pushes]
    [:p "state: " state]
    [:p "turn: " turn]
-   [:p "current-winner: " current-winner]
+   [:p "current-winner: " current-winner] ;; TODO make this make sense for splits (more than one winner..?)
    [:p "current-split: " current-split]
    [:p "results: " (apply str (interpose ", " results))]
    [:button {:on-click #(reset-modal-fn)} "reset"]])

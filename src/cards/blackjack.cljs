@@ -97,11 +97,14 @@
   (swap! hands update-in [player (:current-split @game)] conj card))
 
 (defn dealer-plays! []
-  (do (swap! game assoc :turn :dealer :current-split 0)
-      (while (= (:state @game) :running)
-        (if (< (hand->value (nth (:dealer @hands) 0)) dealer-hit-cutoff)
-          (add-hit-card-to-hand! :dealer (draw-hit-card!))
-          (conclude-game!)))))
+  (let [your-highest-non-bust-value (->> (:you @hands) (map hand->value) (filter #(<= % 21)) (apply max 0))]
+    (do (swap! game assoc :turn :dealer :current-split 0)
+        (while (= (:state @game) :running)
+          (let [dealer-hand-value (hand->value (nth (:dealer @hands) 0))]
+            (if (and (< dealer-hand-value your-highest-non-bust-value)
+                     (< dealer-hand-value dealer-hit-cutoff))
+              (add-hit-card-to-hand! :dealer (draw-hit-card!))
+              (conclude-game!)))))))
 
 (defn deal! []
   (do (reset! deck (generate-shuffled-deck))

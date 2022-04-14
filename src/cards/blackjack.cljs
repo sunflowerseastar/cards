@@ -82,7 +82,6 @@
 (defn conclude-game! []
   (let [your-values (map hand->value (:you @hands))
         dealer-value (hand->value (nth (:dealer @hands) 0))]
-    ;; TODO fix logic
     (do (doseq [your-value your-values]
           (cond (> your-value 21) (conclude :dealer "dealer wins - you bust")
                 (> dealer-value 21) (conclude :you "you win - dealer busts")
@@ -108,7 +107,8 @@
 
 (defn deal! []
   (do (reset! deck (generate-shuffled-deck))
-    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 2} {:suit 'club :rank 14}])) ;; split
+      ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 's :rank 14} {:suit 'd :rank 2} {:suit 'c :rank 14}])) ;; split
+      ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 2} {:suit 'diamond :rank 13} {:suit 'club :rank 2} {:suit 'diamond :rank 2} {:suit 'heart :rank 2} {:suit 'heart :rank 3}])) ;; low cards
       (reset! hands (deal-hands @deck))
       (reset! draw-counter 4)
       (swap! game assoc :state :running :turn :you :current-split 0 :current-winner nil :results [])

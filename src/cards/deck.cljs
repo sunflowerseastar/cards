@@ -39,8 +39,8 @@
 
 (defn generate-specific-deck [starting-cards]
   (->> (generate-deck)
-       ;; TODO fix this
-       (filter #(not ((into #{} [{:suit 's :rank 14} {:suit 'c :rank 14}]) %)))
-       (conj starting-cards)
-       flatten
+       ;; remove starting-cards from the deck
+       (filter (fn [card] (not (some #(= card %) starting-cards))))
+       ;; put starting-cards at the front of the deck
+       (concat starting-cards)
        vec))

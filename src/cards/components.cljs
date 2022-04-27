@@ -8,47 +8,54 @@
 ;; game play components
 ;; --------------------
 
+(defn card-component-down
+  "Return a card that is face down and doesn't reveal it's suit or value."
+  []
+  ;; TODO make the back of card
+  [:span.card-container "X"])
+
 (defn card-component
   "Given a 'card' state, return markup of that card."
-  ;; TODO change [down-p] -> down-p
-  [{:keys [suit rank]} & [down-p]]
-  (if down-p
-    ;; TODO make the back of card
-    ;; TODO make dealer's card face-down to start
-    [:span.card-container "X"]
-    (let [suit-svg (svgs/svg-of suit)
-          t-rank (deck/translate-rank-of rank)
-          is-face (and (> rank 10) (< rank 14))
-          is-ace (= rank 14)
-          is-red (or (= suit 'diamond) (= suit 'heart))]
-      [:span.card-container
-       [:span.card-left (svgs/svg-rank rank is-red) suit-svg]
-       [:span.card-middle {:class ["suit-svgs" (str "rank-" rank)]}
-        (cond
-          is-ace [:span suit-svg]
-          is-face [:span.face-card-middle
-                   (svgs/svg-face suit rank)
-                   [:span.face-card-suit-left suit-svg]
-                   [:span.face-card-suit-right suit-svg]]
-          (= rank 9) [:<>
-                      (into [:span.card-middle-left] (repeat 4 suit-svg))
-                      [:span.card-middle-middle suit-svg]
-                      (into [:span.card-middle-right] (repeat 4 suit-svg))]
-          (= rank 10) [:<>
-                       (into [:span.card-middle-left] (repeat 4 suit-svg))
-                       (into [:span.card-middle-middle] (repeat 2 suit-svg))
-                       (into [:span.card-middle-right] (repeat 4 suit-svg))]
-          :else (into [:<>] (repeat rank suit-svg)))]
-       [:span.card-right (svgs/svg-rank rank is-red) suit-svg]])))
+  [{:keys [suit rank]}]
+  (let [suit-svg (svgs/svg-of suit)
+        t-rank (deck/translate-rank-of rank)
+        is-face (and (> rank 10) (< rank 14))
+        is-ace (= rank 14)
+        is-red (or (= suit 'diamond) (= suit 'heart))]
+    [:span.card-container
+     [:span.card-left (svgs/svg-rank rank is-red) suit-svg]
+     [:span.card-middle {:class ["suit-svgs" (str "rank-" rank)]}
+      (cond
+        is-ace [:span suit-svg]
+        is-face [:span.face-card-middle
+                 (svgs/svg-face suit rank)
+                 [:span.face-card-suit-left suit-svg]
+                 [:span.face-card-suit-right suit-svg]]
+        (= rank 9) [:<>
+                    (into [:span.card-middle-left] (repeat 4 suit-svg))
+                    [:span.card-middle-middle suit-svg]
+                    (into [:span.card-middle-right] (repeat 4 suit-svg))]
+        (= rank 10) [:<>
+                     (into [:span.card-middle-left] (repeat 4 suit-svg))
+                     (into [:span.card-middle-middle] (repeat 2 suit-svg))
+                     (into [:span.card-middle-right] (repeat 4 suit-svg))]
+        :else (into [:<>] (repeat rank suit-svg)))]
+     [:span.card-right (svgs/svg-rank rank is-red) suit-svg]]))
 
 (defn hand-component
   "Given a hand, show hand meta (state), and the cards themselves."
   ;; TODO show which hands win, lose, or both (ex. dealer wins against one split and loses against one)
-  [hand hand-value is-active]
+  [hand hand-value is-active & [is-first-card-down]]
   [:div.hand {:class (when is-active "is-hand-active")}
    [:div.hand-meta
     [:span hand-value]]
-   (into [:<>] (map #(card-component %) hand))])
+   (into [:<>]
+         (map-indexed
+          (fn [i card]
+            (if (and is-first-card-down (zero? i))
+              (card-component-down)
+              (card-component card)))
+          hand))])
 
 ;; ----------------
 ;; other components
@@ -64,6 +71,7 @@
 
             ;; (card-component (first local-deck))
             ;; (card-component {:suit 'spade :rank 12})
+            ;; (into [:div.card-display] (map card-component-down @local-deck)) ;; all cards are face down
             (into [:div.card-display] (map card-component @local-deck))])))
 
 (defn game-state-component [{:keys [state turn your-wins dealer-wins pushes current-winner current-split results]} reset-modal-fn]

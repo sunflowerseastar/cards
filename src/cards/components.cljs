@@ -8,11 +8,33 @@
 ;; game play components
 ;; --------------------
 
+(defn stacked-squares
+  "A single instance of the repeating square card-back design."
+  [n]
+  [:span.stacked-squares
+   [:span.stacked-squares-inner
+    [:span.square-wrapper
+     [:div.square]
+     [:div.square.one]
+     [:div.square.two]
+     [:div.square.three]
+     [:div.square.four]]
+    [:span.square-wrapper.offset
+     [:div.square]
+     [:div.square.one]
+     [:div.square.two]
+     [:div.square.three]
+     [:div.square.four]]]])
+
 (defn card-component-down
-  "Return a card that is face down and doesn't reveal it's suit or value."
+  "Return a card that is face down and doesn't reveal its suit or value."
   []
-  ;; TODO make the back of card
-  [:span.card-container "X"])
+  [:span.card-container
+   [:span.face-down-wrapper
+    (into [:span.face-down-inner]
+          (let [i (atom 0)]
+            (repeatedly 63 (fn []
+                             (stacked-squares (even? (swap! i inc)))))))]])
 
 (defn card-component
   "Given a 'card' state, return markup of that card."
@@ -72,7 +94,9 @@
             ;; (card-component (first local-deck))
             ;; (card-component {:suit 'spade :rank 12})
             ;; (into [:div.card-display] (map card-component-down @local-deck)) ;; all cards are face down
-            (into [:div.card-display] (map card-component @local-deck))])))
+            ;; (into [:div.card-display] (map card-component-down (take 1 @local-deck))) ;; 1 card, face down
+            (into [:div.card-display] (map card-component @local-deck))
+            ])))
 
 (defn game-state-component [{:keys [state turn your-wins dealer-wins pushes current-winner current-split results]} reset-modal-fn]
   [:div.game-state-component

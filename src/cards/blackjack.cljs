@@ -87,6 +87,7 @@
                 (> dealer-value 21) (conclude :you "you win - dealer busts")
                 (= your-value dealer-value) (conclude :push "push")
                 (= your-value 21) (conclude :you "you win - blackjack :)")
+                ;; TODO disambiguate "just a 21" versus "actual blackjack" hand
                 (= dealer-value 21) (conclude :dealer "dealer wins - blackjack")
                 (> dealer-value your-value) (conclude :dealer "dealer wins - higher value")
                 :else (conclude :you "you win - higher value")))

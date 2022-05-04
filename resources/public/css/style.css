@@ -7,6 +7,7 @@
 
   --green: #b1e597;
 
+  --space-xs: 0.34em;
   --space-sm: 1em;
   --space-md: 2em;
   --space-lg: 4em;
@@ -273,15 +274,16 @@ button.inactive,
   fill: red;
 }
 .card-container {
+  position: relative;
   display: inline-flex;
   justify-content: space-between;
   width: var(--card-width);
   height: calc(1.37 * var(--card-width));
+  margin: 5px;
+  padding: calc(var(--card-width) * 0.04) calc(var(--card-width) * 0.037);
   border: 1px solid #f1f1f1;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.11), 1px 1px 0 rgba(0, 0, 0, 0.13);
-  padding: calc(var(--card-width) * 0.04) calc(var(--card-width) * 0.037);
   border-radius: calc(var(--card-width) * 0.05);
-  margin: 5px;
   background: #fff;
   z-index: 1;
 }
@@ -510,6 +512,114 @@ button.inactive,
   bottom: 0.6%;
   transform: scale(0.83) scaleY(-1);
   transform-origin: 50%;
+}
+
+/* card back (face down) */
+/* from https://codepen.io/ItsMeNatalie/pen/OJLYbrr, with hard px values refactored out */
+
+.card-down-back-outer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: var(--space-xs);
+  border-radius: var(--space-xs);
+  border: 5px solid;
+}
+.face-down-wrapper {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 4px;
+  bottom: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.face-down-wrapper:before,
+.face-down-wrapper:after {
+  content: '';
+  display: block;
+  position: absolute;
+  box-sizing: border-box;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  border-radius: 2px;
+}
+.face-down-wrapper:before {
+  border: 2px solid #fff;
+  z-index: 2;
+}
+.face-down-wrapper:after {
+  border: 1px solid #7576a0;
+  z-index: 5;
+}
+.face-down-inner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+  transform: scale(1.2);
+  transform-origin: center center;
+}
+
+/* stacked-squares */
+
+.stacked-squares {
+  position: relative;
+}
+.stacked-squares-inner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+.square-wrapper {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: rotate(45deg);
+  box-shadow: 0 0 5px rgba(34, 34, 34, 0.75);
+}
+.square-wrapper.offset {
+  left: -50%;
+  top: -50%;
+}
+
+.square {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #d0d0ff;
+}
+.square.one {
+  top: 20%;
+  left: 20%;
+  background-color: #a1a2cf;
+}
+.square.two {
+  top: 40%;
+  left: 40%;
+  background-color: #7576a0;
+}
+.square.three {
+  top: 60%;
+  left: 60%;
+  background-color: #4a4d74;
+}
+.square.four {
+  top: 80%;
+  left: 80%;
+  background-color: #22274b;
 }
 
 /* utility */

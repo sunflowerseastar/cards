@@ -123,8 +123,6 @@ svg {
 .card-display {
   margin-bottom: var(--space-md);
 }
-.card-display svg {
-}
 .card-display-controls {
   margin-bottom: var(--space-md);
 }
@@ -501,6 +499,10 @@ button.inactive,
   position: relative;
   display: flex;
   height: 100%;
+}
+.face-card-middle svg {
+  /* required for face card SVGs to show in FF & Safari */
+  width: 100%;
 }
 .face-card-suit-left {
   position: absolute;

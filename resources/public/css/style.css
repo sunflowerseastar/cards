@@ -8,16 +8,19 @@
   --green: #b1e597;
 
   --space-xs: 0.34em;
-  --space-sm: 1em;
-  --space-md: 2em;
-  --space-lg: 4em;
+  --space-sm: 0.8em;
+  --space-md: 1.6em;
+  --space-lg: 3.8em;
 }
 
 /* general html */
 
 html,
-body,
+body {
+  height: 100%;
+}
 #app-container {
+  position: relative;
   height: 100%;
 }
 body {
@@ -58,11 +61,11 @@ svg {
 /* app */
 
 .app {
-  height: 100vh;
+  height: 100%;
 }
 
 .main {
-  padding: var(--space-sm) var(--space-md);
+  padding: 0 var(--space-md);
 }
 
 /* modal */
@@ -133,7 +136,7 @@ svg {
   display: flex;
   flex-direction: column;
   max-width: 600px;
-  height: 100vh;
+  height: 100%;
   margin: 0 auto;
 }
 

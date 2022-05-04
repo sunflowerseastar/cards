@@ -18,7 +18,7 @@
 html,
 body,
 #app-container {
-  height: 100vh;
+  height: 100%;
 }
 body {
   margin: 0;
@@ -30,7 +30,7 @@ h2 {
   display: inline-block;
   font-size: 16px;
   color: #333;
-  margin: var(--space-sm) 0 var(--space-xs);
+  margin: var(--space-sm) 0;
   font-weight: normal;
 }
 @media (min-width: 992px) {
@@ -245,7 +245,7 @@ button + button {
 }
 .button-group {
   display: flex;
-  margin: var(--space-md) 0;
+  margin: 0 0 var(--space-md) 0;
 }
 .white-bg button {
   color: black;

@@ -143,10 +143,6 @@
                 :on-click #(toggle-modal!)}
     (game-state-component @game reset-game!)]
 
-   [:div.button-group
-    [:button {:on-click #(deal!)} "deal"]
-    [:button {:on-click #(toggle-modal!)} "stats"]]
-
    [:div.card-play-area
     (when (not (empty? @hands))
       [:<>
@@ -171,6 +167,10 @@
                         (hand-component hand (hand->value hand) is-active))))))]])]
 
    [:div.results (apply str (interpose ", " (:results @game)))]
+
+   [:div.button-group
+    [:button {:on-click #(deal!)} "deal"]
+    [:button {:on-click #(toggle-modal!)} "stats"]]
 
    (let [active-p (and (= (:turn @game) :you) (= (:state @game) :running))
          [card-1 card-2 & hits] (nth (:you @hands) (:current-split @game))

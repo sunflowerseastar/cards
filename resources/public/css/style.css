@@ -3,7 +3,8 @@
   /* --card-width: 310px; */
   /* --card-width: 200px; */
   /* --card-width: 100px; */
-  --card-width: 67px;
+  --card-width: 77px;
+  /* --card-width: 67px; */
 
   --green: #b1e597;
 
@@ -65,7 +66,7 @@ svg {
 }
 
 .main {
-  padding: 0 var(--space-md);
+  padding: 0 var(--space-sm);
 }
 
 /* modal */
@@ -161,11 +162,9 @@ svg {
 .hand {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
-  place-content: left;
   position: relative;
-  padding: var(--space-sm) 90px var(--space-sm) var(--space-sm);
+  padding: var(--space-xs) 90px var(--space-xs) var(--space-xs);
   margin: 0 calc(var(--space-sm) * -1);
-  background: linear-gradient(38deg, #fcfcfc, #fff);
   border-width: 1px;
   border-style: solid;
   border-image: linear-gradient(
@@ -177,7 +176,7 @@ svg {
     1 100%;
 }
 .hand.is-hand-active {
-  background: linear-gradient(38deg, #fdfdfd, #f8f8f8, #fff);
+  background: linear-gradient(38deg, #fdfdfd, #f2f2f2, #fff);
   border-width: 1px;
   border-style: solid;
   border-image: linear-gradient(
@@ -246,7 +245,7 @@ button + button {
 }
 .button-group {
   display: flex;
-  margin: 0 0 var(--space-md) 0;
+  padding-bottom: var(--space-sm);
 }
 .white-bg button {
   color: black;
@@ -625,6 +624,10 @@ button.inactive,
   top: 80%;
   left: 80%;
   background-color: #22274b;
+}
+
+.results {
+  padding: var(--space-sm) 0;
 }
 
 /* utility */

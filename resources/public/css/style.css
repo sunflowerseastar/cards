@@ -7,8 +7,15 @@
   --card-width: min(120px, calc(18vw));
   /* --card-width: 67px; */
 
+  --gray: #666;
   --black: #333;
   --green: #b1e597;
+  --red: #ff8c94;
+  --lavendar: #d0d0ff;
+  --lavendar-1: #a1a2cf;
+  --lavendar-2: #7576a0;
+  --lavendar-3: #4a4d74;
+  --lavendar-4: #22274b;
 
   --space-xs: 0.26em;
   --space-sm: 0.88em;
@@ -92,7 +99,7 @@ img {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1;
+  z-index: 10;
   opacity: 0;
   pointer-events: none;
   background: rgba(0, 0, 0, 0);
@@ -111,7 +118,7 @@ img {
   padding: 0 var(--space-md);
   opacity: 0;
   pointer-events: none;
-  z-index: 2;
+  z-index: 11;
 }
 .modal.is-modal-showing {
   flex: 1;
@@ -202,7 +209,7 @@ img {
   flex-direction: column;
   text-align: right;
   justify-content: space-evenly;
-  align-items: flex-end;
+  align-items: center;
   height: 100%;
   box-sizing: border-box;
   top: 0;
@@ -210,6 +217,59 @@ img {
 }
 .hand-meta > span {
   flex: 1;
+}
+.meta-value-container {
+  position: relative;
+}
+.meta-value-container:before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 3px;
+}
+.meta-value-container.win:before,
+.meta-value-container.lose:before,
+.meta-value-container.push:before {
+}
+
+.meta-value-container.win:before {
+  background: var(--green);
+}
+.meta-value-container.lose:before {
+  background: var(--red);
+}
+.meta-value-container.push:before {
+  background: var(--lavendar);
+}
+.meta-value {
+  position: relative;
+  z-index: 1;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+@media (min-width: 768px) {
+  .meta-value {
+    font-size: 14px;
+  }
+}
+@media (min-width: 992px) {
+  .meta-value {
+    font-size: 15px;
+  }
+}
+@media (min-width: 1200px) {
+  .meta-value {
+    font-size: 15px;
+  }
+}
+
+.small-down-card .card-container {
+  width: 26px;
+  height: calc(1.37 * 26px);
 }
 
 .hand {
@@ -623,22 +683,22 @@ button.inactive,
 .square.one {
   top: 20%;
   left: 20%;
-  background-color: #a1a2cf;
+  background-color: var(--lavendar-1);
 }
 .square.two {
   top: 40%;
   left: 40%;
-  background-color: #7576a0;
+  background-color: var(--lavendar-2);
 }
 .square.three {
   top: 60%;
   left: 60%;
-  background-color: #4a4d74;
+  background-color: var(--lavendar-3);
 }
 .square.four {
   top: 80%;
   left: 80%;
-  background-color: #22274b;
+  background-color: var(--lavendar-4);
 }
 
 /* utility */
@@ -654,4 +714,7 @@ button.inactive,
 }
 .padding-lr-sm {
   padding: 0 var(--space-sm);
+}
+.hide {
+  opacity: 0;
 }

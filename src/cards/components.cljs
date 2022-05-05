@@ -70,9 +70,8 @@
   "Given a hand value and options, render the hand meta/state."
   [hand-value {:keys [is-active hand-outcome is-a-card-in-the-hole]}]
   [:div.hand-meta
-   [:span (if is-active "active" (gstring/unescapeEntities "&nbsp;"))]
-   [:span {:class (when (> hand-value 21) :is-bust)} (if (not is-a-card-in-the-hole) hand-value "")]
-   [:span (if hand-outcome (name hand-outcome) (gstring/unescapeEntities "&nbsp;"))]])
+   [:div.meta-value-container {:class (when hand-outcome (name hand-outcome))} [:span.meta-value (if (not is-a-card-in-the-hole) hand-value "") ]]
+   [:div.small-down-card {:class (when (not is-active) "hide")} (card-down-component)]])
 
 (defn hand-component
   "Given a hand, render hand meta options (state), and the cards themselves."

@@ -38,7 +38,7 @@
   (let [d (generate-deck)] (nth (iterate shuffle d) 6)))
 
 (defn generate-specific-deck [starting-cards]
-  (->> (generate-deck)
+  (->> (generate-shuffled-deck)
        ;; remove starting-cards from the deck
        (filter (fn [card] (not (some #(= card %) starting-cards))))
        ;; put starting-cards at the front of the deck

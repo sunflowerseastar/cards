@@ -153,8 +153,8 @@
         (let [hand (first (:dealer @hands))
               value (hand->value hand)
               is-active false
-              is-first-card-down (= (:turn @game) :you)]
-          (hand-component hand (hand->value hand) is-active is-first-card-down))]
+              is-a-card-in-the-hole (= (:turn @game) :you)]
+          (hand-component hand (hand->value hand) is-active is-a-card-in-the-hole))]
 
        [:div.player-container.you
         [:h2 {:class (if (= (:current-winner @game) :you) "win")} "you"]

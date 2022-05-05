@@ -67,14 +67,14 @@
 (defn hand-component
   "Given a hand, show hand meta (state), and the cards themselves."
   ;; TODO show which hands win, lose, or both (ex. dealer wins against one split and loses against one)
-  [hand hand-value is-active & [is-first-card-down]]
+  [hand hand-value is-active & [is-a-card-in-the-hole]]
   [:div.hand {:class (when is-active "is-hand-active")}
    [:div.hand-meta
-    [:span hand-value]]
+    (when (not is-a-card-in-the-hole) [:span hand-value])]
    (into [:<>]
          (map-indexed
           (fn [i card]
-            (if (and is-first-card-down (zero? i))
+            (if (and is-a-card-in-the-hole (= i 1))
               (card-component-down)
               (card-component card)))
           hand))])

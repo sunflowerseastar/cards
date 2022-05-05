@@ -135,11 +135,11 @@
        [:div.player-container.dealer
         [:h2  "dealer"]
         (let [hand (first (:dealer @hands))
-              value (hand->value hand)
               is-active false
               is-a-card-in-the-hole (= (:turn @game) :you)]
-          ;; TODO change function to options
-          (hand-component hand (hand->value hand) is-active is-a-card-in-the-hole nil))]
+          (hand-component hand
+                          :is-active is-active
+                          :is-a-card-in-the-hole is-a-card-in-the-hole))]
 
        [:div.player-container.you
         {:class (if (= (:current-winner @game) :dealer) "win")}
@@ -150,15 +150,13 @@
                     (fn [i hand]
                       (let [is-active (and (= (:turn @game) :you)
                                            (= (:current-split @game) i))
-                            hand-outcome (hands->win-lose-push hand (first (:dealer @hands)))
-                            is-win (and (= (@game :state) :stopped) (= hand-outcome :win))
-                            ;; is-loss (and (= (@game :state) :stopped) (= hand-outcome :loss))
-                            ;; is-push (and (= (@game :state) :stopped) (= hand-outcome :push))
-
-                            ]
-                        ;; TODO change hand-component to options (and please document in clojure.org)
-                        ;; TODO change that last nil to whether this hand won or not
-                        (hand-component hand (hand->value hand) is-active nil is-win))))))]])]
+                            hand-outcome (and (= (:state @game) :stopped)
+                                              (hands->win-lose-push hand (first (:dealer @hands))))
+                            is-win (and (= (:state @game) :stopped)
+                                        (= hand-outcome :win))]
+                        (hand-component hand
+                                        :is-active is-active
+                                        :hand-outcome hand-outcome))))))]])]
 
    [:div.button-group
     [:button {:on-click #(deal!)} "deal"]

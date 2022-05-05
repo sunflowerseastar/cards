@@ -1,6 +1,7 @@
 (ns cards.components
   (:require
    [goog.string :as gstring]
+   [cards.blackjack-helpers :refer [hand->value]]
    [cards.deck :as deck]
    [cards.svgs :as svgs]
    [reagent.core :as reagent :refer [atom]]))
@@ -27,7 +28,7 @@
      [:div.square.three]
      [:div.square.four]]]])
 
-(defn card-component-down
+(defn card-down-component
   "Return a card that is face down and doesn't reveal its suit or value."
   []
   [:span.card-container
@@ -65,22 +66,28 @@
         :else (into [:<>] (repeat rank suit-svg)))]
      [:span.card-right (svgs/svg-rank rank is-red) suit-svg]]))
 
+(defn hand-meta-component
+  "Given a hand value and options, render the hand meta/state."
+  [hand-value {:keys [is-active hand-outcome is-a-card-in-the-hole]}]
+  [:div.hand-meta
+   [:span (if is-active "active" (gstring/unescapeEntities "&nbsp;"))]
+   [:span {:class (when (> hand-value 21) :is-bust)} (if (not is-a-card-in-the-hole) hand-value "")]
+   [:span (if hand-outcome (name hand-outcome) (gstring/unescapeEntities "&nbsp;"))]])
+
 (defn hand-component
-  "Given a hand, show hand meta (state), and the cards themselves."
-  ;; TODO show which hands win, lose, or both (ex. dealer wins against one split and loses against one)
-  [hand hand-value is-active & [is-a-card-in-the-hole is-a-win]]
-  [:div.hand {:class (when is-active "is-hand-active")}
-   [:div.hand-meta
-    [:span (if (> hand-value 21) "bust" (gstring/unescapeEntities "&nbsp;"))]
-    [:span (if (not is-a-card-in-the-hole) hand-value "")]
-    [:span (if is-a-win "win" (gstring/unescapeEntities "&nbsp;"))]]
-   (into [:<>]
-         (map-indexed
-          (fn [i card]
-            (if (and is-a-card-in-the-hole (= i 1))
-              (card-component-down)
-              (card-component card)))
-          hand))])
+  "Given a hand, render hand meta options (state), and the cards themselves."
+  [hand & {:as opts}]
+  (let [hand-value (hand->value hand)
+        {:keys [is-active hand-outcome is-a-card-in-the-hole]} opts]
+    [:div.hand {:class (when is-active "is-hand-active")}
+     (hand-meta-component hand-value opts)
+     (into [:<>]
+           (map-indexed
+            (fn [i card]
+              (if (and is-a-card-in-the-hole (= i 1))
+                (card-down-component)
+                (card-component card)))
+            hand))]))
 
 ;; ----------------
 ;; other components
@@ -96,8 +103,8 @@
 
             ;; (card-component (first local-deck))
             ;; (card-component {:suit 'spade :rank 12})
-            ;; (into [:div.card-display] (map card-component-down @local-deck)) ;; all cards are face down
-            ;; (into [:div.card-display] (map card-component-down (take 1 @local-deck))) ;; 1 card, face down
+            ;; (into [:div.card-display] (map card-down-component @local-deck)) ;; all cards are face down
+            ;; (into [:div.card-display] (map card-down-component (take 1 @local-deck))) ;; 1 card, face down
             (into [:div.card-display] (map card-component @local-deck))])))
 
 (defn game-state-component [game reset-modal-fn]

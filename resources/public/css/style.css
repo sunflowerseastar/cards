@@ -115,7 +115,6 @@ img {
   left: 0;
   right: 0;
   display: flex;
-  padding: 0 var(--space-md);
   opacity: 0;
   pointer-events: none;
   z-index: 11;
@@ -151,12 +150,14 @@ img {
 /*
 <div.blackjack-container>
   <div.header>
-  <div.card-play-area>
-    <div.hand> ... </div>
-    <div.player-division-line> ... </div>
-    <div.hand(s)> ... </div>
+  <div.game-play-area>
+    <div.card-play-area>
+      <div.hand> ... </div>
+      <div.player-division-line> ... </div>
+      <div.hand(s)> ... </div>
+    </div>
+    <div.button-group(s)> ... </div>
   </div>
-  <div.button-group(s)> ... </div>
 </div>
 */
 
@@ -164,7 +165,6 @@ img {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  max-width: 900px;
   height: 100%;
   margin: 0 auto;
 }
@@ -181,7 +181,6 @@ img {
   display: block;
   width: 22px;
   height: 8px;
-  /* border: 1px solid magenta; */
 }
 .double-spade:before,
 .double-spade:after {
@@ -198,6 +197,15 @@ img {
 }
 .double-spade:after {
   bottom: 0;
+}
+.game-play-area {
+  flex: 1;
+  width: 100%;
+  max-width: 900px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
 }
 .card-play-area {
   flex: 1;

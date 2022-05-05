@@ -40,6 +40,7 @@
 
 ;; TODO change how cards are dealt (draw-counter)
 ;; TODO review deal and verify that this is vegas standard
+;; TODO check if dealer has blackjack after dealing - if so, end game
 (defn deal-hands [local-deck]
   (let [your-card-1 (first local-deck)
         dealer-card-1 (second local-deck)
@@ -130,41 +131,42 @@
 
    [:div.header [:a {:on-click #(toggle-modal!)} [:div.double-spade]]]
 
-   [:div.card-play-area
-    (when (not (empty? @hands))
-      [:<>
+   [:div.game-play-area
+    [:div.card-play-area
+     (when (not (empty? @hands))
+       [:<>
 
-       (let [hand (first (:dealer @hands))
-             is-active false
-             is-a-card-in-the-hole (= (:turn @game) :you)]
-         (hand-component hand
-                         :is-active is-active
-                         :is-a-card-in-the-hole is-a-card-in-the-hole))
+        (let [hand (first (:dealer @hands))
+              is-active false
+              is-a-card-in-the-hole (= (:turn @game) :you)]
+          (hand-component hand
+                          :is-active is-active
+                          :is-a-card-in-the-hole is-a-card-in-the-hole))
 
-       [:div.player-division-line
-        [:h2 "--- dealer stands on soft 17 ---"]]
+        [:div.player-division-line
+         [:h2 "--- dealer stands on soft 17 ---"]]
 
-       (into [:<>]
-             (->> (@hands :you)
-                  (map-indexed
-                   (fn [i hand]
-                     (let [is-active (and (= (:turn @game) :you)
-                                          (= (:current-split @game) i))
-                           hand-outcome (and (= (:state @game) :stopped)
-                                             (hands->win-lose-push hand (first (:dealer @hands))))
-                           is-win (and (= (:state @game) :stopped)
-                                       (= hand-outcome :win))]
-                       (hand-component hand
-                                       :is-active is-active
-                                       :hand-outcome hand-outcome))))))])]
+        (into [:<>]
+              (->> (@hands :you)
+                   (map-indexed
+                    (fn [i hand]
+                      (let [is-active (and (= (:turn @game) :you)
+                                           (= (:current-split @game) i))
+                            hand-outcome (and (= (:state @game) :stopped)
+                                              (hands->win-lose-push hand (first (:dealer @hands))))
+                            is-win (and (= (:state @game) :stopped)
+                                        (= hand-outcome :win))]
+                        (hand-component hand
+                                        :is-active is-active
+                                        :hand-outcome hand-outcome))))))])]
 
-   [:div.button-group {:class (when (not= (:state @game) :stopped) "inactive")} [:button {:on-click #(deal!)} "deal"]]
+    [:div.button-group {:class (when (not= (:state @game) :stopped) "inactive")} [:button {:on-click #(deal!)} "deal"]]
 
-   (let [active-p (and (= (:turn @game) :you) (= (:state @game) :running))
-         [card-1 card-2 & hits] (nth (:you @hands) (:current-split @game))
-         can-stand-p (some? card-2)
-         can-split-p (and (= (:rank card-1) (:rank card-2)) (empty? hits))]
-     [:div.button-group {:class (if (not active-p) "inactive")}
-      [:button {:on-click #(hit!)} "hit"]
-      [:button {:class (if (not can-stand-p) "inactive") :on-click #(stand!)} "stand"]
-      [:button {:class (if (not can-split-p) "inactive") :on-click #(split!)} "split"]])])
+    (let [active-p (and (= (:turn @game) :you) (= (:state @game) :running))
+          [card-1 card-2 & hits] (nth (:you @hands) (:current-split @game))
+          can-stand-p (some? card-2)
+          can-split-p (and (= (:rank card-1) (:rank card-2)) (empty? hits))]
+      [:div.button-group {:class (if (not active-p) "inactive")}
+       [:button {:on-click #(hit!)} "hit"]
+       [:button {:class (if (not can-stand-p) "inactive") :on-click #(stand!)} "stand"]
+       [:button {:class (if (not can-split-p) "inactive") :on-click #(split!)} "split"]])]])

@@ -6,6 +6,7 @@
   --card-width: 77px;
   /* --card-width: 67px; */
 
+  --black: #333;
   --green: #b1e597;
 
   --space-xs: 0.34em;
@@ -27,19 +28,19 @@ body {
 body {
   margin: 0;
   font-family: 'iosevka ss05', Menlo, 'Andale Mono', monospace;
-  color: black;
+  color: var(--black);
   touch-action: manipulation;
 }
 h2 {
   display: inline-block;
-  font-size: 16px;
-  color: #333;
+  font-size: 13px;
+  text-transform: uppercase;
   margin: var(--space-sm) 0;
   font-weight: normal;
 }
 @media (min-width: 992px) {
   h2 {
-    font-size: 17px;
+    font-size: 14px;
   }
 }
 img {
@@ -193,12 +194,16 @@ svg {
   display: flex;
   flex-direction: column;
   text-align: right;
-  justify-content: center;
+  justify-content: space-evenly;
+  align-items: flex-end;
   height: 100%;
   box-sizing: border-box;
   top: 0;
   right: 0;
   font-weight: 300;
+}
+.hand-meta > span {
+  flex: 1;
 }
 
 .hand {
@@ -213,8 +218,8 @@ button {
   text-transform: uppercase;
   font-size: 10px;
   padding: 10px 20px;
-  background: black;
-  border: 1px solid black;
+  background: var(--black);
+  border: 1px solid var(--black);
 }
 button:focus {
   outline: none;
@@ -236,7 +241,7 @@ button:focus:after {
   }
 }
 button:hover {
-  color: black;
+  color: var(--black);
   background: white;
   cursor: pointer;
 }
@@ -248,12 +253,12 @@ button + button {
   padding-bottom: var(--space-sm);
 }
 .white-bg button {
-  color: black;
+  color: var(--black);
   background: white;
 }
 .white-bg button:hover {
   color: white;
-  background: black;
+  background: var(--black);
 }
 
 button.inactive,
@@ -264,7 +269,7 @@ button.inactive,
 }
 .inactive button:hover {
   color: white;
-  background: black;
+  background: var(--black);
 }
 
 /* cards */
@@ -624,10 +629,6 @@ button.inactive,
   top: 80%;
   left: 80%;
   background-color: #22274b;
-}
-
-.results {
-  padding: var(--space-sm) 0;
 }
 
 /* utility */

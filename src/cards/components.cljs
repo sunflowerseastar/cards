@@ -1,5 +1,6 @@
 (ns cards.components
   (:require
+   [goog.string :as gstring]
    [cards.deck :as deck]
    [cards.svgs :as svgs]
    [reagent.core :as reagent :refer [atom]]))
@@ -67,10 +68,12 @@
 (defn hand-component
   "Given a hand, show hand meta (state), and the cards themselves."
   ;; TODO show which hands win, lose, or both (ex. dealer wins against one split and loses against one)
-  [hand hand-value is-active & [is-a-card-in-the-hole]]
+  [hand hand-value is-active & [is-a-card-in-the-hole is-a-win]]
   [:div.hand {:class (when is-active "is-hand-active")}
    [:div.hand-meta
-    (when (not is-a-card-in-the-hole) [:span hand-value])]
+    [:span (if (> hand-value 21) "bust" (gstring/unescapeEntities "&nbsp;"))]
+    [:span (if (not is-a-card-in-the-hole) hand-value "")]
+    [:span (if is-a-win "win" (gstring/unescapeEntities "&nbsp;"))]]
    (into [:<>]
          (map-indexed
           (fn [i card]
@@ -95,17 +98,9 @@
             ;; (card-component {:suit 'spade :rank 12})
             ;; (into [:div.card-display] (map card-component-down @local-deck)) ;; all cards are face down
             ;; (into [:div.card-display] (map card-component-down (take 1 @local-deck))) ;; 1 card, face down
-            (into [:div.card-display] (map card-component @local-deck))
-            ])))
+            (into [:div.card-display] (map card-component @local-deck))])))
 
-(defn game-state-component [{:keys [state turn your-wins dealer-wins pushes current-winner current-split results]} reset-modal-fn]
+(defn game-state-component [game reset-modal-fn]
   [:div.game-state-component
-   [:p "your wins: " your-wins]
-   [:p "dealer wins: " dealer-wins]
-   [:p "pushes: " pushes]
-   [:p "state: " state]
-   [:p "turn: " turn]
-   [:p "current-winner: " current-winner] ;; TODO make this make sense for splits (more than one winner..?)
-   [:p "current-split: " current-split]
-   [:p "results: " (apply str (interpose ", " results))]
+   (into [:div] (map (fn [[k v]] [:p k ": " (str v)]) game))
    [:button {:on-click #(reset-modal-fn)} "reset"]])

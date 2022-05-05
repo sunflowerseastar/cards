@@ -1,6 +1,6 @@
 (ns cards.blackjack
   (:require
-   [cards.blackjack-helpers :refer [hand->value]]
+   [cards.blackjack-helpers :refer [hand->value hands->win-lose-push]]
    [cards.components :refer [game-state-component hand-component]]
    [cards.deck :refer [generate-shuffled-deck]]
    [reagent.core :as reagent :refer [atom]]))
@@ -8,31 +8,38 @@
 (def dealer-hit-cutoff 17)
 
 
-;; State variables get the "normal" name, and components get the cumbersome long
-;; name. Ex. (hand-component hand) is the `hand-component` function receiving a
-;; piece of game state called `hand`.
+;; Repo convention: state variables get the "normal" name, and components get
+;; the cumbersome long name. Ex. (hand-component hand) is the `hand-component`
+;; function receiving a piece of game state called `hand`.
 
 
-(def game-initial-state {:state :stopped ;; stopped | running
+(def game-initial-state {;; gameplay
+                         :state :stopped ;; stopped | running
                          :turn :none ;; none | you | dealer
                          :current-split 0 ;; hand index of current split
-                         :dealer-wins 0 ;; number of wins for dealer
-                         :your-wins 0 ;; number of wins for you
-                         :pushes 0 ;; number of pushes
-                         :current-winner nil ;; who just won the finished hand
-                         :is-modal-showing false
-                         :results [] ;; explanation of who won & why
-                         })
+
+                         ;; outcomes/scoring
+                         :wins 0 ;; your total wins
+                         :losses 0 ;; your total losses
+                         :pushes 0 ;; number of ties
+
+                         ;; ui
+                         :is-modal-showing false})
 
 (def game (atom game-initial-state))
 (def deck (atom (generate-shuffled-deck)))
 
 ;; hands ex. {:you [[{:suit diamond :rank 7} {:suit diamond, :rank 14}]],
 ;;            :dealer [[{:suit heart, :rank 2} {:suit heart, :rank 8}]]}
+
 ;; Dealer gets a vector of hands, although in practice the dealer always has only one hand.
+;; TODO consider changing dealer hand data structure
+
 (def hands (atom {}))
 (def draw-counter (atom 4))
 
+;; TODO change how cards are dealt (draw-counter)
+;; TODO review deal and verify that this is vegas standard
 (defn deal-hands [local-deck]
   (let [your-card-1 (first local-deck)
         dealer-card-1 (second local-deck)
@@ -44,6 +51,7 @@
 (defn reset-game! []
   (do (reset! deck generate-shuffled-deck)
       (reset! hands {})
+      ;; TODO change how cards are dealt (draw-counter)
       (reset! draw-counter 4)
       (reset! game game-initial-state)))
 
@@ -51,48 +59,21 @@
   (do (swap! draw-counter inc)
       (@deck @draw-counter)))
 
-(defn end-game! []
-  (swap! game assoc :state :stopped :turn :none))
-
-(defn increment-wins! [win-count]
-  (swap! game assoc win-count (inc (@game win-count))))
-
-(defn you-win! []
-  (swap! game assoc :your-wins (inc (:your-wins @game)) :current-winner :you))
-
-(defn dealer-wins! []
-  (swap! game assoc :dealer-wins (inc (:dealer-wins @game)) :current-winner :dealer))
-
-(defn push! []
-  (increment-wins! :pushes))
-
-(defn update-result! [result-text]
-  (swap! game assoc :results (conj (:results @game) result-text)))
-
-(defn conclude [winner result-text]
-  (do (update-result! result-text)
-      (case winner
-        :push (push!)
-        :dealer (dealer-wins!)
-        (you-win!))))
+(defn end-game! [])
 
 (defn play-next-split! []
   (swap! game assoc :current-split (inc (:current-split @game))))
 
 (defn conclude-game! []
-  (let [your-values (map hand->value (:you @hands))
-        your-numbers-of-cards (map count (:you @hands))
-        dealer-value (hand->value (nth (:dealer @hands) 0))
-        dealer-number-of-cards (-> (:dealer @hands) first count)]
-    (do (doseq [your-value your-values your-number-of-cards your-numbers-of-cards]
-          (cond (and (= dealer-value 21) (= dealer-number-of-cards 2)) (conclude :dealer "dealer wins - blackjack")
-                (and (= your-value 21) (= your-number-of-cards 2)) (conclude :you "you win - blackjack")
-                (> dealer-value 21) (conclude :you "you win - dealer busts")
-                (> your-value 21) (conclude :dealer "dealer wins - you bust")
-                (= your-value dealer-value) (conclude :push "push")
-                (> dealer-value your-value) (conclude :dealer "dealer wins - higher value")
-                :else (conclude :you "you win - higher value")))
-        (end-game!))))
+  (do
+    ;; update scoring
+    (doseq [outcome (map #(hands->win-lose-push % (first (:dealer @hands))) (:you @hands))]
+      (case outcome
+        :win (swap! game update :wins inc)
+        :lose (swap! game update :losses inc)
+        :push (swap! game update :pushes inc)))
+    ;; end gameplay
+    (swap! game assoc :state :stopped :turn :none)))
 
 (defn add-hit-card-to-hand! [player card]
   (swap! hands update-in [player (:current-split @game)] conj card))
@@ -108,13 +89,15 @@
               (conclude-game!)))))))
 
 (defn deal! []
-  (do (reset! deck (generate-shuffled-deck))
-      ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 's :rank 14} {:suit 'd :rank 2} {:suit 'c :rank 14}])) ;; split
+  (do
+    (reset! deck (generate-shuffled-deck))
+    ;; TODO don't permit splitting aces
+    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 2} {:suit 'club :rank 14}])) ;; deal a split
       ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 2} {:suit 'diamond :rank 13} {:suit 'club :rank 2} {:suit 'diamond :rank 2} {:suit 'heart :rank 2} {:suit 'heart :rank 3}])) ;; low cards
-      (reset! hands (deal-hands @deck))
-      (reset! draw-counter 4)
-      (swap! game assoc :state :running :turn :you :current-split 0 :current-winner nil :results [])
-      (if (= (hand->value (nth (:you @hands) (:current-split @game))) 21) (dealer-plays!))))
+    (reset! hands (deal-hands @deck))
+    (reset! draw-counter 4)
+    (swap! game assoc :state :running :turn :you :current-split 0)
+    (if (= (hand->value (nth (:you @hands) (:current-split @game))) 21) (dealer-plays!))))
 
 (defn stand! []
   (if (> (- (count (:you @hands)) 1) (:current-split @game))
@@ -122,6 +105,7 @@
     (dealer-plays!)))
 
 (defn split! []
+  ;; TODO don't permit splitting aces
   (do (let [split-card (nth (nth (:you @hands) (:current-split @game)) 1)]
         (swap! hands update :you conj [split-card]))
       (swap! hands update-in [:you (:current-split @game)] #(-> (take 1 %) vec))))
@@ -149,25 +133,32 @@
       [:<>
 
        [:div.player-container.dealer
-        [:h2 {:class (if (= (:current-winner @game) :dealer) "win")} "dealer"]
+        [:h2  "dealer"]
         (let [hand (first (:dealer @hands))
               value (hand->value hand)
               is-active false
               is-a-card-in-the-hole (= (:turn @game) :you)]
-          (hand-component hand (hand->value hand) is-active is-a-card-in-the-hole))]
+          ;; TODO change function to options
+          (hand-component hand (hand->value hand) is-active is-a-card-in-the-hole nil))]
 
        [:div.player-container.you
-        [:h2 {:class (if (= (:current-winner @game) :you) "win")} "you"]
+        {:class (if (= (:current-winner @game) :dealer) "win")}
+        [:h2 "you"]
         (into [:<>]
               (->> (@hands :you)
                    (map-indexed
                     (fn [i hand]
                       (let [is-active (and (= (:turn @game) :you)
-                                           (or (= (count (:you @hands)) 1)
-                                               (= (:current-split @game) i)))]
-                        (hand-component hand (hand->value hand) is-active))))))]])]
+                                           (= (:current-split @game) i))
+                            hand-outcome (hands->win-lose-push hand (first (:dealer @hands)))
+                            is-win (and (= (@game :state) :stopped) (= hand-outcome :win))
+                            ;; is-loss (and (= (@game :state) :stopped) (= hand-outcome :loss))
+                            ;; is-push (and (= (@game :state) :stopped) (= hand-outcome :push))
 
-   [:div.results (apply str (interpose ", " (:results @game)))]
+                            ]
+                        ;; TODO change hand-component to options (and please document in clojure.org)
+                        ;; TODO change that last nil to whether this hand won or not
+                        (hand-component hand (hand->value hand) is-active nil is-win))))))]])]
 
    [:div.button-group
     [:button {:on-click #(deal!)} "deal"]

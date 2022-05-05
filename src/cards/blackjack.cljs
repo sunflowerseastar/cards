@@ -128,6 +128,8 @@
                 :on-click #(toggle-modal!)}
     (game-state-component @game reset-game!)]
 
+   [:div.header [:a {:on-click #(toggle-modal!)} [:div.double-spade]]]
+
    [:div.card-play-area
     (when (not (empty? @hands))
       [:<>
@@ -156,9 +158,7 @@
                                        :is-active is-active
                                        :hand-outcome hand-outcome))))))])]
 
-   [:div.button-group
-    [:button {:on-click #(deal!)} "deal"]
-    [:button {:on-click #(toggle-modal!)} "stats"]]
+   [:div.button-group {:class (when (not= (:state @game) :stopped) "inactive")} [:button {:on-click #(deal!)} "deal"]]
 
    (let [active-p (and (= (:turn @game) :you) (= (:state @game) :running))
          [card-1 card-2 & hits] (nth (:you @hands) (:current-split @game))

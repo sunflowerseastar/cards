@@ -150,6 +150,7 @@ img {
 
 /*
 <div.blackjack-container>
+  <div.header>
   <div.card-play-area>
     <div.hand> ... </div>
     <div.player-division-line> ... </div>
@@ -167,8 +168,40 @@ img {
   height: 100%;
   margin: 0 auto;
 }
+.header {
+  text-align: right;
+}
+.header a {
+  display: inline-block;
+  padding: var(--space-md) var(--space-sm);
+  margin-right: calc(var(--space-xs) * -1);
+}
+.double-spade {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 8px;
+  /* border: 1px solid magenta; */
+}
+.double-spade:before,
+.double-spade:after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--black);
+}
+.double-spade:before {
+  top: 0;
+}
+.double-spade:after {
+  bottom: 0;
+}
 .card-play-area {
   flex: 1;
+  padding-bottom: var(--space-md);
 }
 .player-division-line {
   padding: var(--space-xs) 0 var(--space-sm);

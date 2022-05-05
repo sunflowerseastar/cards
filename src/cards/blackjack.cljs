@@ -95,11 +95,18 @@
     (reset! deck (generate-shuffled-deck))
     ;; TODO auto one-hit-then-stand aces when they're split
     ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 2} {:suit 'club :rank 14}])) ;; deal a split
-      ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 2} {:suit 'diamond :rank 13} {:suit 'club :rank 2} {:suit 'diamond :rank 2} {:suit 'heart :rank 2} {:suit 'heart :rank 3}])) ;; low cards
+    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 14} {:suit 'club :rank 13} {:suit 'heart :rank 13}])) ;; you and dealer both have blackjacks
+    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 14} {:suit 'club :rank 9} {:suit 'heart :rank 13}])) ;; dealer has blackjack
+    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 14} {:suit 'club :rank 13} {:suit 'heart :rank 8}])) ;; you have blackjack
+    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 2} {:suit 'diamond :rank 13} {:suit 'club :rank 2} {:suit 'diamond :rank 2} {:suit 'heart :rank 2} {:suit 'heart :rank 3}])) ;; low cards
     (reset! hands (deal-hands @deck))
     (reset! draw-counter 4)
     (swap! game assoc :state :running :turn :you :current-split 0)
-    (if (= (hand->value (nth (:you @hands) (:current-split @game))) 21) (dealer-plays!))))
+    (if (= (->> (:dealer @hands) first hand->value) 21)
+      ;; if the dealer has blackjack, then there is no interactive gameplay for the round
+      (conclude-game!)
+      ;; otherwise, if you have blackjack, go ahead and turn gameplay over to the dealer
+      (when (= (->> (:you @hands) first hand->value) 21) (dealer-plays!)))))
 
 (defn stand! []
   (if (> (- (count (:you @hands)) 1) (:current-split @game))

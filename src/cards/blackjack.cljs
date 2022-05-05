@@ -121,7 +121,7 @@
   (swap! game assoc :is-modal-showing (not (:is-modal-showing @game))))
 
 (defn blackjack []
-  [:div.main.blackjack-container
+  [:div.blackjack-container.padding-lr-sm
 
    [:div.blocker {:class (if (:is-modal-showing @game) "is-modal-showing")}]
    [:div.modal {:class (if (:is-modal-showing @game) "is-modal-showing")
@@ -132,31 +132,29 @@
     (when (not (empty? @hands))
       [:<>
 
-       [:div.player-container.dealer
-        [:h2  "dealer"]
-        (let [hand (first (:dealer @hands))
-              is-active false
-              is-a-card-in-the-hole (= (:turn @game) :you)]
-          (hand-component hand
-                          :is-active is-active
-                          :is-a-card-in-the-hole is-a-card-in-the-hole))]
+       (let [hand (first (:dealer @hands))
+             is-active false
+             is-a-card-in-the-hole (= (:turn @game) :you)]
+         (hand-component hand
+                         :is-active is-active
+                         :is-a-card-in-the-hole is-a-card-in-the-hole))
 
-       [:div.player-container.you
-        {:class (if (= (:current-winner @game) :dealer) "win")}
-        [:h2 "you"]
-        (into [:<>]
-              (->> (@hands :you)
-                   (map-indexed
-                    (fn [i hand]
-                      (let [is-active (and (= (:turn @game) :you)
-                                           (= (:current-split @game) i))
-                            hand-outcome (and (= (:state @game) :stopped)
-                                              (hands->win-lose-push hand (first (:dealer @hands))))
-                            is-win (and (= (:state @game) :stopped)
-                                        (= hand-outcome :win))]
-                        (hand-component hand
-                                        :is-active is-active
-                                        :hand-outcome hand-outcome))))))]])]
+       [:div.player-division-line
+        [:h2 "--- dealer stands on soft 17 ---"]]
+
+       (into [:<>]
+             (->> (@hands :you)
+                  (map-indexed
+                   (fn [i hand]
+                     (let [is-active (and (= (:turn @game) :you)
+                                          (= (:current-split @game) i))
+                           hand-outcome (and (= (:state @game) :stopped)
+                                             (hands->win-lose-push hand (first (:dealer @hands))))
+                           is-win (and (= (:state @game) :stopped)
+                                       (= hand-outcome :win))]
+                       (hand-component hand
+                                       :is-active is-active
+                                       :hand-outcome hand-outcome))))))])]
 
    [:div.button-group
     [:button {:on-click #(deal!)} "deal"]

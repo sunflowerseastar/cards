@@ -81,14 +81,15 @@
 
 (defn conclude-game! []
   (let [your-values (map hand->value (:you @hands))
-        dealer-value (hand->value (nth (:dealer @hands) 0))]
-    (do (doseq [your-value your-values]
-          (cond (> your-value 21) (conclude :dealer "dealer wins - you bust")
+        your-numbers-of-cards (map count (:you @hands))
+        dealer-value (hand->value (nth (:dealer @hands) 0))
+        dealer-number-of-cards (-> (:dealer @hands) first count)]
+    (do (doseq [your-value your-values your-number-of-cards your-numbers-of-cards]
+          (cond (and (= dealer-value 21) (= dealer-number-of-cards 2)) (conclude :dealer "dealer wins - blackjack")
+                (and (= your-value 21) (= your-number-of-cards 2)) (conclude :you "you win - blackjack")
                 (> dealer-value 21) (conclude :you "you win - dealer busts")
+                (> your-value 21) (conclude :dealer "dealer wins - you bust")
                 (= your-value dealer-value) (conclude :push "push")
-                (= your-value 21) (conclude :you "you win - blackjack :)")
-                ;; TODO disambiguate "just a 21" versus "actual blackjack" hand
-                (= dealer-value 21) (conclude :dealer "dealer wins - blackjack")
                 (> dealer-value your-value) (conclude :dealer "dealer wins - higher value")
                 :else (conclude :you "you win - higher value")))
         (end-game!))))

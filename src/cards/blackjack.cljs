@@ -93,7 +93,6 @@
 (defn deal! []
   (do
     (reset! deck (generate-shuffled-deck))
-    ;; TODO auto one-hit-then-stand aces when they're split
     ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 2} {:suit 'club :rank 14}])) ;; deal a split
     ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 14} {:suit 'club :rank 13} {:suit 'heart :rank 13}])) ;; you and dealer both have blackjacks
     ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 14} {:suit 'club :rank 9} {:suit 'heart :rank 13}])) ;; dealer has blackjack
@@ -114,7 +113,6 @@
     (dealer-plays!)))
 
 (defn split! []
-  ;; TODO don't permit splitting aces
   (do (let [split-card (nth (nth (:you @hands) (:current-split @game)) 1)]
         (swap! hands update :you conj [split-card]))
       (swap! hands update-in [:you (:current-split @game)] #(-> (take 1 %) vec))))
@@ -171,10 +169,18 @@
     [:div.button-group {:class (when (not= (:state @game) :stopped) "inactive")} [:button {:on-click #(deal!)} "deal"]]
 
     (let [active-p (and (= (:turn @game) :you) (= (:state @game) :running))
-          [card-1 card-2 & hits] (nth (:you @hands) (:current-split @game))
+          your-current-hand (nth (:you @hands) (:current-split @game))
+          [card-1 card-2 & hits] your-current-hand
           can-stand-p (some? card-2)
-          can-split-p (and (= (:rank card-1) (:rank card-2)) (empty? hits))]
+          can-split-p (and (= (:rank card-1) (:rank card-2)) (empty? hits))
+          cannot-hit (and
+                      ;; player can't keep hitting if they're playing split hands...
+                      (-> (:you @hands) count (> 1))
+                      ;; ...and it is aces that were split
+                      (= (-> your-current-hand first :rank) 14)
+                      ;; ...and they've already hit once.
+                      (= (count your-current-hand) 2))]
       [:div.button-group {:class (if (not active-p) "inactive")}
-       [:button {:on-click #(hit!)} "hit"]
+       [:button {:class (if cannot-hit "inactive") :on-click #(hit!)} "hit"]
        [:button {:class (if (not can-stand-p) "inactive") :on-click #(stand!)} "stand"]
        [:button {:class (if (not can-split-p) "inactive") :on-click #(split!)} "split"]])]])

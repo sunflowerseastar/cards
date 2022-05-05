@@ -26,6 +26,7 @@
         your-value (hand->value your-hand)
 
         ;; names for clarity/simplicity
+        ;; TODO don't consider A-[10] cards a blackjack for split hands
         dealer-blackjack (and (= dealer-value 21) (is-two-cards dealer-hand))
         you-blackjack (and (= your-value 21) (is-two-cards your-hand))
         dealer-busts (> dealer-value 21)

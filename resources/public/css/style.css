@@ -20,7 +20,7 @@
   --space-xs: 0.26em;
   --space-sm: 0.88em;
   --space-md: 1.6em;
-  --space-lg: 3.8em;
+  --space-lg: 2.8em;
 }
 
 /* general html */
@@ -114,6 +114,7 @@ img {
   bottom: 0;
   left: 0;
   right: 0;
+  padding: 0 var(--space-md);
   display: flex;
   opacity: 0;
   pointer-events: none;
@@ -124,12 +125,18 @@ img {
   opacity: 1;
   pointer-events: initial;
 }
+.modal button {
+  margin-top: var(--space-md);
+}
+.modal p:first-child {
+  margin-top: 0;
+}
 .game-state-component {
   flex: 1;
   align-self: center;
   max-width: 320px;
   margin: 0 auto;
-  padding: var(--space-md);
+  padding: var(--space-lg);
   border: 1px solid #bbb;
   background: #fff;
 }

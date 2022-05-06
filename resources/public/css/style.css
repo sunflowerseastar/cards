@@ -131,7 +131,7 @@ img {
 .modal p:first-child {
   margin-top: 0;
 }
-.game-state-component {
+.outcomes-component {
   flex: 1;
   align-self: center;
   max-width: 320px;
@@ -183,14 +183,17 @@ img {
   padding: var(--space-md) var(--space-sm);
   margin-right: calc(var(--space-xs) * -1);
 }
-.double-spade {
+.hamburger-container {
+  cursor: pointer;
+}
+.hamburger {
   position: relative;
   display: block;
   width: 22px;
   height: 8px;
 }
-.double-spade:before,
-.double-spade:after {
+.hamburger:before,
+.hamburger:after {
   content: '';
   display: block;
   position: absolute;
@@ -199,10 +202,10 @@ img {
   height: 1px;
   background: var(--black);
 }
-.double-spade:before {
+.hamburger:before {
   top: 0;
 }
-.double-spade:after {
+.hamburger:after {
   bottom: 0;
 }
 .game-play-area {

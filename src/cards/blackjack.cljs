@@ -1,37 +1,39 @@
 (ns cards.blackjack
   (:require
    [cards.blackjack-helpers :refer [hand->value hands->win-lose-push]]
-   [cards.components :refer [game-state-component hand-component]]
+   [cards.components :refer [outcomes-component hand-component]]
    [cards.deck :refer [generate-shuffled-deck]]
    [reagent.core :as reagent :refer [atom]]))
 
 
+
+;; -------------
+;; consts, state
+;; -------------
+
 ;; dealer hits everything below, stands on everything equal and above
 
 
-(def dealer-hit-cutoff 17)
-
+(defonce dealer-hit-cutoff 17)
 
 ;; Repo convention: state variables get the "normal" name, and components get
 ;; the cumbersome long name. Ex. (hand-component hand) is the `hand-component`
 ;; function receiving a piece of game state called `hand`.
 
 
-(def game-initial-state {;; gameplay
-                         :state :stopped ;; stopped | running
-                         :turn :none ;; none | you | dealer
-                         :current-split 0 ;; hand index of current split
+(defonce game-initial-state {;; gameplay
+                             :state :stopped ;; stopped | running
+                             :turn :none ;; none | you | dealer
+                             :current-split 0 ;; hand index of current split
 
-                         ;; outcomes/scoring
-                         :wins 0 ;; your total wins
-                         :losses 0 ;; your total losses
-                         :pushes 0 ;; number of ties
+                             ;; ui
+                             :is-modal-showing false})
 
-                         ;; ui
-                         :is-modal-showing false})
+;; a scoreboard that increments for each hand's win, loss, or push
+(defonce outcomes (atom {:win 0 :lose 0 :push 0}))
 
-(def game (atom game-initial-state))
-(def deck (atom (generate-shuffled-deck)))
+(defonce game (atom game-initial-state))
+(defonce deck (atom (generate-shuffled-deck)))
 
 ;; hands ex. {:you [[{:suit diamond :rank 7} {:suit diamond, :rank 14}]],
 ;;            :dealer [{:suit heart, :rank 2} {:suit heart, :rank 8}]}
@@ -43,9 +45,13 @@
 ;; that one hand. But when you split, there will be additional hands, and
 ;; :current-split will inc past 0, through each of the split hands.
 
-(def hands (atom {}))
+(defonce hands (atom {}))
 ;; TODO change how cards are dealt (draw-counter)
-(def draw-counter (atom 4))
+(defonce draw-counter (atom 4))
+
+;; ----------------
+;; commands/actions
+;; ----------------
 
 (defn deal-hands [local-deck]
   (let [your-card-1 (first local-deck)
@@ -74,10 +80,7 @@
   (do
     ;; update scoring
     (doseq [outcome (map #(hands->win-lose-push % (:dealer @hands)) (:you @hands))]
-      (case outcome
-        :win (swap! game update :wins inc)
-        :lose (swap! game update :losses inc)
-        :push (swap! game update :pushes inc)))
+      (swap! outcomes update outcome inc))
     ;; end gameplay
     (swap! game assoc :state :stopped :turn :none)))
 
@@ -141,7 +144,9 @@
   (swap! game assoc :is-modal-showing (not (:is-modal-showing @game))))
 
 
-;; Top-level gameplay markup
+;; ---------------
+;; gameplay markup
+;; ---------------
 
 
 (defn blackjack []
@@ -150,9 +155,9 @@
    [:div.blocker {:class (if (:is-modal-showing @game) "is-modal-showing")}]
    [:div.modal {:class (if (:is-modal-showing @game) "is-modal-showing")
                 :on-click #(toggle-modal!)}
-    (game-state-component @game reset-game!)]
+    (outcomes-component @outcomes reset-game!)]
 
-   [:div.header [:a {:on-click #(toggle-modal!)} [:div.double-spade]]]
+   [:div.header [:a.hamburger-container {:on-click #(toggle-modal!)} [:div.hamburger]]]
 
    [:div.game-play-area
     [:div.card-play-area

@@ -6,12 +6,13 @@
    [cards.svgs :as svgs]
    [reagent.core :as reagent :refer [atom]]))
 
-;; --------------------
-;; game play components
-;; --------------------
+;; ---------------
+;; card components
+;; ---------------
 
 (defn stacked-squares
-  "A single instance of the repeating square card-back design."
+  "A single instance of the repeating 'stacked squares' card-back design.
+  ref. https://codepen.io/ItsMeNatalie/pen/OJLYbrr"
   [n]
   [:span.stacked-squares
    [:span.stacked-squares-inner
@@ -39,7 +40,7 @@
                              (stacked-squares (even? (swap! i inc)))))))]])
 
 (defn card-component
-  "Given a 'card' state, return markup of that card."
+  "Given a 'card' state (ex. {:suit 'club :rank 3}), return markup of that card."
   [{:keys [suit rank]}]
   (let [suit-svg (svgs/svg-of suit)
         t-rank (deck/translate-rank-of rank)
@@ -65,6 +66,10 @@
                      (into [:span.card-middle-right] (repeat 4 suit-svg))]
         :else (into [:<>] (repeat rank suit-svg)))]
      [:span.card-right (svgs/svg-rank rank is-red) suit-svg]]))
+
+;; --------------------
+;; game play components
+;; --------------------
 
 (defn hand-meta-component
   "Given a hand value and options, render the hand meta/state."
@@ -92,10 +97,11 @@
 ;; other components
 ;; ----------------
 
-(defn card-display []
+(defn card-display
+  "Show the cards, along with buttons to shuffle and sort."
+  []
   (let [local-deck (atom (deck/generate-deck))]
     (fn [] [:div.main.card-display
-
             [:div.card-display-controls
              [:button {:on-click #(swap! local-deck deck/shuffle-deck)} "shuffle"]
              [:button {:on-click #(reset! local-deck (deck/generate-deck))} "sort"]]
@@ -106,7 +112,7 @@
             ;; (into [:div.card-display] (map card-down-component (take 1 @local-deck))) ;; 1 card, face down
             (into [:div.card-display] (map card-component @local-deck))])))
 
-(defn game-state-component [game reset-modal-fn]
-  [:div.game-state-component
-   (into [:div] (map (fn [[k v]] [:p k ": " (str v)]) game))
+(defn outcomes-component [outcomes reset-modal-fn]
+  [:div.outcomes-component
+   (into [:div] (map (fn [[k v]] [:p k ": " (str v)]) outcomes))
    [:button {:on-click #(reset-modal-fn)} "reset"]])

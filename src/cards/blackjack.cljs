@@ -168,11 +168,11 @@
 
     [:div.button-group {:class (when (not= (:state @game) :stopped) "inactive")} [:button {:on-click #(deal!)} "deal"]]
 
-    (let [active-p (and (= (:turn @game) :you) (= (:state @game) :running))
+    (let [is-active (and (= (:turn @game) :you) (= (:state @game) :running))
           your-current-hand (nth (:you @hands) (:current-split @game))
           [card-1 card-2 & hits] your-current-hand
-          can-stand-p (some? card-2)
-          can-split-p (and (= (:rank card-1) (:rank card-2)) (empty? hits))
+          can-stand (some? card-2)
+          can-split (and (= (:rank card-1) (:rank card-2)) (empty? hits))
           cannot-hit (and
                       ;; player can't keep hitting if they're playing split hands...
                       (-> (:you @hands) count (> 1))
@@ -180,7 +180,7 @@
                       (= (-> your-current-hand first :rank) 14)
                       ;; ...and they've already hit once.
                       (= (count your-current-hand) 2))]
-      [:div.button-group {:class (if (not active-p) "inactive")}
+      [:div.button-group {:class (if (not is-active) "inactive")}
        [:button {:class (if cannot-hit "inactive") :on-click #(hit!)} "hit"]
-       [:button {:class (if (not can-stand-p) "inactive") :on-click #(stand!)} "stand"]
-       [:button {:class (if (not can-split-p) "inactive") :on-click #(split!)} "split"]])]])
+       [:button {:class (if (not can-stand) "inactive") :on-click #(stand!)} "stand"]
+       [:button {:class (if (not can-split) "inactive") :on-click #(split!)} "split"]])]])

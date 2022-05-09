@@ -6,21 +6,13 @@
    [cards.deck :refer [generate-shuffled-deck]]
    [reagent.core :as reagent :refer [atom]]))
 
-
-
 ;; -------------
 ;; consts, state
 ;; -------------
 
-;; dealer hits everything below, stands on everything equal and above
-
-
-(defonce dealer-hit-cutoff 17)
-
 ;; Repo convention: state variables get the "normal" name, and components get
 ;; the cumbersome long name. Ex. (hand-component hand) is the `hand-component`
 ;; function receiving a piece of game state called `hand`.
-
 
 (defonce game-initial-state {;; gameplay
                              :state :stopped ;; stopped | running
@@ -32,6 +24,7 @@
 
 ;; a scoreboard that increments for each hand's win, loss, or push
 (defonce outcomes (local-storage (atom {:win 0 :lose 0 :push 0}) :outcomes))
+(defonce options (local-storage (atom {:dealer-stands-on-17 true}) :options))
 
 (defonce game (local-storage (atom game-initial-state) :game))
 (defonce deck (local-storage (atom (generate-shuffled-deck)) :deck))
@@ -101,7 +94,7 @@
         (if you-busted-all-hands
           (conclude-game!)
           (while (= (:state @game) :running)
-            (if (< (hand->value (:dealer @hands)) dealer-hit-cutoff)
+            (if (< (hand->value (:dealer @hands)) (if (:dealer-stands-on-17 @options) 17 18))
               (add-hit-card-to-hand!)
               (conclude-game!)))))))
 

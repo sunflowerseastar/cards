@@ -31,7 +31,7 @@
                             :is-a-card-in-the-hole is-a-card-in-the-hole))
 
         [:div.player-division-line
-         [:h2 "--- dealer stands on soft 17 ---"]]
+         [:h2 "--- dealer " (if (:dealer-stands-on-17 @db/options) "stands" "hits") " on soft 17 ---"]]
 
         (into [:<>]
               (->> (@db/hands :you)

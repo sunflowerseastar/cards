@@ -142,6 +142,6 @@
      (into [:div] (map (fn [[k v]] [:p k ": " (str v)]) @db/outcomes))
      [:hr]
      [:p "Dealer "
-      [:a {:on-click #(.log js/console "click")}
+      [:a.inline-toggle {:on-click #(swap! db/options update :dealer-stands-on-17 not)}
        (if (:dealer-stands-on-17 @db/options) "stands" "hits")] " on 17"]
      [:button {:on-click #(db/reset-game!)} "reset"]]]])

@@ -1,5 +1,4 @@
-(ns cards.blackjack-helpers
-  (:require [tupelo.core :refer [spyx]]))
+(ns cards.blackjack-helpers)
 
 (defn rank->hard-value [rank]
   (cond (< rank 11) rank

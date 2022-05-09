@@ -3,7 +3,8 @@
    [cards.components :refer [card-display]]
    [cards.blackjack :refer [blackjack]]
    [goog.dom :as gdom]
-   [reagent.core :as reagent :refer [atom create-class]]))
+   [reagent.core :as reagent :refer [atom create-class]]
+   [reagent.dom :as rdom]))
 
 (def screen (atom blackjack))
 ;; (def screen (atom card-display))
@@ -23,7 +24,7 @@
        [@screen]])}))
 
 (defn mount [el]
-  (reagent/render-component [app] el))
+  (rdom/render [app] el))
 
 (defn get-app-element []
   (gdom/getElement "app-container"))

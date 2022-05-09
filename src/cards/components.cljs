@@ -4,10 +4,11 @@
    [cards.blackjack-helpers :refer [hand->value]]
    [cards.deck :as deck]
    [cards.svgs :as svgs]
+   [cards.db :as db]
    [reagent.core :as reagent :refer [atom]]))
 
 ;; ---------------
-;; card components
+;; cards and hands
 ;; ---------------
 
 (defn stacked-squares
@@ -67,10 +68,6 @@
         :else (into [:<>] (repeat rank suit-svg)))]
      [:span.card-right (svgs/svg-rank rank is-red) suit-svg]]))
 
-;; --------------------
-;; game play components
-;; --------------------
-
 (defn hand-meta-component
   "Given a hand value and options, render the hand meta/state."
   [hand-value {:keys [is-active hand-outcome is-a-card-in-the-hole]}]
@@ -93,9 +90,9 @@
                 (card-component card)))
             hand))]))
 
-;; ----------------
-;; other components
-;; ----------------
+;; -----------------
+;; card display page
+;; -----------------
 
 (defn card-display
   "Show the cards, along with buttons to shuffle and sort."
@@ -112,7 +109,27 @@
             ;; (into [:div.card-display] (map card-down-component (take 1 @local-deck))) ;; 1 card, face down
             (into [:div.card-display] (map card-component @local-deck))])))
 
-(defn outcomes-component [outcomes reset-modal-fn]
-  [:div.outcomes-component
-   (into [:div] (map (fn [[k v]] [:p k ": " (str v)]) outcomes))
-   [:button {:on-click #(reset-modal-fn)} "reset"]])
+;; --
+;; UI
+;; --
+
+(defn header
+  "Top of UI with modal-toggling hamburger."
+  []
+  [:div.header [:a.hamburger-container {:on-click #(db/toggle-modal!)} [:div.hamburger]]])
+
+(defn blocker
+  "This is the grayed out full-viewport area that sits above the gameplay and
+  below the modal."
+  []
+  [:div.blocker {:class (if (:is-modal-showing @db/game) "is-modal-showing")}])
+
+(defn modal
+  "Markup for the modal, blocker, and modal contents."
+  []
+  [:<> (blocker)
+   [:div.modal {:class (if (:is-modal-showing @db/game) "is-modal-showing")
+                :on-click #(db/toggle-modal!)}
+    [:div.outcomes-component
+     (into [:div] (map (fn [[k v]] [:p k ": " (str v)]) @db/outcomes))
+     [:button {:on-click #(db/reset-game!)} "reset"]]]])

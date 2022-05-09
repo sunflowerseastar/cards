@@ -2,7 +2,7 @@
   (:require
    [alandipert.storage-atom :refer [local-storage]]
    [cards.blackjack-helpers :refer [hand->value hands->win-lose-push]]
-   [cards.components :refer [outcomes-component hand-component]]
+   [cards.components :as c]
    [cards.deck :refer [generate-shuffled-deck]]
    [cards.db :as db]
    [reagent.core :as reagent :refer [atom]]))
@@ -11,16 +11,12 @@
 ;; gameplay markup
 ;; ---------------
 
-
-(defn blackjack []
+(defn blackjack-main []
   [:div.blackjack-container.padding-lr-sm
 
-   [:div.blocker {:class (if (:is-modal-showing @db/game) "is-modal-showing")}]
-   [:div.modal {:class (if (:is-modal-showing @db/game) "is-modal-showing")
-                :on-click #(db/toggle-modal!)}
-    (outcomes-component @db/outcomes db/reset-game!)]
+   (c/modal)
 
-   [:div.header [:a.hamburger-container {:on-click #(db/toggle-modal!)} [:div.hamburger]]]
+   (c/header)
 
    [:div.game-play-area
     [:div.card-play-area
@@ -30,9 +26,9 @@
         (let [hand (:dealer @db/hands)
               is-active false
               is-a-card-in-the-hole (= (:turn @db/game) :you)]
-          (hand-component hand
-                          :is-active is-active
-                          :is-a-card-in-the-hole is-a-card-in-the-hole))
+          (c/hand-component hand
+                            :is-active is-active
+                            :is-a-card-in-the-hole is-a-card-in-the-hole))
 
         [:div.player-division-line
          [:h2 "--- dealer stands on soft 17 ---"]]
@@ -47,11 +43,12 @@
                                               (hands->win-lose-push hand (:dealer @db/hands)))
                             is-win (and (= (:state @db/game) :stopped)
                                         (= hand-outcome :win))]
-                        (hand-component hand
-                                        :is-active is-active
-                                        :hand-outcome hand-outcome))))))])]
+                        (c/hand-component hand
+                                          :is-active is-active
+                                          :hand-outcome hand-outcome))))))])]
 
-    [:div.button-group {:class (when (not= (:state @db/game) :stopped) "inactive")} [:button {:on-click #(db/deal!)} "deal"]]
+    [:div.button-group {:class (when (not= (:state @db/game) :stopped) "inactive")}
+     [:button {:on-click #(db/deal!)} "deal"]]
 
     (let [is-active (and (= (:turn @db/game) :you) (= (:state @db/game) :running))
           your-current-hand (nth (:you @db/hands) (:current-split @db/game))

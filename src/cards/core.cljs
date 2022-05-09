@@ -1,12 +1,12 @@
 (ns ^:figwheel-hooks cards.core
   (:require
    [cards.components :refer [card-display]]
-   [cards.blackjack :refer [blackjack]]
+   [cards.blackjack :refer [blackjack-main]]
    [goog.dom :as gdom]
    [reagent.core :as reagent :refer [atom create-class]]
    [reagent.dom :as rdom]))
 
-(def screen (atom blackjack))
+(def screen (atom blackjack-main))
 ;; (def screen (atom card-display))
 
 (defonce has-initially-loaded (atom false))

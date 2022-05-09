@@ -1,5 +1,6 @@
 (ns cards.blackjack
   (:require
+   [alandipert.storage-atom :refer [local-storage]]
    [cards.blackjack-helpers :refer [hand->value hands->win-lose-push]]
    [cards.components :refer [outcomes-component hand-component]]
    [cards.deck :refer [generate-shuffled-deck]]
@@ -30,10 +31,10 @@
                              :is-modal-showing false})
 
 ;; a scoreboard that increments for each hand's win, loss, or push
-(defonce outcomes (atom {:win 0 :lose 0 :push 0}))
+(defonce outcomes (local-storage (atom {:win 0 :lose 0 :push 0}) :outcomes))
 
-(defonce game (atom game-initial-state))
-(defonce deck (atom (generate-shuffled-deck)))
+(defonce game (local-storage (atom game-initial-state) :game))
+(defonce deck (local-storage (atom (generate-shuffled-deck)) :deck))
 
 ;; hands ex. {:you [[{:suit diamond :rank 7} {:suit diamond, :rank 14}]],
 ;;            :dealer [{:suit heart, :rank 2} {:suit heart, :rank 8}]}
@@ -45,9 +46,9 @@
 ;; that one hand. But when you split, there will be additional hands, and
 ;; :current-split will inc past 0, through each of the split hands.
 
-(defonce hands (atom {}))
+(defonce hands (local-storage (atom {}) :hands))
 ;; TODO change how cards are dealt (draw-counter)
-(defonce draw-counter (atom 4))
+(defonce draw-counter (local-storage (atom 4) :draw-counter))
 
 ;; ----------------
 ;; commands/actions

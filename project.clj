@@ -8,6 +8,7 @@
 
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/clojurescript "1.11.4"]
+                 [alandipert/storage-atom "2.0.1"]
                  [cljsjs/react "17.0.2-0"]
                  [cljsjs/react-dom "17.0.2-0"]
                  [reagent "1.1.1" ]]

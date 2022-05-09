@@ -122,14 +122,26 @@
   "This is the grayed out full-viewport area that sits above the gameplay and
   below the modal."
   []
-  [:div.blocker {:class (if (:is-modal-showing @db/game) "is-modal-showing")}])
+  [:div.blocker {:class (if (:is-modal-showing @db/game) "is-modal-showing")
+                 :on-click #(db/toggle-modal!)}])
+
+(defn close-x
+  "X to close modal."
+  []
+  [:a.close-x-container {:on-click #(db/toggle-modal!)}
+   [:span.close-x]])
 
 (defn modal
   "Markup for the modal, blocker, and modal contents."
   []
-  [:<> (blocker)
-   [:div.modal {:class (if (:is-modal-showing @db/game) "is-modal-showing")
-                :on-click #(db/toggle-modal!)}
-    [:div.outcomes-component
+  [:<>
+   [:div.modal {:class (if (:is-modal-showing @db/game) "is-modal-showing")}
+    (blocker)
+    [:div.modal-inner
+     (close-x)
      (into [:div] (map (fn [[k v]] [:p k ": " (str v)]) @db/outcomes))
+     [:hr]
+     [:p "Dealer "
+      [:a {:on-click #(.log js/console "click")}
+       (if (:dealer-stands-on-17 @db/options) "stands" "hits")] " on 17"]
      [:button {:on-click #(db/reset-game!)} "reset"]]]])

@@ -1,8 +1,8 @@
 (defproject cards "0.2.0"
   :description "blackjack"
   :url "https://github.com/sunflowerseastar/cards"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :license {:name "GNU Affero General Public License v3"
+            :url "http://www.gnu.org/licenses/agpl-3.0.html"}
 
   :min-lein-version "2.7.1"
 

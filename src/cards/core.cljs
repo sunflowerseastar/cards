@@ -6,8 +6,8 @@
    [reagent.core :as reagent :refer [atom create-class]]
    [reagent.dom :as rdom]))
 
-(def screen (atom blackjack-main))
-;; (def screen (atom card-display))
+;; (def screen (atom blackjack-main))
+(def screen (atom card-display))
 
 (defonce has-initially-loaded (atom false))
 

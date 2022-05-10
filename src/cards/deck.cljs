@@ -1,7 +1,8 @@
 (ns cards.deck)
 
 (defn generate-deck []
-  (vec (for [suit ['spade 'club 'diamond 'heart] rank [2 3 4 5 6 7 8 9 10 11 12 13 14]] {:suit suit :rank rank})))
+  (vec (for [suit ['spade 'club 'diamond 'heart] rank [2 3 4 5 6 7 8 9 10 11 12 13 14]]
+         {:suit suit :rank rank})))
 
 (def deck (atom (generate-deck)))
 
@@ -13,14 +14,22 @@
     14 'A
     rank))
 
-(defn weighted-shuffle [a b]
-  (loop [a a b b l [] probably-a 50]
-    (let [r (rand-int 100)]
-      (cond (and (empty? a) (empty? b)) l
-            (empty? a) (concat l b)
-            (empty? b) (concat l a)
-            (< r probably-a) (recur (rest a) b (conj l (first a)) (- probably-a 15))
-            :else (recur a (rest b) (conj l (first b)) (+ probably-a 15))))))
+(defn shuffle-riffle
+  "Given two halves of a deck, imprecisely zipper them together. A card is
+  selected from either side in alternation, except for 'errors' when (rand)
+  doesn't reach preicision, in which a card from the previous side is repeated."
+  [left right]
+  (let [precision 0.9]
+    (loop [l left r right shuffled-deck [] is-card-l (< (rand) 0.5)]
+      (cond (and (empty? l) (empty? r)) shuffled-deck
+            (empty? l) (concat shuffled-deck r)
+            (empty? r) (concat shuffled-deck l)
+
+            (and (< (rand) precision) is-card-l) (recur (rest l) r (conj shuffled-deck (first l)) false)
+            (< (rand) precision) (recur l (rest r) (conj shuffled-deck (first r)) true)
+
+            is-card-l (recur (rest l) r (conj shuffled-deck (first l)) true)
+            :else (recur l (rest r) (conj shuffled-deck (first r)) false)))))
 
 (defn divide-deck [deck]
   (let [separate-point (+ (/ (count deck) 2) (- (rand-int 10) 5))]
@@ -30,7 +39,7 @@
   (let [l-r-deck (divide-deck deck)] (shuffle-fn (first l-r-deck) (second l-r-deck))))
 
 (defn shuffle-deck [deck]
-  (vec (shuffler deck weighted-shuffle)))
+  (vec (shuffler deck shuffle-riffle)))
 
 (defn generate-shuffled-deck
   "Return a deck that is shuffled."

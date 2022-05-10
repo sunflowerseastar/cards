@@ -4,7 +4,7 @@
    [cards.blackjack-helpers :refer [hands->win-lose-push]]
    [cljs.test :refer-macros [are deftest is testing]]))
 
-(deftest generate-deck-test
+(deftest sorted-deck-test
   (is (= true true)))
 
 ;; "h-" stands for "hand-", or "sample-test-hand-"

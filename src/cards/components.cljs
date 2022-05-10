@@ -97,11 +97,13 @@
 (defn card-display
   "Show the cards, along with buttons to shuffle and sort."
   []
-  (let [local-deck (atom (deck/generate-deck))]
+  (let [local-deck (atom (deck/sorted-deck))]
     (fn [] [:div.main.card-display
             [:div.card-display-controls
-             [:button {:on-click #(swap! local-deck deck/shuffle-deck)} "shuffle"]
-             [:button {:on-click #(reset! local-deck (deck/generate-deck))} "sort"]]
+             [:button {:on-click #(swap! local-deck deck/shuffle-deck)} "riffle"]
+             [:button {:on-click #(swap! local-deck deck/cut-deck)} "cut"]
+             [:button {:on-click #(reset! local-deck (deck/sorted-deck))} "sort"]
+             ]
 
             ;; (card-component (first local-deck))
             ;; (card-component {:suit 'spade :rank 12})

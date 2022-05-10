@@ -1,6 +1,6 @@
 (ns cards.deck)
 
-(defn generate-deck
+(defn sorted-deck
   "Pulling from the top (A is low):
      - A -> K hearts
      - A -> K clubs
@@ -13,7 +13,7 @@
         K->A-diamonds-and-spades (for [suit ['diamond 'spade] rank K->A-ranks] {:suit suit :rank rank})]
     (vec (concat A->K-hearts-and-clubs K->A-diamonds-and-spades))))
 
-(def deck (atom (generate-deck)))
+(def deck (atom (sorted-deck)))
 
 (defn translate-rank-of [rank]
   (case rank
@@ -27,22 +27,41 @@
   "Given two halves of a deck, imprecisely zipper them together. A card is
   selected from either side in alternation, except for 'errors' when (rand)
   doesn't reach preicision, in which a card from the previous side is repeated."
-  [left right]
-  (let [precision 0.9]
-    (loop [l left r right shuffled-deck [] is-card-l (< (rand) 0.5)]
-      (cond (and (empty? l) (empty? r)) shuffled-deck
-            (empty? l) (concat shuffled-deck r)
-            (empty? r) (concat shuffled-deck l)
+  ([left right]
+   (shuffle-riffle left right 0.9))
+  ([left right precision]
+   (do
+     (println (reverse left) (reverse right))
+     (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) 0.5)]
 
-            (and (< (rand) precision) is-card-l) (recur (rest l) r (conj shuffled-deck (first l)) false)
-            (< (rand) precision) (recur l (rest r) (conj shuffled-deck (first r)) true)
+       (do
+         (println shuffled-deck)
+         (cond (and (empty? l) (empty? r)) shuffled-deck
+               (empty? l) (apply conj shuffled-deck r)
+               (empty? r) (apply conj shuffled-deck l)
 
-            is-card-l (recur (rest l) r (conj shuffled-deck (first l)) true)
-            :else (recur l (rest r) (conj shuffled-deck (first r)) false)))))
+               (and (< (rand) precision) is-card-l) (recur (rest l) r (conj shuffled-deck (first l)) false)
+               (< (rand) precision) (recur l (rest r) (conj shuffled-deck (first r)) true)
 
-(defn divide-deck [deck]
-  (let [separate-point (+ (/ (count deck) 2) (- (rand-int 10) 5))]
-    [(take separate-point deck) (drop separate-point deck)]))
+               is-card-l (recur (rest l) r (conj shuffled-deck (first l)) true)
+               :else (recur l (rest r) (conj shuffled-deck (first r)) false)))))))
+
+(defn divide-deck
+  ;; TODO replace with split?
+  "Given a deck, split it in two and return to halves"
+  ([deck] (divide-deck deck 1))
+  ([deck precision]
+   (let [num-cards (count deck)
+         num-half (/ num-cards 2)
+         imprecision (- num-cards (* precision num-cards))
+         separate-point
+         (+ num-half (- (rand-int imprecision) (if (zero? imprecision) 0 (/ 2 imprecision))))]
+     [(take separate-point deck) (drop separate-point deck)])))
+
+(defn cut-deck
+  "Split a deck and stack the previously lower portion on top."
+  [deck]
+  (let [[top bottom] (divide-deck deck)] (vec (concat bottom top))))
 
 (defn shuffler [deck shuffle-fn]
   (let [l-r-deck (divide-deck deck)] (shuffle-fn (first l-r-deck) (second l-r-deck))))
@@ -53,7 +72,7 @@
 (defn generate-shuffled-deck
   "Return a deck that is shuffled."
   []
-  (let [d (generate-deck)] (nth (iterate shuffle d) 6)))
+  (let [d (sorted-deck)] (nth (iterate shuffle d) 6)))
 
 (defn generate-specific-deck [starting-cards]
   (->> (generate-shuffled-deck)

@@ -222,7 +222,6 @@ hr {
 }
 .close-x:before {
   transform: rotate(45deg);
-
 }
 .close-x:after {
   transform: rotate(-45deg);
@@ -430,6 +429,7 @@ button {
 button:focus {
   outline: none;
   position: relative;
+  background: var(--black);
 }
 button:focus:after {
   content: '';
@@ -446,10 +446,12 @@ button:focus:after {
     font-size: 12px;
   }
 }
-button:hover {
-  color: var(--black);
-  background: white;
-  cursor: pointer;
+@media (min-width: 768px) {
+  button:hover {
+    color: var(--black);
+    background: white;
+    cursor: pointer;
+  }
 }
 button + button {
   margin-left: var(--space-md);

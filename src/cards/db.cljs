@@ -2,6 +2,7 @@
   (:require
    [alandipert.storage-atom :refer [local-storage]]
    [cards.blackjack-helpers :refer [hand->value hands->win-lose-push]]
+   [cards.constants :as constants]
    [cards.deck :refer [generate-shuffled-deck]]
    [reagent.core :as reagent :refer [atom]]))
 
@@ -23,7 +24,8 @@
 
 ;; a scoreboard that increments for each hand's win, loss, or push
 (defonce outcomes (local-storage (atom {:win 0 :lose 0 :push 0}) :outcomes))
-(defonce options (local-storage (atom {:dealer-stands-on-17 true}) :options))
+(defonce options (local-storage (atom {:dealer-stands-on-17 true
+                                       :shuffle-precision constants/default-precision}) :options))
 
 (defonce game (local-storage (atom game-initial-state) :game))
 (defonce deck (local-storage (atom (generate-shuffled-deck)) :deck))
@@ -55,7 +57,7 @@
      :dealer [dealer-card-1 dealer-card-2]}))
 
 (defn reset-game! []
-  (do (reset! deck generate-shuffled-deck)
+  (do (reset! deck (generate-shuffled-deck))
       (reset! hands {})
       (reset! draw-counter 4)
       (reset! game game-initial-state)))

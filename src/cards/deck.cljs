@@ -1,4 +1,4 @@
-(ns cards.deck)
+(ns cards.deck (:require [cards.constants :as constants]))
 
 (defn sorted-deck
   "Pulling from the top (A is low):
@@ -28,28 +28,23 @@
   selected from either side in alternation, except for 'errors' when (rand)
   doesn't reach preicision, in which a card from the previous side is repeated."
   ([left right]
-   (shuffle-riffle left right 0.9))
+   (shuffle-riffle left right constants/default-precision))
   ([left right precision]
-   (do
-     (println (reverse left) (reverse right))
-     (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) 0.5)]
+   (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) 0.5)]
+     (cond (and (empty? l) (empty? r)) shuffled-deck
+           (empty? l) (apply conj shuffled-deck r)
+           (empty? r) (apply conj shuffled-deck l)
 
-       (do
-         (println shuffled-deck)
-         (cond (and (empty? l) (empty? r)) shuffled-deck
-               (empty? l) (apply conj shuffled-deck r)
-               (empty? r) (apply conj shuffled-deck l)
+           (and (< (rand) precision) is-card-l) (recur (rest l) r (conj shuffled-deck (first l)) false)
+           (< (rand) precision) (recur l (rest r) (conj shuffled-deck (first r)) true)
 
-               (and (< (rand) precision) is-card-l) (recur (rest l) r (conj shuffled-deck (first l)) false)
-               (< (rand) precision) (recur l (rest r) (conj shuffled-deck (first r)) true)
-
-               is-card-l (recur (rest l) r (conj shuffled-deck (first l)) true)
-               :else (recur l (rest r) (conj shuffled-deck (first r)) false)))))))
+           is-card-l (recur (rest l) r (conj shuffled-deck (first l)) true)
+           :else (recur l (rest r) (conj shuffled-deck (first r)) false)))))
 
 (defn divide-deck
   ;; TODO replace with split?
   "Given a deck, split it in two and return to halves"
-  ([deck] (divide-deck deck 1))
+  ([deck] (divide-deck deck constants/default-precision))
   ([deck precision]
    (let [num-cards (count deck)
          num-half (/ num-cards 2)

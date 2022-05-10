@@ -146,14 +146,12 @@
 (defn modal-routing
   "Markup for the modal page-switching."
   [current-route routes route-to-fn]
-  (do
-    (println current-route)
-    [:div.modal-routing
-     [:a {:on-click #(when (not= @current-route :blackjack) (route-to-fn :blackjack))
-          :class (when (= @current-route :blackjack) "is-active")} "blackjack"]
-     " | "
-     [:a {:on-click #(when (not= @current-route :card-display) (route-to-fn :card-display))
-          :class (when (= @current-route :card-display) "is-active")} "card-display"]]))
+  [:div.modal-routing
+   [:a {:on-click #(when (not= @current-route :blackjack) (route-to-fn :blackjack))
+        :class (when (= @current-route :blackjack) "is-active")} "blackjack"]
+   " | "
+   [:a {:on-click #(when (not= @current-route :card-display) (route-to-fn :card-display))
+        :class (when (= @current-route :card-display) "is-active")} "card-display"]])
 
 (defn modal
   "Markup for the modal, blocker, and modal contents."

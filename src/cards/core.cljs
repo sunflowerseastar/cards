@@ -32,8 +32,8 @@
             (let [key (.-key e)
                   is-b (= (.-keyCode e) 66)
                   is-d (= (.-keyCode e) 68)]
-              (cond is-d (do (println "is-d") (route-to! :card-display))
-                    is-b (do (println "is-b") (route-to! :blackjack)))))]
+              (cond is-d (route-to! :card-display)
+                    is-b (route-to! :blackjack))))]
     (create-class
      {:component-did-mount (fn [] (do (js/setTimeout #(reset! has-initially-loaded true) 0)
                                       (.addEventListener js/document "keydown" keyboard-listeners)))

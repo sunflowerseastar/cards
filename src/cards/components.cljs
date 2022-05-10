@@ -98,7 +98,7 @@
   "Show the cards, along with buttons to shuffle and sort."
   []
   (let [local-deck (atom (deck/sorted-deck))]
-    (fn [] [:div.main.card-display
+    (fn [] [:div.card-display.padding-lr-sm
             [:div.card-display-controls
              [:button {:on-click #(swap! local-deck deck/shuffle-deck)} "riffle"]
              [:button {:on-click #(swap! local-deck deck/cut-deck)} "cut"]
@@ -109,7 +109,7 @@
             ;; (card-component {:suit 'spade :rank 12})
             ;; (into [:div.card-display] (map card-down-component @local-deck)) ;; all cards are face down
             ;; (into [:div.card-display] (map card-down-component (take 1 @local-deck))) ;; 1 card, face down
-            (into [:div.card-display] (map card-component @local-deck))])))
+            (into [:div.card-display-inner] (map card-component @local-deck))])))
 
 ;; --
 ;; UI

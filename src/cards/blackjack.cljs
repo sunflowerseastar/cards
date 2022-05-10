@@ -14,10 +14,6 @@
 (defn blackjack-main []
   [:div.blackjack-container.padding-lr-sm
 
-   (c/modal)
-
-   (c/header)
-
    [:div.game-play-area
     [:div.card-play-area
      (when (not (empty? @db/hands))

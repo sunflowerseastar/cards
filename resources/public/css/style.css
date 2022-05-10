@@ -188,7 +188,7 @@ hr {
 /* --- */
 
 .card-display {
-  margin-bottom: var(--space-md);
+  margin: 0 auto var(--space-md);
 }
 .card-display-controls {
   margin-bottom: var(--space-md);
@@ -224,7 +224,6 @@ hr {
 .header a {
   display: inline-block;
   padding: var(--space-md) var(--space-sm);
-  margin-right: calc(var(--space-xs) * -1);
 }
 .hamburger-container {
   cursor: pointer;

@@ -94,22 +94,32 @@
 ;; card display page
 ;; -----------------
 
-(defn card-display
+(defn card-display-inner
   "Show the cards, along with buttons to shuffle and sort."
   []
   (let [local-deck (atom (deck/sorted-deck))]
-    (fn [] [:div.card-display.padding-lr-sm
-            [:div.card-display-controls
-             [:button {:on-click #(swap! local-deck deck/shuffle-deck)} "riffle"]
-             [:button {:on-click #(swap! local-deck deck/cut-deck)} "cut"]
-             [:button {:on-click #(reset! local-deck (deck/sorted-deck))} "sort"]
-             ]
+    (fn []
+      [:div.card-display.padding-lr-sm
+       [:div.card-display-controls
+        [:button {:on-click #(do
+                             ;; (println @local-deck)
+                             ;; (println (deck/riffle-shuffle @local-deck))
+                               (reset! local-deck [{:suit 'diamond :rank 3}]))} "X"]
+        [:button {:on-click #(do
+                               (println @local-deck)
+                               (println (deck/riffle-shuffle @local-deck))
+                               (swap! local-deck deck/riffle-shuffle))} "riffle"]
+        [:button {:on-click #(swap! local-deck deck/cut-deck)} "cut"]
+        [:button {:on-click #(reset! local-deck (deck/sorted-deck))} "sort"]]
 
-            ;; (card-component (first local-deck))
-            ;; (card-component {:suit 'spade :rank 12})
-            ;; (into [:div.card-display] (map card-down-component @local-deck)) ;; all cards are face down
-            ;; (into [:div.card-display] (map card-down-component (take 1 @local-deck))) ;; 1 card, face down
-            (into [:div.card-display-inner] (map card-component @local-deck))])))
+     ;; (card-component (first local-deck))
+     ;; (card-component {:suit 'spade :rank 12})
+     ;; (into [:div.card-display] (map card-down-component @local-deck)) ;; all cards are face down
+     ;; (into [:div.card-display] (map card-down-component (take 1 @local-deck))) ;; 1 card, face down
+       (into [:div.card-display-inner] (map card-component @local-deck))])))
+
+(defn card-display []
+  [card-display-inner])
 
 ;; --
 ;; UI
@@ -133,14 +143,28 @@
   [:a.close-x-container {:on-click #(db/toggle-modal!)}
    [:span.close-x]])
 
+(defn modal-routing
+  "Markup for the modal page-switching."
+  [current-route routes route-to-fn]
+  (do
+    (println current-route)
+    [:div.modal-routing
+     [:a {:on-click #(when (not= @current-route :blackjack) (route-to-fn :blackjack))
+          :class (when (= @current-route :blackjack) "is-active")} "blackjack"]
+     " | "
+     [:a {:on-click #(when (not= @current-route :card-display) (route-to-fn :card-display))
+          :class (when (= @current-route :card-display) "is-active")} "card-display"]]))
+
 (defn modal
   "Markup for the modal, blocker, and modal contents."
-  []
+  [current-route routes route-to-fn]
   [:<>
    [:div.modal {:class (if (:is-modal-showing @db/game) "is-modal-showing")}
     (blocker)
     [:div.modal-inner
      (close-x)
+     (modal-routing current-route routes route-to-fn)
+     [:hr]
      (into [:div] (map (fn [[k v]] [:p k ": " (str v)]) @db/outcomes))
      [:hr]
      [:p "Dealer "

@@ -7,6 +7,7 @@
   --card-width: min(120px, calc(18vw));
   /* --card-width: 67px; */
 
+  --light-gray: #999;
   --gray: #666;
   --black: #333;
   --green: #b1e597;
@@ -43,10 +44,15 @@ body {
 }
 @media (min-width: 768px) {
   body {
-    font-size: 15px;
+    font-size: 14px;
   }
 }
 @media (min-width: 992px) {
+  body {
+    font-size: 15px;
+  }
+}
+@media (min-width: 1600px) {
   body {
     font-size: 16px;
   }
@@ -89,6 +95,10 @@ hr {
 /* --- */
 
 .app {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   height: 100%;
 }
 
@@ -131,6 +141,40 @@ hr {
   flex: 1;
   opacity: 1;
   pointer-events: initial;
+}
+.modal-routing {
+  color: var(--light-gray);
+}
+.modal-routing a {
+  font-family: 'Verdana Pro', Verdana, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--light-gray);
+  cursor: pointer;
+}
+@media (min-width: 768px) {
+  .modal-routing a {
+    font-size: 12px;
+  }
+}
+@media (min-width: 992px) {
+  .modal-routing a {
+    font-size: 12px;
+  }
+}
+.modal-routing a:hover {
+  color: var(--gray);
+}
+.modal-routing a.is-active:hover {
+  color: var(--black);
+}
+.modal-routing a.is-active {
+  text-decoration: underline;
+  text-underline-offset: 0.4em;
+  color: var(--black);
+  cursor: default;
 }
 .modal button {
   margin-top: var(--space-md);
@@ -215,6 +259,7 @@ hr {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  width: 100%;
   height: 100%;
   margin: 0 auto;
 }
@@ -815,4 +860,5 @@ button.inactive,
   font-weight: bold;
   text-decoration: underline;
   text-underline-offset: 0.4em;
+  cursor: pointer;
 }

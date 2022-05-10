@@ -1,8 +1,17 @@
 (ns cards.deck)
 
-(defn generate-deck []
-  (vec (for [suit ['spade 'club 'diamond 'heart] rank [2 3 4 5 6 7 8 9 10 11 12 13 14]]
-         {:suit suit :rank rank})))
+(defn generate-deck
+  "Pulling from the top (A is low):
+     - A -> K hearts
+     - A -> K clubs
+     - K -> A diamond
+     - K -> A spade"
+  []
+  (let [A->K-ranks [14 2 3 4 5 6 7 8 9 10 11 12 13]
+        K->A-ranks (reverse A->K-ranks)
+        A->K-hearts-and-clubs (for [suit ['heart 'club] rank A->K-ranks] {:suit suit :rank rank})
+        K->A-diamonds-and-spades (for [suit ['diamond 'spade] rank K->A-ranks] {:suit suit :rank rank})]
+    (vec (concat A->K-hearts-and-clubs K->A-diamonds-and-spades))))
 
 (def deck (atom (generate-deck)))
 

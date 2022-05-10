@@ -425,6 +425,7 @@ button {
   padding: 10px 20px;
   background: var(--black);
   border: 1px solid var(--black);
+  cursor: pointer;
 }
 button:focus {
   outline: none;

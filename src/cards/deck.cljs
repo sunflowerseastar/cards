@@ -23,27 +23,9 @@
     14 'A
     rank))
 
-(defn shuffle-riffle
-  "Given two halves of a deck, imprecisely zipper them together. A card is
-  selected from either side in alternation, except for 'errors' when (rand)
-  doesn't reach preicision, in which a card from the previous side is repeated."
-  ([left right]
-   (shuffle-riffle left right constants/default-precision))
-  ([left right precision]
-   (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) 0.5)]
-     (cond (and (empty? l) (empty? r)) shuffled-deck
-           (empty? l) (apply conj shuffled-deck r)
-           (empty? r) (apply conj shuffled-deck l)
-
-           (and (< (rand) precision) is-card-l) (recur (rest l) r (conj shuffled-deck (first l)) false)
-           (< (rand) precision) (recur l (rest r) (conj shuffled-deck (first r)) true)
-
-           is-card-l (recur (rest l) r (conj shuffled-deck (first l)) true)
-           :else (recur l (rest r) (conj shuffled-deck (first r)) false)))))
-
 (defn divide-deck
   ;; TODO replace with split?
-  "Given a deck, split it in two and return to halves"
+  "Given a deck, split it in two and return the halves in a vector."
   ([deck] (divide-deck deck constants/default-precision))
   ([deck precision]
    (let [num-cards (count deck)
@@ -53,21 +35,38 @@
          (+ num-half (- (rand-int imprecision) (if (zero? imprecision) 0 (/ 2 imprecision))))]
      [(take separate-point deck) (drop separate-point deck)])))
 
+(defn riffle-shuffle
+  "Given two halves of a deck, imprecisely zipper them together. A card is
+  selected from either side in alternation, except for 'errors' when (rand)
+  doesn't reach preicision, in which a card from the previous side is repeated."
+  ([deck]
+   (riffle-shuffle deck constants/default-precision))
+  ([deck precision]
+   (let [[left right] (divide-deck deck)]
+     (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) precision)]
+       (cond (and (empty? l) (empty? r)) shuffled-deck
+             (empty? l) (apply conj shuffled-deck r)
+             (empty? r) (apply conj shuffled-deck l)
+
+             (and (< (rand) precision) is-card-l) (recur (rest l) r (conj shuffled-deck (first l)) false)
+             (< (rand) precision) (recur l (rest r) (conj shuffled-deck (first r)) true)
+
+             is-card-l (recur (rest l) r (conj shuffled-deck (first l)) true)
+             :else (recur l (rest r) (conj shuffled-deck (first r)) false))))))
+
 (defn cut-deck
   "Split a deck and stack the previously lower portion on top."
   [deck]
   (let [[top bottom] (divide-deck deck)] (vec (concat bottom top))))
 
 (defn shuffler [deck shuffle-fn]
-  (let [l-r-deck (divide-deck deck)] (shuffle-fn (first l-r-deck) (second l-r-deck))))
-
-(defn shuffle-deck [deck]
-  (vec (shuffler deck shuffle-riffle)))
+  (let [[top bottom] (divide-deck deck)] (shuffle-fn top bottom)))
 
 (defn generate-shuffled-deck
+  ;; TODO use local shuffle functions
   "Return a deck that is shuffled."
   []
-  (let [d (sorted-deck)] (nth (iterate shuffle d) 6)))
+  (let [deck (sorted-deck)] (nth (iterate shuffle deck) 7)))
 
 (defn generate-specific-deck [starting-cards]
   (->> (generate-shuffled-deck)

@@ -101,14 +101,7 @@
     (fn []
       [:div.card-display.padding-lr-sm
        [:div.card-display-controls
-        [:button {:on-click #(do
-                             ;; (println @local-deck)
-                             ;; (println (deck/riffle-shuffle @local-deck))
-                               (reset! local-deck [{:suit 'diamond :rank 3}]))} "X"]
-        [:button {:on-click #(do
-                               (println @local-deck)
-                               (println (deck/riffle-shuffle @local-deck))
-                               (swap! local-deck deck/riffle-shuffle))} "riffle"]
+        [:button {:on-click #(swap! local-deck deck/riffle-shuffle)} "riffle"]
         [:button {:on-click #(swap! local-deck deck/cut-deck)} "cut"]
         [:button {:on-click #(reset! local-deck (deck/sorted-deck))} "sort"]]
 

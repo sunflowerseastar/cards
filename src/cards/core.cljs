@@ -12,16 +12,22 @@
 (defonce has-initially-loaded (atom false))
 
 (defn app []
-  (create-class
-   {:component-did-mount
-    (fn [] (js/setTimeout #(reset! has-initially-loaded true) 0))
-    :reagent-render
-    (fn [this]
-      [:div.app.fade-in-1 {:class [(if @has-initially-loaded "has-initially-loaded")]}
-       ;; [:div.button-group.white-bg
-       ;;  [:button {:on-click #(reset! screen card-display)} "card-display"]
-       ;;  [:button {:on-click #(reset! screen blackjack)} "blackjack"]]
-       [@screen]])}))
+  (letfn [(keyboard-listeners [e]
+            (let [key (.-key e)
+                  is-b (= (.-keyCode e) 66)
+                  is-d (= (.-keyCode e) 68)]
+              (cond is-d (reset! screen c/card-display)
+                    is-b (reset! screen blackjack-main))))]
+    (create-class
+     {:component-did-mount (fn [] (do (js/setTimeout #(reset! has-initially-loaded true) 0)
+                                      (.addEventListener js/document "keydown" keyboard-listeners)))
+      :reagent-render
+      (fn [this]
+        [:div.app.fade-in-1 {:class [(if @has-initially-loaded "has-initially-loaded")]}
+        ;; [:div.button-group.white-bg
+        ;;  [:button {:on-click #(reset! screen card-display)} "card-display"]
+        ;;  [:button {:on-click #(reset! screen blackjack-main)} "blackjack"]]
+         [@screen]])})))
 
 (defn mount [el]
   (rdom/render [app] el))

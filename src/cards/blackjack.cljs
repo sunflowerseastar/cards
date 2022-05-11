@@ -49,7 +49,18 @@
          your-current-hand (nth (:you @db/hands) (:current-split @db/game))
          [card-1 card-2 & hits] your-current-hand
          can-stand (some? card-2)
-         can-split (and (= (:rank card-1) (:rank card-2)) (empty? hits))
+         num-your-split-hands (->> @db/hands :you count)
+         can-split-aces (and
+                         (>= @options/num-splits-permitted-ace num-your-split-hands)
+                         (= (:rank card-1) (:rank card-2))
+                         (= (:rank card-1) 14)
+                         (empty? hits))
+         can-split-non-aces (and
+                             (>= @options/num-splits-permitted-non-ace num-your-split-hands)
+                             (= (:rank card-1) (:rank card-2))
+                             (not= (:rank card-1) 14)
+                             (empty? hits))
+         can-split (or can-split-aces can-split-non-aces)
          cannot-hit (and
                       ;; player can't keep hitting if they're playing split hands...
                      (-> (:you @db/hands) count (> 1))

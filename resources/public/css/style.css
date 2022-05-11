@@ -277,9 +277,10 @@ hr {
 /* --- */
 
 /*
-<div.blackjack-container>
-  <div.header>
-  <div.game-play-area>
+<div.app>
+  <div.modal />
+  <div.header />
+  <div.blackjack-view>
     <div.card-play-area>
       <div.hand> ... </div>
       <div.player-division-line> ... </div>
@@ -290,7 +291,8 @@ hr {
 </div>
 */
 
-.blackjack-container {
+.blackjack-view {
+  flex: 1;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -331,12 +333,6 @@ hr {
   bottom: 0;
 }
 .game-play-area {
-  flex: 1;
-  width: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
 }
 .card-play-area {
   flex: 1;
@@ -836,7 +832,7 @@ button.inactive,
   top: 0;
   bottom: 0;
 }
-.square-wrapper {
+.square-pattern {
   display: block;
   position: relative;
   width: 100%;
@@ -844,7 +840,7 @@ button.inactive,
   transform: rotate(45deg);
   box-shadow: 0 0 5px rgba(34, 34, 34, 0.75);
 }
-.square-wrapper.offset {
+.square-pattern.offset {
   left: -50%;
   top: -50%;
 }

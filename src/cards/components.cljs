@@ -12,34 +12,27 @@
 ;; cards and hands
 ;; ---------------
 
+(defn square-pattern [classname]
+  [:span.square-pattern {:class (when classname classname)}
+   [:div.square]
+   [:div.square.one]
+   [:div.square.two]
+   [:div.square.three]
+   [:div.square.four]])
+
 (defn stacked-squares
-  "A single instance of the repeating 'stacked squares' card-back design.
+  "A row of the repeating 'stacked squares' card-back design.
   ref. https://codepen.io/ItsMeNatalie/pen/OJLYbrr"
-  [n]
-  [:span.stacked-squares
-   [:span.stacked-squares-inner
-    [:span.square-wrapper
-     [:div.square]
-     [:div.square.one]
-     [:div.square.two]
-     [:div.square.three]
-     [:div.square.four]]
-    [:span.square-wrapper.offset
-     [:div.square]
-     [:div.square.one]
-     [:div.square.two]
-     [:div.square.three]
-     [:div.square.four]]]])
+  []
+  [:span.stacked-squares>span.stacked-squares-inner
+   [square-pattern]
+   [square-pattern "offset"]])
 
 (defn card-down-component
   "Return a card that is face down and doesn't reveal its suit or value."
   []
-  [:span.card-container
-   [:span.face-down-wrapper
-    (into [:span.face-down-inner]
-          (let [i (atom 0)]
-            (repeatedly 63 (fn []
-                             (stacked-squares (even? (swap! i inc)))))))]])
+  [:span.card-container>span.face-down-wrapper
+   (into [:span.face-down-inner] (repeatedly 63 #(stacked-squares)))])
 
 (defn card-component
   "Given a 'card' state (ex. {:suit 'club :rank 3}), return markup of that card."
@@ -99,7 +92,7 @@
 (defn header
   "Top of UI with modal-toggling hamburger."
   []
-  [:div.header [:a.hamburger-container {:on-click #(db/toggle-modal!)} [:div.hamburger]]])
+  [:div.header>a.hamburger-container {:on-click #(db/toggle-modal!)} [:div.hamburger]])
 
 (defn blocker
   "This is the grayed out full-viewport area that sits above the gameplay and

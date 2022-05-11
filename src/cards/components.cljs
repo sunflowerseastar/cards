@@ -1,10 +1,11 @@
 (ns cards.components
   (:require
-   [goog.string :as gstring]
    [cards.blackjack-helpers :refer [hand->value]]
-   [cards.deck :as deck]
-   [cards.svgs :as svgs]
    [cards.db :as db]
+   [cards.deck :as deck]
+   [cards.options :as options]
+   [cards.svgs :as svgs]
+   [goog.string :as gstring]
    [reagent.core :as reagent :refer [atom]]))
 
 ;; ---------------
@@ -72,7 +73,8 @@
   "Given a hand value and options, render the hand meta/state."
   [hand-value {:keys [is-active hand-outcome is-a-card-in-the-hole]}]
   [:div.hand-meta
-   [:div.meta-value-container {:class (when hand-outcome (name hand-outcome))} [:span.meta-value (if (not is-a-card-in-the-hole) hand-value "")]]
+   [:div.meta-value-container {:class (when hand-outcome (name hand-outcome))}
+    [:span.meta-value.text-small (if (not is-a-card-in-the-hole) hand-value "")]]
    [:div.small-down-card {:class (when (not is-active) "hide")} (card-down-component)]])
 
 (defn hand-component
@@ -135,6 +137,9 @@
      (into [:div] (map (fn [[k v]] [:p k ": " (str v)]) @db/outcomes))
      [:hr]
      [:p "Dealer "
-      [:a.inline-toggle {:on-click #(swap! db/options update :dealer-stands-on-17 not)}
-       (if (:dealer-stands-on-17 @db/options) "stands" "hits")] " on 17"]
-     [:button {:on-click #(db/reset-game!)} "reset"]]]])
+      [:a.inline-toggle {:on-click #(swap! options/dealer-stands-on-17 not)}
+       (if @options/dealer-stands-on-17 "stands" "hits")] " on 17"]
+     (options/shuffle-precision-range-slider)
+
+     [:button {:on-click #(options/reset-options-defaults!)} "revert options to defaults"]
+     [:button {:on-click #(db/reset-game!)} "reset win/lose/push"]]]])

@@ -2,9 +2,9 @@
   (:require
    [alandipert.storage-atom :refer [local-storage]]
    [cards.blackjack-helpers :refer [hand->value hands->win-lose-push]]
-   [cards.constants :as constants]
    [cards.deck :refer [generate-shuffled-deck]]
-   [reagent.core :as reagent :refer [atom]]))
+   [cards.options :as options]
+   [reagent.core :refer [atom]]))
 
 ;; -------------
 ;; consts, state
@@ -24,8 +24,6 @@
 
 ;; a scoreboard that increments for each hand's win, loss, or push
 (defonce outcomes (local-storage (atom {:win 0 :lose 0 :push 0}) :outcomes))
-(defonce options (local-storage (atom {:dealer-stands-on-17 true
-                                       :shuffle-precision constants/default-precision}) :options))
 
 (defonce game (local-storage (atom game-initial-state) :game))
 (defonce deck (local-storage (atom (generate-shuffled-deck)) :deck))
@@ -44,9 +42,11 @@
 ;; TODO change how cards are dealt (draw-counter)
 (defonce draw-counter (local-storage (atom 4) :draw-counter))
 
+
 ;; ----------------
 ;; commands/actions
 ;; ----------------
+
 
 (defn deal-hands [local-deck]
   (let [your-card-1 (first local-deck)
@@ -68,6 +68,7 @@
 
 (defn end-game! [])
 
+;; TODO verify that split cards are dealt correctly
 (defn play-next-split! []
   (swap! game assoc :current-split (inc (:current-split @game))))
 
@@ -95,7 +96,7 @@
         (if you-busted-all-hands
           (conclude-game!)
           (while (= (:state @game) :running)
-            (if (< (hand->value (:dealer @hands)) (if (:dealer-stands-on-17 @options) 17 18))
+            (if (< (hand->value (:dealer @hands)) (if options/dealer-stands-on-17 17 18))
               (add-hit-card-to-hand!)
               (conclude-game!)))))))
 

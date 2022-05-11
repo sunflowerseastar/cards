@@ -91,6 +91,28 @@ hr {
   background: var(--gray);
 }
 
+/* text */
+/* --- */
+
+.text-small {
+  font-size: 11px;
+}
+@media (min-width: 768px) {
+  .text-small {
+    font-size: 12px;
+  }
+}
+@media (min-width: 992px) {
+  .text-small {
+    font-size: 13px;
+  }
+}
+@media (min-width: 1200px) {
+  .text-small {
+    font-size: 14px;
+  }
+}
+
 /* app */
 /* --- */
 
@@ -161,7 +183,7 @@ hr {
 }
 @media (min-width: 992px) {
   .modal-routing a {
-    font-size: 12px;
+    font-size: 13px;
   }
 }
 .modal-routing a:hover {
@@ -462,12 +484,11 @@ button:focus:after {
 }
 @media (min-width: 768px) {
   button:hover {
-    color: var(--black);
-    background: white;
+    background: var(--gray);
     cursor: pointer;
   }
 }
-button + button {
+.button-group button + button {
   margin-left: var(--space-md);
 }
 .button-group {
@@ -853,6 +874,12 @@ button.inactive,
   top: 80%;
   left: 80%;
   background-color: var(--lavendar-4);
+}
+
+.slider-text {
+  position: relative;
+  top: 10px;
+  color: var(--gray);
 }
 
 /* utility */

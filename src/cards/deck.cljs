@@ -1,4 +1,6 @@
-(ns cards.deck (:require [cards.constants :as constants]))
+(ns cards.deck
+  (:require
+   [cards.options :as options]))
 
 (defn sorted-deck
   "Pulling from the top (A is low):
@@ -26,21 +28,23 @@
 (defn divide-deck
   ;; TODO replace with split?
   "Given a deck, split it in two and return the halves in a vector."
-  ([deck] (divide-deck deck constants/default-precision))
+  ([deck] (divide-deck deck @options/shuffle-precision))
   ([deck precision]
    (let [num-cards (count deck)
-         num-half (/ num-cards 2)
+         num-half (quot num-cards 2)
          imprecision (- num-cards (* precision num-cards))
          separate-point
-         (+ num-half (- (rand-int imprecision) (if (zero? imprecision) 0 (/ 2 imprecision))))]
-     [(take separate-point deck) (drop separate-point deck)])))
+         (+ num-half (- (rand-int imprecision) (if (zero? imprecision) 0 (quot 2 imprecision))))]
+     (do
+       (println "d-d s-p: " separate-point)
+       [(take separate-point deck) (drop separate-point deck)]))))
 
 (defn riffle-shuffle
   "Given two halves of a deck, imprecisely zipper them together. A card is
   selected from either side in alternation, except for 'errors' when (rand)
   doesn't reach preicision, in which a card from the previous side is repeated."
   ([deck]
-   (riffle-shuffle deck constants/default-precision))
+   (riffle-shuffle deck @options/shuffle-precision))
   ([deck precision]
    (let [[left right] (divide-deck deck)]
      (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) precision)]

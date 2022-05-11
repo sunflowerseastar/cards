@@ -5,6 +5,7 @@
    [cards.components :as c]
    [cards.db :as db]
    [cards.deck :refer [generate-shuffled-deck]]
+   [cards.options :as options]
    [reagent.core :as reagent :refer [atom]]))
 
 ;; ---------------
@@ -27,7 +28,7 @@
                             :is-a-card-in-the-hole is-a-card-in-the-hole))
 
         [:div.player-division-line
-         [:h2 "--- dealer " (if (:dealer-stands-on-17 @db/options) "stands" "hits") " on soft 17 ---"]]
+         [:h2 "--- dealer " (if options/dealer-stands-on-17 "stands" "hits") " on soft 17 ---"]]
 
         (into [:<>]
               (->> (@db/hands :you)

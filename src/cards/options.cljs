@@ -3,7 +3,7 @@
    [alandipert.storage-atom :refer [local-storage]]
    [reagent.core :refer [atom]]))
 
-(def shuffle-precision-default 0.6)
+(def shuffle-precision-default 0.9)
 (defonce shuffle-precision (local-storage (atom shuffle-precision-default) :shuffle-precision))
 
 (def dealer-stands-on-17-default true)
@@ -51,4 +51,4 @@
                          (reset! value (js/parseFloat (.. e -target -value))))}]])
 
 (defn shuffle-precision-slider []
-  [range-slider-float shuffle-precision 0.0 1.0 "any" "Shuffle Precision"])
+  [range-slider-float shuffle-precision 0.0 1.0 0.001 "Shuffle Precision"])

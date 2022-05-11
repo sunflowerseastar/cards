@@ -44,17 +44,23 @@
   ([deck]
    (riffle-shuffle deck @options/shuffle-precision))
   ([deck precision]
+   ;; the intuition is that divided decks are in the left & right hands
    (let [[left right] (divide-deck deck)]
+     ;; 'is-card-l' means 'the bottom card of the left deck is going to go on top of the shuffled-deck
      (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) precision)]
-       (cond (and (empty? l) (empty? r)) shuffled-deck
-             (empty? l) (apply conj shuffled-deck r)
-             (empty? r) (apply conj shuffled-deck l)
+       (let [;; this determines whether the shuffles alternates correctly,
+             ;; or if there's an "error," and the next iteration will place its
+             ;; card from the same side again.
+             next-is-card-l (if (< (rand) precision) (not is-card-l) is-card-l)]
+         (cond
+            ;; the first three cases are finishing a shuffle
+           (and (empty? l) (empty? r)) shuffled-deck
+           (empty? l) (apply conj shuffled-deck r)
+           (empty? r) (apply conj shuffled-deck l)
 
-             (and (< (rand) precision) is-card-l) (recur (rest l) r (conj shuffled-deck (first l)) false)
-             (< (rand) precision) (recur l (rest r) (conj shuffled-deck (first r)) true)
-
-             is-card-l (recur (rest l) r (conj shuffled-deck (first l)) true)
-             :else (recur l (rest r) (conj shuffled-deck (first r)) false))))))
+           ;; the last two cases are placing either the left card or right card & recurring
+           is-card-l (recur (rest l) r (conj shuffled-deck (first l)) next-is-card-l)
+           :else (recur l (rest r) (conj shuffled-deck (first r)) next-is-card-l)))))))
 
 (defn cut-deck
   "Split a deck and stack the previously lower portion on top."

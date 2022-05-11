@@ -1,6 +1,7 @@
 (ns ^:figwheel-hooks cards.core
   (:require
    [cards.components :as c]
+   [cards.db :as db]
    [cards.blackjack :refer [blackjack-main]]
    [alandipert.storage-atom :refer [local-storage]]
    [goog.dom :as gdom]
@@ -31,9 +32,11 @@
   (letfn [(keyboard-listeners [e]
             (let [key (.-key e)
                   is-b (= (.-keyCode e) 66)
-                  is-d (= (.-keyCode e) 68)]
+                  is-d (= (.-keyCode e) 68)
+                  is-m (= (.-keyCode e) 77)]
               (cond is-d (route-to! :card-display)
-                    is-b (route-to! :blackjack))))]
+                    is-b (route-to! :blackjack)
+                    is-m (db/toggle-modal!))))]
     (create-class
      {:component-did-mount (fn [] (do (js/setTimeout #(reset! has-initially-loaded true) 0)
                                       (.addEventListener js/document "keydown" keyboard-listeners)))

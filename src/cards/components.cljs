@@ -133,13 +133,23 @@
     [:div.modal-inner
      (close-x)
      (modal-routing current-route routes route-to-fn)
+
      [:hr]
      (into [:div] (map (fn [[k v]] [:p k ": " (str v)]) @db/outcomes))
+
      [:hr]
      [:p "Dealer "
       [:a.inline-toggle {:on-click #(swap! options/dealer-stands-on-17 not)}
        (if @options/dealer-stands-on-17 "stands" "hits")] " on 17"]
-     (options/shuffle-precision-range-slider)
+     (options/split-non-ace-slider)
+     (options/split-ace-slider)
+     [:p [:a.inline-toggle {:on-click #(swap! options/can-hit-split-aces not)}
+          (if @options/can-hit-split-aces "Can" "Cannot")] " hit split aces"]
+
+     [:hr]
+     (options/shuffle-precision-slider)
+
+     [:hr]
 
      [:button {:on-click #(options/reset-options-defaults!)} "revert options to defaults"]
      [:button {:on-click #(db/reset-game!)} "reset win/lose/push"]]]])

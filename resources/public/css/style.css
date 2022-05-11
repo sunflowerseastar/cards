@@ -12,11 +12,11 @@
   --black: #333;
   --green: #b1e597;
   --red: #ff8c94;
-  --lavendar: #d0d0ff;
-  --lavendar-1: #a1a2cf;
-  --lavendar-2: #7576a0;
-  --lavendar-3: #4a4d74;
-  --lavendar-4: #22274b;
+  --lavender: #d0d0ff;
+  --lavender-1: #a1a2cf;
+  --lavender-2: #7576a0;
+  --lavender-3: #4a4d74;
+  --lavender-4: #22274b;
 
   --space-xs: 0.26em;
   --space-sm: 0.88em;
@@ -415,7 +415,7 @@ hr {
   background: var(--red);
 }
 .meta-value-container.push:before {
-  background: var(--lavendar);
+  background: var(--lavender);
 }
 .meta-value {
   position: relative;
@@ -858,28 +858,42 @@ button.inactive,
 .square.one {
   top: 20%;
   left: 20%;
-  background-color: var(--lavendar-1);
+  background-color: var(--lavender-1);
 }
 .square.two {
   top: 40%;
   left: 40%;
-  background-color: var(--lavendar-2);
+  background-color: var(--lavender-2);
 }
 .square.three {
   top: 60%;
   left: 60%;
-  background-color: var(--lavendar-3);
+  background-color: var(--lavender-3);
 }
 .square.four {
   top: 80%;
   left: 80%;
-  background-color: var(--lavendar-4);
+  background-color: var(--lavender-4);
 }
 
 .slider-text {
+  margin-top: 0;
   position: relative;
   top: 10px;
   color: var(--gray);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: var(--lavender);
+  border-radius: 5px;
+}
+input[type="range"]::-moz-range-track {
+  -moz-appearance: none;
+  background: var(--lavender);
+  outline: 1px solid var(--light-gray);
+  height: 4px;
+  border-radius: 2px;
 }
 
 /* utility */

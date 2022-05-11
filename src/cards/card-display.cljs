@@ -18,7 +18,7 @@
     [:button {:on-click #(swap! local-deck deck/cut-deck)} "cut"]
     [:button {:on-click #(reset! local-deck (deck/sorted-deck))} "sort"]]
    [:div.card-display-controls
-    (options/shuffle-precision-range-slider)
+    (options/shuffle-precision-slider)
     ]
 
        ;; (card-component (first local-deck))

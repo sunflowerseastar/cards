@@ -1,9 +1,10 @@
 (ns ^:figwheel-hooks cards.core
   (:require
+   [alandipert.storage-atom :refer [local-storage]]
+   [cards.blackjack :refer [blackjack-view]]
+   [cards.card-display :refer [card-display-view]]
    [cards.components :as c]
    [cards.db :as db]
-   [cards.blackjack :refer [blackjack-main]]
-   [alandipert.storage-atom :refer [local-storage]]
    [goog.dom :as gdom]
    [reagent.core :as reagent :refer [atom create-class]]
    [reagent.dom :as rdom]))
@@ -13,8 +14,8 @@
 (def current-route (local-storage (atom :blackjack) :current-route))
 
 (def routes
-  {:card-display c/card-display
-   :blackjack blackjack-main})
+  {:card-display card-display-view
+   :blackjack blackjack-view})
 
 (defn route-to-blackjack!
   "Send user to the blackjack page."

@@ -3,15 +3,15 @@
    [alandipert.storage-atom :refer [local-storage]]
    [cards.blackjack-helpers :refer [hand->value hands->win-lose-push]]
    [cards.components :as c]
-   [cards.deck :refer [generate-shuffled-deck]]
    [cards.db :as db]
+   [cards.deck :refer [generate-shuffled-deck]]
    [reagent.core :as reagent :refer [atom]]))
 
 ;; ---------------
 ;; gameplay markup
 ;; ---------------
 
-(defn blackjack-main []
+(defn blackjack-view []
   [:div.blackjack-container.padding-lr-sm
 
    [:div.game-play-area.max-width-900

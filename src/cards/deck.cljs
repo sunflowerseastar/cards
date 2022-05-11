@@ -34,10 +34,8 @@
          num-half (quot num-cards 2)
          imprecision (- num-cards (* precision num-cards))
          separate-point
-         (+ num-half (- (rand-int imprecision) (if (zero? imprecision) 0 (quot 2 imprecision))))]
-     (do
-       (println "d-d s-p: " separate-point)
-       [(take separate-point deck) (drop separate-point deck)]))))
+         (+ num-half (- (rand-int imprecision) (if (zero? imprecision) 0 (quot imprecision 2))))]
+     [(take separate-point deck) (drop separate-point deck)])))
 
 (defn riffle-shuffle
   "Given two halves of a deck, imprecisely zipper them together. A card is

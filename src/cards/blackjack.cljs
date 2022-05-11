@@ -62,10 +62,11 @@
                              (empty? hits))
          can-split (or can-split-aces can-split-non-aces)
          cannot-hit (and
+                     (false? @options/can-hit-split-aces)
                       ;; player can't keep hitting if they're playing split hands...
                      (-> (:you @db/hands) count (> 1))
                       ;; ...and it is aces that were split
-                     (= (-> your-current-hand first :rank) 14)
+                     (= (->> your-current-hand first :rank) 14)
                       ;; ...and they've already hit once.
                      (= (count your-current-hand) 2))]
      [:div.button-group {:class (if (not is-active) "inactive")}

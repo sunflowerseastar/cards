@@ -123,7 +123,7 @@
   (do (add-hit-card-to-hand!)
       (let [your-value (hand->value (nth (:you @hands) (:current-split @game)))
             are-more-splits-remaining (and (= (:turn @game) :you) (> (- (count (:you @hands)) 1) (:current-split @game)))]
-        (cond (and are-more-splits-remaining (>= your-value 21)) (play-next-split!)
+        (cond (and are-more-splits-remaining (>= your-value 21)) (do (play-next-split!) (hit!))
               (>= your-value 21) (dealer-plays!)))))
 
 (defn split! []

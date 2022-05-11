@@ -68,10 +68,6 @@
 
 (defn end-game! [])
 
-;; TODO verify that split cards are dealt correctly
-(defn play-next-split! []
-  (swap! game assoc :current-split (inc (:current-split @game))))
-
 (defn conclude-game! []
   (do
     ;; update scoring
@@ -120,15 +116,8 @@
       ;; otherwise, if you have blackjack, go ahead and turn gameplay over to the dealer
       (when (= (->> (:you @hands) first hand->value) 21) (dealer-plays!)))))
 
-(defn stand! []
-  (if (> (- (count (:you @hands)) 1) (:current-split @game))
-    (play-next-split!)
-    (dealer-plays!)))
-
-(defn split! []
-  (do (let [split-card (nth (nth (:you @hands) (:current-split @game)) 1)]
-        (swap! hands update :you conj [split-card]))
-      (swap! hands update-in [:you (:current-split @game)] #(-> (take 1 %) vec))))
+(defn play-next-split! []
+  (swap! game assoc :current-split (inc (:current-split @game))))
 
 (defn hit! []
   (do (add-hit-card-to-hand!)
@@ -136,6 +125,22 @@
             are-more-splits-remaining (and (= (:turn @game) :you) (> (- (count (:you @hands)) 1) (:current-split @game)))]
         (cond (and are-more-splits-remaining (>= your-value 21)) (play-next-split!)
               (>= your-value 21) (dealer-plays!)))))
+
+(defn split! []
+  (do (let
+          ;; get the second card of the current split hand
+       [split-card (nth (nth (:you @hands) (:current-split @game)) 1)]
+        ;; ... and create a new hand of just that card
+        (swap! hands update :you conj [split-card]))
+      ;; ... and then remove that split card from the current split hand
+      (swap! hands update-in [:you (:current-split @game)] #(-> (take 1 %) vec))
+      (hit!)))
+
+(defn stand! []
+  (if (> (- (count (:you @hands)) 1) (:current-split @game))
+    (do (play-next-split!)
+        (hit!))
+    (dealer-plays!)))
 
 (defn toggle-modal! []
   (swap! game assoc :is-modal-showing (not (:is-modal-showing @game))))

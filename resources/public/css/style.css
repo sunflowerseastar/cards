@@ -879,12 +879,12 @@ button.inactive,
   color: var(--gray);
 }
 
-input[type="range"]::-webkit-slider-thumb {
+input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   background: var(--lavender);
   border-radius: 5px;
 }
-input[type="range"]::-moz-range-track {
+input[type='range']::-moz-range-track {
   -moz-appearance: none;
   background: var(--lavender);
   outline: 1px solid var(--light-gray);
@@ -917,4 +917,7 @@ input[type="range"]::-moz-range-track {
 }
 .max-width-900 {
   max-width: 900px;
+}
+.light-gray {
+  color: var(--light-gray);
 }

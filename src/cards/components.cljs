@@ -136,8 +136,9 @@
        (if @options/dealer-stands-on-17 "stands" "hits")] " on 17"]
      (options/split-non-ace-slider)
      (options/split-ace-slider)
-     [:p [:a.inline-toggle {:on-click #(swap! options/can-hit-split-aces not)}
-          (if @options/can-hit-split-aces "Can" "Cannot")] " hit split aces"]
+     [:p {:class (when (zero? @options/num-splits-permitted-ace) "light-gray")}
+      [:a.inline-toggle {:on-click #(swap! options/can-hit-split-aces not)}
+       (if @options/can-hit-split-aces "Can" "Cannot")] " hit split aces"]
 
      [:hr]
      (options/shuffle-precision-slider)

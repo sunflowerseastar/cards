@@ -99,7 +99,7 @@
   []
   (let [local-deck (atom (deck/sorted-deck))]
     (fn []
-      [:div.card-display.padding-lr-sm
+      [:div.card-display.padding-lr-sm.max-width-900
        [:div.card-display-controls
         [:button {:on-click #(swap! local-deck deck/riffle-shuffle)} "riffle"]
         [:button {:on-click #(swap! local-deck deck/cut-deck)} "cut"]

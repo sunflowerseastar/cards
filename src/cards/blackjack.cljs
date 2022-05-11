@@ -14,7 +14,7 @@
 (defn blackjack-main []
   [:div.blackjack-container.padding-lr-sm
 
-   [:div.game-play-area
+   [:div.game-play-area.max-width-900
     [:div.card-play-area
      (when (not (empty? @db/hands))
        [:<>

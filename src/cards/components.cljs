@@ -122,7 +122,7 @@
   [:<>
    [:div.modal {:class (if (:is-modal-showing @db/game) "is-modal-showing")}
     (blocker)
-    [:div.modal-inner
+    [:div.modal-inner-scroll-container>div.modal-inner
      (close-x)
      (modal-routing current-route routes route-to-fn)
 

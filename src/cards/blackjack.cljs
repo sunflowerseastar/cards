@@ -4,7 +4,6 @@
    [cards.blackjack-helpers :refer [hand->value hands->win-lose-push]]
    [cards.components :as c]
    [cards.db :as db]
-   [cards.deck :refer [generate-shuffled-deck]]
    [cards.options :as options]
    [reagent.core :as reagent :refer [atom]]))
 
@@ -71,6 +70,6 @@
                       ;; ...and they've already hit once.
                       (= (count your-current-hand) 2))]
       [:div.button-group.padding-top-sm {:class (if (not is-active) "inactive")}
-       [:button {:class (if cannot-hit "inactive") :on-click #(db/hit!)} "hit"]
+       [:button {:class (if cannot-hit "inactive") :on-click #(db/draw-and-advance-action!)} "hit"]
        [:button {:class (if (not can-stand) "inactive") :on-click #(db/stand!)} "stand"]
        [:button {:class (if (not can-split) "inactive") :on-click #(db/split!)} "split"]])]])

@@ -108,6 +108,7 @@
   [n]
   (let [shoe (generate-shoe n)
         [left right] (divide-cards shoe)
+        ;; TODO make ctt (cards to take) vary, based on precision
         ctt 26]
     (println (count shoe) (count left) (count right))
     (loop [left-stack left
@@ -116,11 +117,11 @@
            is-working-left false]
 
       (do
-        (println "--")
-        (println (count left-stack) (count right-stack))
-        (println (count working-deck))
+        ;; (println "--")
+        ;; (println (count left-stack) (count right-stack))
+        ;; (println (count working-deck))
         (if
-         (and (empty? left-stack) (empty? right-stack)) (count working-deck) ; working-deck ; conclusion
+         (and (empty? left-stack) (empty? right-stack)) working-deck ; conclusion
 
          (let [use-working-deck (not (empty? working-deck))
                left-chunk (vec (take ctt (if (and use-working-deck is-working-left) working-deck left-stack)))
@@ -131,8 +132,8 @@
                                     strip-shuffle
                                     riffle-shuffle)]
            (do
-             (println "lsr " (count left-stack-remaining) " | rsr " (count right-stack-remaining))
-             (println "sc " (count shuffled-chunks))
+             ;; (println "lsr " (count left-stack-remaining) " | rsr " (count right-stack-remaining))
+             ;; (println "sc " (count shuffled-chunks))
              (recur
               left-stack-remaining
               right-stack-remaining

@@ -27,7 +27,8 @@
 
 (defonce game (local-storage (atom game-initial-state) :game))
 
-(defonce shoe (local-storage (atom (gss @options/num-decks-in-shoe)) :shoe))
+;; the shoe receives (gss @options/num-decks-in-shoe) from deal!
+(defonce shoe (atom '[]))
 (defonce deck (local-storage (atom (generate-shuffled-deck)) :deck))
 
 ;; hands ex. {:you [[{:suit diamond :rank 7} {:suit diamond, :rank 14}]],
@@ -41,8 +42,8 @@
 ;; :current-split will inc past 0, through each of the split hands.
 
 (defonce hands (local-storage (atom {}) :hands))
-;; TODO change how cards are dealt (draw-counter)
 (defonce draw-counter (local-storage (atom 4) :draw-counter))
+(defonce shoe-counter (local-storage (atom 0) :shoe-counter))
 
 
 ;; ----------------
@@ -50,25 +51,66 @@
 ;; ----------------
 
 
-(defn deal-hands [local-deck]
-  (let [your-card-1 (first local-deck)
-        dealer-card-1 (second local-deck)
-        your-card-2 (local-deck 2)
-        dealer-card-2 (local-deck 3)]
-    {:you [[your-card-1 your-card-2]]
-     :dealer [dealer-card-1 dealer-card-2]}))
+(defn deal-shoe-hands!
+  []
+  (if
+   ;; no shoe or shoe is exhausted - shuffle fresh shoe and deal from the top
+   (or (empty? @shoe) (>= @shoe-counter (count @shoe)))
+    (do (println "1 - no shoe or empty shoe, create new shoe and deal and bump counter")
+        (reset! shoe (gss @options/num-decks-in-shoe))
+        (reset! hands {:you [[(first @shoe) (nth @shoe 2)]]
+                       :dealer [(second @shoe) (nth @shoe 3)]})
+        (reset! shoe-counter 4))
+
+    ;; shoe exists
+    (let [num-cards-remaining-in-shoe (- (count @shoe) @shoe-counter)]
+      (do
+        (println "2 - cards exist in shoe...: " num-cards-remaining-in-shoe)
+        (if
+         ;; okay to deal normally...
+         (>= num-cards-remaining-in-shoe 4)
+          (do
+            (println "2a - there are 4 or more cards left, deal those out")
+            (reset! hands {:you [[(nth @shoe @shoe-counter) (nth @shoe (+ @shoe-counter 2))]]
+                           :dealer [(nth @shoe (inc @shoe-counter)) (nth @shoe (+ @shoe-counter 3))]})
+            (swap! shoe-counter #(+ % 4))
+            (when (>= @shoe-counter (count @shoe))
+              (do
+                (println "there were exactly 4 cards left, so it is time to regenerate the shoe (now that those are dealt and shoe is empty)")
+                (reset! shoe (gss @options/num-decks-in-shoe))
+                (reset! shoe-counter 0))))
+
+          ;; ...otherwise, deal the remaining shoe + the first card(s) of a new, fresh shoe
+          (let [remaining-cards (take-last num-cards-remaining-in-shoe @shoe)
+                num-cards-needed-from-fresh-shoe (- 4 num-cards-remaining-in-shoe)
+                ;; TODO shuffle existing shoe rather than re-generating
+                fresh-shoe (gss @options/num-decks-in-shoe)
+                cards-from-fresh-shoe (take num-cards-needed-from-fresh-shoe fresh-shoe)
+                cards-to-deal (vec (concat remaining-cards cards-from-fresh-shoe))
+                [your-first-card dealer-first-card your-second-card dealer-second-card] cards-to-deal]
+            (do
+              (println "2b - there are 3 or fewer cards")
+              (reset! shoe fresh-shoe)
+              (reset! hands {:you [[your-first-card your-second-card]]
+                             :dealer [dealer-first-card dealer-second-card]})
+              (reset! shoe-counter num-cards-needed-from-fresh-shoe))))))))
 
 (defn reset-game! []
-  (do (reset! deck (generate-shuffled-deck))
+  (do (reset! shoe [])
       (reset! hands {})
-      (reset! draw-counter 4)
+      (reset! shoe-counter 0)
       (reset! game game-initial-state)))
 
-(defn draw-hit-card! []
-  (do (swap! draw-counter inc)
-      (@deck @draw-counter)))
-
-(defn end-game! [])
+(defn draw-card! []
+  (let [drawn-card (@shoe @shoe-counter)]
+    (do
+      (swap! shoe-counter inc)
+      (when (>= @shoe-counter (count @shoe))
+        (do
+          (println "reached end, regenerate shoe")
+          (reset! shoe (gss @options/num-decks-in-shoe))
+          (reset! shoe-counter 0)))
+      drawn-card)))
 
 (defn conclude-game! []
   (do
@@ -78,11 +120,11 @@
     ;; end gameplay
     (swap! game assoc :state :stopped :turn :none)))
 
-(defn add-hit-card-to-hand!
+(defn add-draw-card-to-hand!
   "Draw a card and add it to the hand currently being played."
   []
   (let [player (:turn @game)
-        hit-card (draw-hit-card!)]
+        hit-card (draw-card!)]
     (if (= player :you)
       (swap! hands update-in [:you (:current-split @game)] conj hit-card)
       (swap! hands update :dealer conj hit-card))))
@@ -95,22 +137,24 @@
           (conclude-game!)
           (while (= (:state @game) :running)
             (if (< (hand->value (:dealer @hands)) (if options/dealer-stands-on-17 17 18))
-              (add-hit-card-to-hand!)
+              (add-draw-card-to-hand!)
               (conclude-game!)))))))
 
 ;; Interactive commands
 
 (defn deal! []
   (do
-    (reset! deck (generate-shuffled-deck))
+    ;; (reset! deck (generate-shuffled-deck))
     ;; (reset! deck (cards.deck/generate-specific-deck [(rs "a s") (rs "2 d") (rs "a c")])) ;; deal split aces
     ;; (reset! deck (cards.deck/generate-specific-deck [(rs "8 s") (rs "2 d") (rs "8 c")])) ;; deal split 8s
     ;; (reset! deck (cards.deck/generate-specific-deck [(rs "a s") (rs "a d") (rs "k c") (rs "k h")])) ;; you and dealer both have blackjacks
     ;; (reset! deck (cards.deck/generate-specific-deck [(rs "a s") (rs "a d") (rs "9 c") (rs "k h")])) ;; dealer has blackjack
     ;; (reset! deck (cards.deck/generate-specific-deck [(rs "a s") (rs "a d") (rs "k c") (rs "8 h")])) ;; you have blackjack
     ;; (reset! deck (cards.deck/generate-specific-deck [(rs "2 s") (rs "k d") (rs "2 c") (rs "q d") (rs "2 h") (rs "2 d") (rs "3 s") (rs "3 c") (rs "3 h") (rs "3 d")])) ;; low cards
-    (reset! hands (deal-hands @deck))
-    (reset! draw-counter 4)
+
+    ;; beginning of shoe deal
+    (deal-shoe-hands!)
+
     (swap! game assoc :state :running :turn :you :current-split 0)
     (if (= (hand->value (:dealer @hands)) 21)
       ;; if the dealer has blackjack, then there is no interactive gameplay for the round
@@ -121,11 +165,16 @@
 (defn play-next-split! []
   (swap! game assoc :current-split (inc (:current-split @game))))
 
-(defn hit! []
-  (do (add-hit-card-to-hand!)
+(defn draw-and-advance-action!
+  "Draw a card, and then proceed to next split or dealer action if hit reach 21 or
+  bust. This is usually a hit, but is not technically a hit in the scenario
+  where you've split and you're receiving a draw card (+ 'advance-action') for
+  each of the split hands."
+  []
+  (do (add-draw-card-to-hand!)
       (let [your-value (hand->value (nth (:you @hands) (:current-split @game)))
             are-more-splits-remaining (and (= (:turn @game) :you) (> (- (count (:you @hands)) 1) (:current-split @game)))]
-        (cond (and are-more-splits-remaining (>= your-value 21)) (do (play-next-split!) (hit!))
+        (cond (and are-more-splits-remaining (>= your-value 21)) (do (play-next-split!) (draw-and-advance-action!))
               (>= your-value 21) (dealer-plays!)))))
 
 (defn split! []
@@ -136,12 +185,14 @@
         (swap! hands update :you conj [split-card]))
       ;; ... and then remove that split card from the current split hand
       (swap! hands update-in [:you (:current-split @game)] #(-> (take 1 %) vec))
-      (hit!)))
+      (draw-and-advance-action!)))
 
 (defn stand! []
   (if (> (- (count (:you @hands)) 1) (:current-split @game))
+    ;; if you have more split hands to play...
     (do (play-next-split!)
-        (hit!))
+        (draw-and-advance-action!))
+    ;; ...otherwise dealer's turn
     (dealer-plays!)))
 
 (defn toggle-modal! []

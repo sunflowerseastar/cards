@@ -1,11 +1,22 @@
 (ns cards.core-test
   (:require
    [cards.deck :as deck]
-   [cards.blackjack-helpers :refer [hands->win-lose-push]]
+   [cards.blackjack-helpers :refer [hands->win-lose-push rs]]
    [cljs.test :refer-macros [are deftest is testing]]))
 
-(def top-card {:suit 'heart :rank 14})
-(def bottom-card {:suit 'spade :rank 14})
+;; 'rs' is a card shorthand that means 'rank suit'
+(deftest rs-test
+  (are [x y] (= x y)
+    (rs "A c") {:rank 14 :suit 'club}
+    (rs "14 c") {:rank 14 :suit 'club}
+    (rs "a c") {:rank 14 :suit 'club}
+    (rs "13 s") {:rank 13 :suit 'spade}
+    (rs "k s") {:rank 13 :suit 'spade}
+    (rs "10 s") {:rank 10 :suit 'spade}
+    (rs "9 s") {:rank 9 :suit 'spade}))
+
+(def top-card (rs "a h"))
+(def bottom-card (rs "a s"))
 
 (deftest sorted-deck-test
   (are [x y] (= x y)
@@ -32,8 +43,8 @@
     (count (deck/riffle-shuffle (deck/sorted-deck))) 52))
 
 ;; "h-" stands for "hand-", or "sample-test-hand-"
-(def h-blackjack [{:suit 'spade, :rank 14} {:suit 'spade, :rank 13}])
-(def h-20 [{:suit 'club, :rank 10} {:suit 'club, :rank 10}])
+(def h-blackjack [(rs "a s") (rs "k s")])
+(def h-20 [(rs "10 c") (rs "11 c")])
 (def h-21 [{:suit 'heart, :rank 10} {:suit 'club, :rank 9} {:suit 'club, :rank 2}])
 (def h-22 [{:suit 'diamond, :rank 9} {:suit 'diamond, :rank 8} {:suit 'diamond, :rank 5}])
 

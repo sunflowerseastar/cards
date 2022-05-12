@@ -1,7 +1,7 @@
 (ns cards.db
   (:require
    [alandipert.storage-atom :refer [local-storage]]
-   [cards.blackjack-helpers :refer [hand->value hands->win-lose-push]]
+   [cards.blackjack-helpers :refer [hand->value hands->win-lose-push rs]]
    [cards.deck :refer [generate-shuffled-deck]]
    [cards.options :as options]
    [reagent.core :refer [atom]]))
@@ -101,12 +101,12 @@
 (defn deal! []
   (do
     (reset! deck (generate-shuffled-deck))
-    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 2} {:suit 'club :rank 14}])) ;; deal split aces
-    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 8} {:suit 'diamond :rank 2} {:suit 'club :rank 8}])) ;; deal split 8s
-    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 14} {:suit 'club :rank 13} {:suit 'heart :rank 13}])) ;; you and dealer both have blackjacks
-    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 14} {:suit 'club :rank 9} {:suit 'heart :rank 13}])) ;; dealer has blackjack
-    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 14} {:suit 'diamond :rank 14} {:suit 'club :rank 13} {:suit 'heart :rank 8}])) ;; you have blackjack
-    ;; (reset! deck (cards.deck/generate-specific-deck [{:suit 'spade :rank 2} {:suit 'diamond :rank 13} {:suit 'club :rank 2} {:suit 'diamond :rank 2} {:suit 'heart :rank 2} {:suit 'heart :rank 3}])) ;; low cards
+    ;; (reset! deck (cards.deck/generate-specific-deck [(rs "a s") (rs "2 d") (rs "a c")])) ;; deal split aces
+    ;; (reset! deck (cards.deck/generate-specific-deck [(rs "8 s") (rs "2 d") (rs "8 c")])) ;; deal split 8s
+    ;; (reset! deck (cards.deck/generate-specific-deck [(rs "a s") (rs "a d") (rs "k c") (rs "k h")])) ;; you and dealer both have blackjacks
+    ;; (reset! deck (cards.deck/generate-specific-deck [(rs "a s") (rs "a d") (rs "9 c") (rs "k h")])) ;; dealer has blackjack
+    ;; (reset! deck (cards.deck/generate-specific-deck [(rs "a s") (rs "a d") (rs "k c") (rs "8 h")])) ;; you have blackjack
+    ;; (reset! deck (cards.deck/generate-specific-deck [(rs "2 s") (rs "k d") (rs "2 c") (rs "q d") (rs "2 h") (rs "2 d") (rs "3 s") (rs "3 c") (rs "3 h") (rs "3 d")])) ;; low cards
     (reset! hands (deal-hands @deck))
     (reset! draw-counter 4)
     (swap! game assoc :state :running :turn :you :current-split 0)

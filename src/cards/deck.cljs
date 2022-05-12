@@ -19,14 +19,6 @@
 
 (def deck (atom (sorted-deck)))
 
-(defn translate-rank-of [rank]
-  (case rank
-    11 'J
-    12 'Q
-    13 'K
-    14 'A
-    rank))
-
 (defn num-adjusted-for-precision
   "Given an int and a precision, return a random int that within plus/minus
   (* precision n) of n."

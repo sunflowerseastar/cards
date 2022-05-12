@@ -1,4 +1,6 @@
-(ns cards.blackjack-helpers)
+(ns cards.blackjack-helpers
+  (:require
+   [clojure.string :refer [lower-case split]]))
 
 (defn rank->hard-value [rank]
   (cond (< rank 11) rank
@@ -48,3 +50,22 @@
 
           ;; unreachable, TODO instrument
           :else (throw (js/Error. "condition not handled ☠")))))
+
+(defn rs
+  "Take a 'rank suit' (aka 'rs') card notation shorthand and return the regular
+  card data structure."
+  [str]
+  (let [[raw-rank raw-suit] (split str #" ")
+        raw-rank-lower (lower-case raw-rank)
+        rank (cond
+               (= raw-rank-lower \a) 14
+               (= raw-rank-lower \k) 13
+               (= raw-rank-lower \q) 12
+               (= raw-rank-lower \j) 11
+               :else (js/parseInt raw-rank))
+        suit (cond
+               (= raw-suit \s) 'spade
+               (= raw-suit \c) 'club
+               (= raw-suit \d) 'diamond
+               (= raw-suit \h) 'heart)]
+    {:suit suit :rank rank}))

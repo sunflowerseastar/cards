@@ -38,7 +38,6 @@
   "Given a 'card' state (ex. {:suit 'club :rank 3}), return markup of that card."
   [{:keys [suit rank]}]
   (let [suit-svg (svgs/svg-of suit)
-        t-rank (deck/translate-rank-of rank)
         is-face (and (> rank 10) (< rank 14))
         is-ace (= rank 14)
         is-red (or (= suit 'diamond) (= suit 'heart))]

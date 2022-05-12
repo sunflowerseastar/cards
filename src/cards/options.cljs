@@ -18,7 +18,7 @@
 (def can-hit-split-aces-default false)
 (defonce can-hit-split-aces (local-storage (atom can-hit-split-aces-default) :can-hit-split-aces))
 
-(def num-decks-in-shoe-default 1)
+(def num-decks-in-shoe-default 4)
 (defonce num-decks-in-shoe (local-storage (atom num-decks-in-shoe-default) :num-decks-in-shoe))
 
 (defn reset-options-defaults!
@@ -27,6 +27,7 @@
   (do (reset! dealer-stands-on-17 dealer-stands-on-17-default)
       (reset! num-splits-permitted-non-ace num-splits-permitted-non-ace-default)
       (reset! num-splits-permitted-ace num-splits-permitted-ace-default)
+      (reset! num-decks-in-shoe num-decks-in-shoe-default)
       (reset! shuffle-precision shuffle-precision-default)))
 
 (defn range-slider-int [value min max step title cb]

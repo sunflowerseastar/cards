@@ -145,5 +145,6 @@
 
      [:hr]
 
-     [:button {:on-click #(options/reset-options-defaults!)} "revert options to defaults"]
-     [:button {:on-click #(db/reset-game!)} "reset win/lose/push"]]]])
+     [:button {:on-click #(options/reset-options-defaults!)} "reset options"]
+     [:button {:on-click #(db/reset-shoe-and-hands!)} "reset shoe and hands"]
+     [:button {:on-click #(db/reset-win-lose-push!)} "reset win/lose/push"]]]])

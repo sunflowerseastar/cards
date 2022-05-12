@@ -23,7 +23,8 @@
                              :is-modal-showing false})
 
 ;; a scoreboard that increments for each hand's win, loss, or push
-(defonce outcomes (local-storage (atom {:win 0 :lose 0 :push 0}) :outcomes))
+(defonce outcomes-default {:win 0 :lose 0 :push 0})
+(defonce outcomes (local-storage (atom outcomes-default) :outcomes))
 
 (defonce game (local-storage (atom game-initial-state) :game))
 
@@ -95,11 +96,14 @@
                              :dealer [dealer-first-card dealer-second-card]})
               (reset! shoe-counter num-cards-needed-from-fresh-shoe))))))))
 
-(defn reset-game! []
+(defn reset-shoe-and-hands! []
   (do (reset! shoe [])
       (reset! hands {})
       (reset! shoe-counter 0)
       (reset! game game-initial-state)))
+
+(defn reset-win-lose-push! []
+  (reset! outcomes outcomes-default))
 
 (defn draw-card! []
   (let [drawn-card (@shoe @shoe-counter)]

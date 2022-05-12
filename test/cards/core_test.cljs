@@ -7,13 +7,13 @@
 ;; 'rs' is a card shorthand that means 'rank suit'
 (deftest rs-test
   (are [x y] (= x y)
-    (rs "A c") {:rank 14 :suit 'club}
-    (rs "14 c") {:rank 14 :suit 'club}
-    (rs "a c") {:rank 14 :suit 'club}
-    (rs "13 s") {:rank 13 :suit 'spade}
-    (rs "k s") {:rank 13 :suit 'spade}
-    (rs "10 s") {:rank 10 :suit 'spade}
-    (rs "9 s") {:rank 9 :suit 'spade}))
+    (rs "A c") {:rank 14 :suit :club}
+    (rs "14 c") {:rank 14 :suit :club}
+    (rs "a c") {:rank 14 :suit :club}
+    (rs "13 s") {:rank 13 :suit :spade}
+    (rs "k s") {:rank 13 :suit :spade}
+    (rs "10 s") {:rank 10 :suit :spade}
+    (rs "9 s") {:rank 9 :suit :spade}))
 
 (def top-card (rs "a h"))
 (def bottom-card (rs "a s"))
@@ -45,8 +45,8 @@
 ;; "h-" stands for "hand-", or "sample-test-hand-"
 (def h-blackjack [(rs "a s") (rs "k s")])
 (def h-20 [(rs "10 c") (rs "11 c")])
-(def h-21 [{:suit 'heart, :rank 10} {:suit 'club, :rank 9} {:suit 'club, :rank 2}])
-(def h-22 [{:suit 'diamond, :rank 9} {:suit 'diamond, :rank 8} {:suit 'diamond, :rank 5}])
+(def h-21 [{:suit :heart, :rank 10} {:suit :club, :rank 9} {:suit :club, :rank 2}])
+(def h-22 [{:suit :diamond, :rank 9} {:suit :diamond, :rank 8} {:suit :diamond, :rank 5}])
 
 ;; (combo/selections #{"h-20" "h-blackjack" "h-22"} 2) => possible hands
 (deftest hands->win-lose-push-test

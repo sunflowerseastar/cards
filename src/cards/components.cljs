@@ -35,12 +35,12 @@
    (into [:span.face-down-inner] (repeatedly 63 #(stacked-squares)))])
 
 (defn card-component
-  "Given a 'card' state (ex. {:suit 'club :rank 3}), return markup of that card."
+  "Given a 'card' state (ex. {:suit :club :rank 3}), return markup of that card."
   [{:keys [suit rank]}]
   (let [suit-svg (svgs/svg-of suit)
         is-face (and (> rank 10) (< rank 14))
         is-ace (= rank 14)
-        is-red (or (= suit 'diamond) (= suit 'heart))]
+        is-red (or (= suit :diamond) (= suit :heart))]
     [:span.card-container
      [:span.card-left (svgs/svg-rank rank is-red) suit-svg]
      [:span.card-middle {:class ["suit-svgs" (str "rank-" rank)]}

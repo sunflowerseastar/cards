@@ -64,8 +64,8 @@
                (= raw-rank-lower \j) 11
                :else (js/parseInt raw-rank))
         suit (cond
-               (= raw-suit \s) 'spade
-               (= raw-suit \c) 'club
-               (= raw-suit \d) 'diamond
-               (= raw-suit \h) 'heart)]
+               (= raw-suit \s) :spade
+               (= raw-suit \c) :club
+               (= raw-suit \d) :diamond
+               (= raw-suit \h) :heart)]
     {:suit suit :rank rank}))

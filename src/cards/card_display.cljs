@@ -23,7 +23,7 @@
     ]
 
        ;; (card-component (first local-deck))
-       ;; (card-component {:suit 'spade :rank 12})
+       ;; (card-component {:suit :spade :rank 12})
        ;; (into [:div.card-display] (map card-down-component @local-deck)) ;; all cards are face down
        ;; (into [:div.card-display] (map card-down-component (take 1 @local-deck))) ;; 1 card, face down
    (into [:div.card-display-inner] (map c/card-component @local-deck))])

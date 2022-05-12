@@ -25,6 +25,13 @@
     14 'A
     rank))
 
+(defn num-adjusted-for-precision
+  "Given an int and a precision, return a random int that within plus/minus
+  (* precision n) of n."
+  [n precision]
+  (let [imprecision (- n (* precision n))]
+    (+ n (- (rand-int imprecision) (if (zero? imprecision) 0 (quot imprecision 2))))))
+
 (defn divide-deck
   ;; TODO replace with split?
   "Given a deck, split it in two and return the halves in a vector."
@@ -33,16 +40,14 @@
    (let [num-cards (count deck)
          num-half (quot num-cards 2)
          imprecision (- num-cards (* precision num-cards))
-         separate-point
-         (+ num-half (- (rand-int imprecision) (if (zero? imprecision) 0 (quot imprecision 2))))]
+         separate-point (num-adjusted-for-precision num-half precision)]
      [(take separate-point deck) (drop separate-point deck)])))
 
 (defn riffle-shuffle
   "Given two halves of a deck, imprecisely zipper them together. A card is
   selected from either side in alternation, except for 'errors' when (rand)
   doesn't reach preicision, in which a card from the previous side is repeated."
-  ([deck]
-   (riffle-shuffle deck @options/shuffle-precision))
+  ([deck] (riffle-shuffle deck @options/shuffle-precision))
   ([deck precision]
    ;; the intuition is that divided decks are in the left & right hands
    (let [[left right] (divide-deck deck)]
@@ -62,6 +67,24 @@
            is-card-l (recur (rest l) r (conj shuffled-deck (first l)) next-is-card-l)
            :else (recur l (rest r) (conj shuffled-deck (first r)) next-is-card-l)))))))
 
+(defn strip-shuffle
+  "Given a deck, keep taking 1/x of the top cards (3 to 7 times), and stacking
+  them (new top-cards are placed on top of the growing shuffled-deck), until all
+  cards have been placed on the shuffled-deck."
+  ([deck] (strip-shuffle deck @options/shuffle-precision))
+  ([deck precision]
+   (let [strip-precision (* 0.8 precision) ; otherwise very little variation
+         rough-chunk-size (quot 52 (num-adjusted-for-precision 5 strip-precision))]
+     (loop [cards-to-take (num-adjusted-for-precision rough-chunk-size strip-precision)
+            top-chunk (take cards-to-take deck)
+            remaining-deck (drop cards-to-take deck)
+            shuffled-deck '()]
+       (if (empty? remaining-deck) (apply conj shuffled-deck top-chunk)
+           (recur (num-adjusted-for-precision rough-chunk-size strip-precision)
+                  (take cards-to-take remaining-deck)
+                  (drop cards-to-take remaining-deck)
+                  (apply conj shuffled-deck top-chunk)))))))
+
 (defn cut-deck
   "Split a deck and stack the previously lower portion on top."
   [deck]
@@ -71,10 +94,16 @@
   (let [[top bottom] (divide-deck deck)] (shuffle-fn top bottom)))
 
 (defn generate-shuffled-deck
-  ;; TODO use local shuffle functions
   "Return a deck that is shuffled."
   []
-  (let [deck (sorted-deck)] (nth (iterate shuffle deck) 7)))
+  (->> (sorted-deck)
+       strip-shuffle
+       riffle-shuffle
+       strip-shuffle
+       riffle-shuffle
+       riffle-shuffle
+       cut-deck
+       vec))
 
 (defn generate-specific-deck [starting-cards]
   (->> (generate-shuffled-deck)

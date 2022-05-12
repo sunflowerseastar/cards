@@ -15,6 +15,7 @@
   [:div.card-display.padding-lr-sm.max-width-900
    [:div.card-display-controls.button-group
     [:button {:on-click #(swap! local-deck deck/riffle-shuffle)} "riffle"]
+    [:button {:on-click #(swap! local-deck deck/strip-shuffle)} "strip"]
     [:button {:on-click #(swap! local-deck deck/cut-deck)} "cut"]
     [:button {:on-click #(reset! local-deck (deck/sorted-deck))} "sort"]]
    [:div.card-display-controls

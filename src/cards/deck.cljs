@@ -2,6 +2,8 @@
   (:require
    [cards.options :as options]))
 
+;; chunk: a contiguous group of cards in a deck or shoe.
+
 (defn sorted-deck
   "Pulling from the top (A is low):
      - A -> K hearts
@@ -49,7 +51,7 @@
   doesn't reach preicision, in which a card from the previous side is repeated.
   The intuition regarding left/right is that the card chunks are in the left &
   right hands."
-  ([[left right]] (riffle-shuffle-lr deck @options/shuffle-precision))
+  ([l-r-chunks] (riffle-shuffle-lr l-r-chunks @options/shuffle-precision))
   ([[left right] precision]
    ;; 'is-card-l' means 'the bottom card of the left deck is going to go on top of the shuffled-deck
    (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) precision)]
@@ -95,10 +97,76 @@
 (defn cut-deck
   "Split a deck and stack the previously lower portion on top."
   [deck]
-  (let [[top bottom] (divide-deck deck)] (vec (concat bottom top))))
+  (let [[top bottom] (divide-cards deck)] (vec (concat bottom top))))
 
 (defn shuffler [deck shuffle-fn]
-  (let [[top bottom] (divide-deck deck)] (shuffle-fn top bottom)))
+  (let [[top bottom] (divide-cards deck)] (shuffle-fn top bottom)))
+
+(defn generate-shoe
+  "Return n sorted decks, combined."
+  [n]
+  (->> (repeatedly #(sorted-deck)) (take n) (apply concat)))
+
+(defn gss
+  "Return a shuffled shoe comprised of n decks. Roughly based on
+  https://www.youtube.com/watch?v=tpv5sqoveuc. 'Stack' refers to the two
+  original divided shoe stacks that sit on the left and right. 'Chunk' refers to
+  the cards that are either in the left hand or right hand that will be shuffled
+  together in a given iteration."
+  [n]
+  (let [shoe (generate-shoe n)
+        [left right] (divide-cards shoe)
+        ctt 26]
+    (println (count shoe) (count left) (count right))
+    (loop [left-stack left
+           right-stack right
+           working-deck '()
+           is-working-left false]
+
+      (do
+        (println "--")
+        (println (count left-stack) (count right-stack))
+        (println (count working-deck))
+        (if
+         (and (empty? left-stack) (empty? right-stack)) (count working-deck) ; working-deck ; conclusion
+
+         (let [use-working-deck (not (empty? working-deck))
+               left-chunk (vec (take ctt (if (and use-working-deck is-working-left) working-deck left-stack)))
+               left-stack-remaining (if (and use-working-deck is-working-left) left-stack (drop ctt left-stack))
+               right-chunk (vec (take ctt (if (and use-working-deck (not is-working-left)) working-deck right-stack)))
+               right-stack-remaining (if (and use-working-deck (not is-working-left)) right-stack (drop ctt right-stack))
+               shuffled-chunks (->> (riffle-shuffle-lr [left-chunk right-chunk])
+                                    strip-shuffle
+                                    riffle-shuffle)]
+           (do
+             (println "lsr " (count left-stack-remaining) " | rsr " (count right-stack-remaining))
+             (println "sc " (count shuffled-chunks))
+             (recur
+              left-stack-remaining
+              right-stack-remaining
+              ;; add the newly shuffled cards on top of the working-deck
+              (vec (concat shuffled-chunks (drop ctt working-deck)))
+              ;; alternate which hand will pull from the working deck
+              (not is-working-left)))))))))
+
+(defn generate-shuffled-shoe
+  "Return a shuffled shoe comprised of n decks. Roughly based on
+  https://www.youtube.com/watch?v=tpv5sqoveuc."
+  [n]
+  (let [shoe (generate-shoe n)
+        [left right] (divide-cards shoe)
+
+        left-chunk (vec (take 26 left))
+        left-remaining (vec (drop 26 left))
+
+        right-chunk (vec (take 26 right))
+        right-remaining (vec (drop 26 right))]
+    (println (count shoe) (count left) (count right))
+    (println (count left-chunk) (count left-remaining))
+    ;; left-chunk
+    (->> (riffle-shuffle-lr [left-chunk right-chunk])
+         strip-shuffle
+         riffle-shuffle)))
 
 (defn generate-shuffled-deck
   "Return a deck that is shuffled."

@@ -272,7 +272,9 @@ hr {
 .card-display-controls {
   margin-bottom: var(--space-md);
 }
-
+.card-display-controls .button-group {
+  padding-bottom: var(--space-sm);
+}
 /* blackjack game play */
 /* --- */
 
@@ -286,7 +288,9 @@ hr {
       <div.player-division-line> ... </div>
       <div.hand(s)> ... </div>
     </div>
-    <div.button-group(s)> ... </div>
+    <div.action-area>
+      <div.button-group(s)> ... </div>
+    </div>
   </div>
 </div>
 */
@@ -332,11 +336,12 @@ hr {
 .hamburger:after {
   bottom: 0;
 }
-.game-play-area {
-}
 .card-play-area {
   flex: 1;
   padding-bottom: var(--space-md);
+}
+.action-area {
+  padding-bottom: var(--space-sm);
 }
 .player-division-line {
   padding: var(--space-xs) 0 var(--space-sm);
@@ -489,7 +494,6 @@ button:focus:after {
 }
 .button-group {
   display: flex;
-  padding-bottom: var(--space-sm);
 }
 .white-bg button {
   color: var(--black);
@@ -920,4 +924,7 @@ input[type='range']::-moz-range-track {
 }
 .light-gray {
   color: var(--light-gray);
+}
+.padding-top-sm {
+  padding-top: var(--space-sm);
 }

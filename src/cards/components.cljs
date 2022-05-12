@@ -141,6 +141,7 @@
 
      [:hr]
      (options/shuffle-precision-slider)
+     (options/num-decks-in-shoe-slider)
 
      [:hr]
 

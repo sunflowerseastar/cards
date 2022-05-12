@@ -18,6 +18,9 @@
 (def can-hit-split-aces-default false)
 (defonce can-hit-split-aces (local-storage (atom can-hit-split-aces-default) :can-hit-split-aces))
 
+(def num-decks-in-shoe-default 1)
+(defonce num-decks-in-shoe (local-storage (atom num-decks-in-shoe-default) :num-decks-in-shoe))
+
 (defn reset-options-defaults!
   "Clear user changes to defaults."
   []
@@ -26,21 +29,14 @@
       (reset! num-splits-permitted-ace num-splits-permitted-ace-default)
       (reset! shuffle-precision shuffle-precision-default)))
 
-
-
-(defn range-slider-int [value min max step title]
+(defn range-slider-int [value min max step title cb]
   [:<>
    [:p.slider-text.text-small title ": " @value]
    [:input {:type "range" :value @value :min min :max max :step step
             :style {:width "100%"}
             :on-change (fn [e]
-                         (reset! value (js/parseInt (.. e -target -value))))}]])
-
-(defn split-non-ace-slider []
-  [range-slider-int num-splits-permitted-non-ace 0 3 1 "Number of non-ace splits permitted"])
-
-(defn split-ace-slider []
-  [range-slider-int num-splits-permitted-ace 0 3 1 "Number of ace splits permitted"])
+                         (do (reset! value (js/parseInt (.. e -target -value)))
+                             (when cb (cb))))}]])
 
 (defn range-slider-float [value min max step title]
   [:<>
@@ -50,5 +46,15 @@
             :on-change (fn [e]
                          (reset! value (js/parseFloat (.. e -target -value))))}]])
 
+(defn split-non-ace-slider []
+  [range-slider-int num-splits-permitted-non-ace 0 3 1 "Number of non-ace splits permitted"])
+
+(defn split-ace-slider []
+  [range-slider-int num-splits-permitted-ace 0 3 1 "Number of ace splits permitted"])
+
 (defn shuffle-precision-slider []
-  [range-slider-float shuffle-precision 0.0 1.0 0.001 "Shuffle Precision"])
+  [range-slider-float shuffle-precision 0.0 1.0 0.001 "Shuffle precision"])
+
+(defn num-decks-in-shoe-slider
+  ([] (num-decks-in-shoe-slider #()))
+  ([callback] [range-slider-int num-decks-in-shoe 1 8 1 "Number of decks in the shoe" callback]))

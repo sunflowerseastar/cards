@@ -2,7 +2,7 @@
   (:require
    [alandipert.storage-atom :refer [local-storage]]
    [cards.blackjack-helpers :refer [hand->value hands->win-lose-push rs]]
-   [cards.deck :refer [generate-shuffled-deck]]
+   [cards.deck :refer [generate-shuffled-deck gss]]
    [cards.options :as options]
    [reagent.core :refer [atom]]))
 
@@ -26,6 +26,8 @@
 (defonce outcomes (local-storage (atom {:win 0 :lose 0 :push 0}) :outcomes))
 
 (defonce game (local-storage (atom game-initial-state) :game))
+
+(defonce shoe (local-storage (atom (gss @options/num-decks-in-shoe)) :shoe))
 (defonce deck (local-storage (atom (generate-shuffled-deck)) :deck))
 
 ;; hands ex. {:you [[{:suit diamond :rank 7} {:suit diamond, :rank 14}]],

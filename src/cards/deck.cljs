@@ -32,40 +32,47 @@
   (let [imprecision (- n (* precision n))]
     (+ n (- (rand-int imprecision) (if (zero? imprecision) 0 (quot imprecision 2))))))
 
-(defn divide-deck
+(defn divide-cards
   ;; TODO replace with split?
-  "Given a deck, split it in two and return the halves in a vector."
-  ([deck] (divide-deck deck @options/shuffle-precision))
-  ([deck precision]
-   (let [num-cards (count deck)
+  "Given a deck or shoe, split it in two and return the halves in a vector."
+  ([deck-or-shoe] (divide-cards deck-or-shoe @options/shuffle-precision))
+  ([deck-or-shoe precision]
+   (let [num-cards (count deck-or-shoe)
          num-half (quot num-cards 2)
          imprecision (- num-cards (* precision num-cards))
          separate-point (num-adjusted-for-precision num-half precision)]
-     [(take separate-point deck) (drop separate-point deck)])))
+     [(take separate-point deck-or-shoe) (drop separate-point deck-or-shoe)])))
 
-(defn riffle-shuffle
+(defn riffle-shuffle-lr
   "Given two halves of a deck, imprecisely zipper them together. A card is
   selected from either side in alternation, except for 'errors' when (rand)
-  doesn't reach preicision, in which a card from the previous side is repeated."
-  ([deck] (riffle-shuffle deck @options/shuffle-precision))
-  ([deck precision]
-   ;; the intuition is that divided decks are in the left & right hands
-   (let [[left right] (divide-deck deck)]
-     ;; 'is-card-l' means 'the bottom card of the left deck is going to go on top of the shuffled-deck
-     (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) precision)]
-       (let [;; this determines whether the shuffles alternates correctly,
+  doesn't reach preicision, in which a card from the previous side is repeated.
+  The intuition regarding left/right is that the card chunks are in the left &
+  right hands."
+  ([[left right]] (riffle-shuffle-lr deck @options/shuffle-precision))
+  ([[left right] precision]
+   ;; 'is-card-l' means 'the bottom card of the left deck is going to go on top of the shuffled-deck
+   (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) precision)]
+     (let [;; this determines whether the shuffles alternates correctly,
              ;; or if there's an "error," and the next iteration will place its
              ;; card from the same side again.
-             next-is-card-l (if (< (rand) precision) (not is-card-l) is-card-l)]
-         (cond
+           next-is-card-l (if (< (rand) precision) (not is-card-l) is-card-l)]
+       (cond
             ;; the first three cases are finishing a shuffle
-           (and (empty? l) (empty? r)) shuffled-deck
-           (empty? l) (apply conj shuffled-deck r)
-           (empty? r) (apply conj shuffled-deck l)
+         (and (empty? l) (empty? r)) shuffled-deck
+         (empty? l) (apply conj shuffled-deck r)
+         (empty? r) (apply conj shuffled-deck l)
 
            ;; the last two cases are placing either the left card or right card & recurring
-           is-card-l (recur (rest l) r (conj shuffled-deck (first l)) next-is-card-l)
-           :else (recur l (rest r) (conj shuffled-deck (first r)) next-is-card-l)))))))
+         is-card-l (recur (rest l) r (conj shuffled-deck (first l)) next-is-card-l)
+         :else (recur l (rest r) (conj shuffled-deck (first r)) next-is-card-l))))))
+
+(defn riffle-shuffle
+  "Helper function to riffle-shuffle a full deck. The riffle-shuffle-lr function
+  is separate because it shuffles l/r chunks in a shoe."
+  ([deck] (riffle-shuffle deck @options/shuffle-precision))
+  ([deck precision]
+   (riffle-shuffle-lr (divide-cards deck) precision)))
 
 (defn strip-shuffle
   "Given a deck, keep taking 1/x of the top cards (3 to 7 times), and stacking

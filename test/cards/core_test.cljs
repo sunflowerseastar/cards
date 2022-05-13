@@ -42,7 +42,22 @@
   ;; two imperfect riffles will not match
   (is (not= (deck/riffle (deck/generate-sorted-deck) 0.9) (deck/riffle (deck/generate-sorted-deck) 0.9)))
 
+  ;; 52 perfect (faro) shuffles puts the deck in original order
+  (is (= (nth (iterate #(deck/riffle % 1) (deck/generate-sorted-deck)) 52) (deck/generate-sorted-deck)))
+  (is (not= (nth (iterate #(deck/riffle % 1) (deck/generate-sorted-deck)) 51) (deck/generate-sorted-deck)))
+  (is (not= (nth (iterate #(deck/riffle % 1) (deck/generate-sorted-deck)) 53) (deck/generate-sorted-deck)))
+
+  ;; 26 perfect deck/riffles puts the deck in reverse order
+  (is (= (nth (iterate #(deck/riffle % 1) (deck/generate-sorted-deck)) 26) (reverse (deck/generate-sorted-deck))))
+  (is (not= (nth (iterate #(deck/riffle % 1) (deck/generate-sorted-deck)) 25) (reverse (deck/generate-sorted-deck))))
+  (is (not= (nth (iterate #(deck/riffle % 1) (deck/generate-sorted-deck)) 27) (reverse (deck/generate-sorted-deck))))
+
+  ;; these last two ideas won't work with imprecise shuffles
+  (is (not= (nth (iterate #(deck/riffle % 0.99) (deck/generate-sorted-deck)) 52) (deck/generate-sorted-deck)))
+  (is (not= (nth (iterate #(deck/riffle % 0.99) (deck/generate-sorted-deck)) 26) (reverse (deck/generate-sorted-deck))))
+
   (are [x y] (= x y)
+    ;; sanity check
     (count (deck/riffle (deck/generate-sorted-deck))) 52))
 
 (deftest generate-shoe-test

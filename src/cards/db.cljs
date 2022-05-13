@@ -2,7 +2,7 @@
   (:require
    [alandipert.storage-atom :refer [local-storage]]
    [cards.blackjack-helpers :refer [hand->value hands->win-lose-push rs]]
-   [cards.deck :refer [generate-shuffled-deck gss]]
+   [cards.deck :refer [generate-shuffled-deck generate-shuffled-shoe]]
    [cards.options :as options]
    [reagent.core :refer [atom]]))
 
@@ -28,7 +28,7 @@
 
 (defonce game (local-storage (atom game-initial-state) :game))
 
-;; the shoe receives (gss @options/num-decks-in-shoe) from deal!
+;; the shoe receives (generate-shuffled-shoe @options/num-decks-in-shoe) from deal!
 (defonce shoe (atom '[]))
 (defonce deck (local-storage (atom (generate-shuffled-deck)) :deck))
 
@@ -58,7 +58,7 @@
    ;; no shoe or shoe is exhausted - shuffle fresh shoe and deal from the top
    (or (empty? @shoe) (>= @shoe-counter (count @shoe)))
     (do (println "1 - no shoe or empty shoe, create new shoe and deal and bump counter")
-        (reset! shoe (gss @options/num-decks-in-shoe))
+        (reset! shoe (generate-shuffled-shoe @options/num-decks-in-shoe))
         (reset! hands {:you [[(first @shoe) (nth @shoe 2)]]
                        :dealer [(second @shoe) (nth @shoe 3)]})
         (reset! shoe-counter 4))
@@ -78,14 +78,14 @@
             (when (>= @shoe-counter (count @shoe))
               (do
                 (println "there were exactly 4 cards left, so it is time to regenerate the shoe (now that those are dealt and shoe is empty)")
-                (reset! shoe (gss @options/num-decks-in-shoe))
+                (reset! shoe (generate-shuffled-shoe @options/num-decks-in-shoe))
                 (reset! shoe-counter 0))))
 
           ;; ...otherwise, deal the remaining shoe + the first card(s) of a new, fresh shoe
           (let [remaining-cards (take-last num-cards-remaining-in-shoe @shoe)
                 num-cards-needed-from-fresh-shoe (- 4 num-cards-remaining-in-shoe)
                 ;; TODO shuffle existing shoe rather than re-generating
-                fresh-shoe (gss @options/num-decks-in-shoe)
+                fresh-shoe (generate-shuffled-shoe @options/num-decks-in-shoe)
                 cards-from-fresh-shoe (take num-cards-needed-from-fresh-shoe fresh-shoe)
                 cards-to-deal (vec (concat remaining-cards cards-from-fresh-shoe))
                 [your-first-card dealer-first-card your-second-card dealer-second-card] cards-to-deal]
@@ -112,7 +112,7 @@
       (when (>= @shoe-counter (count @shoe))
         (do
           (println "reached end, regenerate shoe")
-          (reset! shoe (gss @options/num-decks-in-shoe))
+          (reset! shoe (generate-shuffled-shoe @options/num-decks-in-shoe))
           (reset! shoe-counter 0)))
       drawn-card)))
 

@@ -19,9 +19,9 @@
   [:div.card-display.padding-lr-sm.max-width-900
    [:div.card-display-controls
     [:div.button-group
-     [:button {:class (if (> @options/num-decks-in-shoe 2) "inactive") :on-click #(swap! local-shoe deck/riffle-shuffle)} "riffle"]
-     [:button {:class (if (> @options/num-decks-in-shoe 2) "inactive") :on-click #(swap! local-shoe deck/strip-shuffle)} "strip"]
-     [:button {:on-click #(swap! local-shoe deck/cut-deck)} "cut"]
+     [:button {:class (if (> @options/num-decks-in-shoe 2) "inactive") :on-click #(swap! local-shoe deck/riffle)} "riffle"]
+     [:button {:class (if (> @options/num-decks-in-shoe 2) "inactive") :on-click #(swap! local-shoe deck/strip)} "strip"]
+     [:button {:on-click #(swap! local-shoe deck/cut)} "cut"]
      [:button {:on-click regenerate!} "regenerate"]]
     (options/shuffle-precision-slider)
     (options/num-decks-in-shoe-slider regenerate!)

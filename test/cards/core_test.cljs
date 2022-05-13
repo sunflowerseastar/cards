@@ -18,15 +18,32 @@
 (def top-card (rs "a h"))
 (def bottom-card (rs "a s"))
 
-(deftest sorted-deck-test
+(deftest generate-sorted-deck-test
   (are [x y] (= x y)
-    (count (deck/sorted-deck)) 52
-    (first (deck/sorted-deck)) top-card
-    (last (deck/sorted-deck)) bottom-card))
+    (count (deck/generate-sorted-deck)) 52
+    (first (deck/generate-sorted-deck)) top-card
+    (last (deck/generate-sorted-deck)) bottom-card))
+
+(deftest plus-minus-test
+  (are [x y] (= x y)
+    (as-> (repeatedly 10000 #(deck/plus-minus 100 0.9)) xs [(apply min xs) (apply max xs)]) [90 110]
+    (as-> (repeatedly 10000 #(deck/plus-minus 100 0.8)) xs [(apply min xs) (apply max xs)]) [80 120]
+    (as-> (repeatedly 10000 #(deck/plus-minus 100 0.5)) xs [(apply min xs) (apply max xs)]) [50 150]
+    (as-> (repeatedly 10000 #(deck/plus-minus 100 0)) xs [(apply min xs) (apply max xs)]) [0 200]))
 
 (deftest divide-cards-test
   (are [x y] (= x y)
-    (->> (deck/divide-cards (deck/sorted-deck) 1) (map count)) '(26 26)))
+    (->> (deck/divide-cards (deck/generate-sorted-deck) 1) (map count)) '(26 26)))
+
+(deftest riffle-test
+  ;; two perfect (faro) riffles will match
+  (is (= (deck/riffle (deck/generate-sorted-deck) 1) (deck/riffle (deck/generate-sorted-deck) 1)))
+
+  ;; two imperfect riffles will not match
+  (is (not= (deck/riffle (deck/generate-sorted-deck) 0.9) (deck/riffle (deck/generate-sorted-deck) 0.9)))
+
+  (are [x y] (= x y)
+    (count (deck/riffle (deck/generate-sorted-deck))) 52))
 
 (deftest generate-shoe-test
   (are [x y] (= x y)
@@ -37,16 +54,6 @@
     (-> (deck/generate-shoe 4) (nth 51)) bottom-card
     (-> (deck/generate-shoe 4) (nth 52)) top-card
     (last (deck/generate-shoe 4)) bottom-card))
-
-(deftest riffle-shuffle-test
-  ;; two perfect (faro) riffles will match
-  (is (= (deck/riffle-shuffle (deck/sorted-deck) 1) (deck/riffle-shuffle (deck/sorted-deck) 1)))
-
-  ;; two imperfect riffles will not match
-  (is (not= (deck/riffle-shuffle (deck/sorted-deck) 0.9) (deck/riffle-shuffle (deck/sorted-deck) 0.9)))
-
-  (are [x y] (= x y)
-    (count (deck/riffle-shuffle (deck/sorted-deck))) 52))
 
 ;; "h-" stands for "hand-", or "sample-test-hand-"
 

@@ -4,7 +4,7 @@
 
 ;; chunk: a contiguous group of cards in a deck or shoe.
 
-(defn sorted-deck
+(defn generate-sorted-deck
   "Pulling from the top (A is low):
      - A -> K hearts
      - A -> K clubs
@@ -17,7 +17,16 @@
         K->A-diamonds-and-spades (for [suit [:diamond :spade] rank K->A-ranks] {:suit suit :rank rank})]
     (vec (concat A->K-hearts-and-clubs K->A-diamonds-and-spades))))
 
-(def deck (atom (sorted-deck)))
+(def deck (atom (generate-sorted-deck)))
+
+(defn plus-minus
+  "Given an int and a precision, return a random int that's within plus/minus
+  (* precision n) of n. Ex. n of 100 with 90% precision returns rand-int range
+  90 to 110 -- a 10% error of 100 is 10, and that 10 can manifest from 10 below n
+  to 10 above n."
+  [n precision]
+  (let [imprecision (->> n (* precision) (- n) (* 2) inc)] ; inc is because rand-int plus is exclusive
+    (+ n (- (rand-int imprecision) (if (zero? imprecision) 0 (quot imprecision 2))))))
 
 (defn num-adjusted-for-precision
   "Given an int and a precision, return a random int that within plus/minus
@@ -36,13 +45,13 @@
          separate-point (num-adjusted-for-precision num-half precision)]
      (split-at separate-point deck-or-shoe))))
 
-(defn riffle-shuffle-lr
+(defn riffle-lr
   "Given two halves of a deck, imprecisely zipper them together. A card is
   selected from either side in alternation, except for 'errors' when (rand)
   doesn't reach preicision, in which a card from the previous side is repeated.
   The intuition regarding left/right is that the card chunks are in the left &
   right hands."
-  ([l-r-chunks] (riffle-shuffle-lr l-r-chunks @options/shuffle-precision))
+  ([l-r-chunks] (riffle-lr l-r-chunks @options/shuffle-precision))
   ([[left right] precision]
    ;; 'is-card-l' means 'the bottom card of the left deck is going to go on top of the shuffled-deck
    (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) precision)]
@@ -60,18 +69,18 @@
          is-card-l (recur (rest l) r (conj shuffled-deck (first l)) next-is-card-l)
          :else (recur l (rest r) (conj shuffled-deck (first r)) next-is-card-l))))))
 
-(defn riffle-shuffle
-  "Helper function to riffle-shuffle a full deck. The riffle-shuffle-lr function
+(defn riffle
+  "Helper function to riffle a full deck. The riffle-lr function
   is separate because it shuffles l/r chunks in a shoe."
-  ([deck] (riffle-shuffle deck @options/shuffle-precision))
+  ([deck] (riffle deck @options/shuffle-precision))
   ([deck precision]
-   (riffle-shuffle-lr (divide-cards deck) precision)))
+   (riffle-lr (divide-cards deck) precision)))
 
-(defn strip-shuffle
+(defn strip
   "Given a deck, keep taking 1/x of the top cards (3 to 7 times), and stacking
   them (new top-cards are placed on top of the growing shuffled-deck), until all
   cards have been placed on the shuffled-deck."
-  ([deck] (strip-shuffle deck @options/shuffle-precision))
+  ([deck] (strip deck @options/shuffle-precision))
   ([deck precision]
    (let [strip-precision (* 0.8 precision) ; otherwise very little variation
          rough-chunk-size (quot 52 (num-adjusted-for-precision 5 strip-precision))]
@@ -85,7 +94,7 @@
                   (drop cards-to-take remaining-deck)
                   (apply conj shuffled-deck top-chunk)))))))
 
-(defn cut-deck
+(defn cut
   "Split a deck and stack the previously lower portion on top."
   [deck]
   (let [[top bottom] (divide-cards deck)] (vec (concat bottom top))))
@@ -93,9 +102,9 @@
 (defn generate-shoe
   "Return n sorted decks, combined."
   [n]
-  (->> (repeatedly #(sorted-deck)) (take n) (apply concat)))
+  (->> (repeatedly #(generate-sorted-deck)) (take n) (apply concat)))
 
-(defn gss
+(defn generate-shuffled-shoe
   "Return a shuffled shoe comprised of n decks. Roughly based on
   https://www.youtube.com/watch?v=tpv5sqoveuc. 'Stack' refers to the two
   original divided shoe stacks that sit on the left and right. 'Chunk' refers to
@@ -124,9 +133,9 @@
                left-stack-remaining (if (and use-working-deck is-working-left) left-stack (drop ctt left-stack))
                right-chunk (vec (take ctt (if (and use-working-deck (not is-working-left)) working-deck right-stack)))
                right-stack-remaining (if (and use-working-deck (not is-working-left)) right-stack (drop ctt right-stack))
-               shuffled-chunks (->> (riffle-shuffle-lr [left-chunk right-chunk])
-                                    strip-shuffle
-                                    riffle-shuffle)]
+               shuffled-chunks (->> (riffle-lr [left-chunk right-chunk])
+                                    strip
+                                    riffle)]
            (do
              ;; (println "lsr " (count left-stack-remaining) " | rsr " (count right-stack-remaining))
              ;; (println "sc " (count shuffled-chunks))
@@ -138,35 +147,16 @@
               ;; alternate which hand will pull from the working deck
               (not is-working-left)))))))))
 
-(defn generate-shuffled-shoe
-  "Return a shuffled shoe comprised of n decks. Roughly based on
-  https://www.youtube.com/watch?v=tpv5sqoveuc."
-  [n]
-  (let [shoe (generate-shoe n)
-        [left right] (divide-cards shoe)
-
-        left-chunk (vec (take 26 left))
-        left-remaining (vec (drop 26 left))
-
-        right-chunk (vec (take 26 right))
-        right-remaining (vec (drop 26 right))]
-    (println (count shoe) (count left) (count right))
-    (println (count left-chunk) (count left-remaining))
-    ;; left-chunk
-    (->> (riffle-shuffle-lr [left-chunk right-chunk])
-         strip-shuffle
-         riffle-shuffle)))
-
 (defn generate-shuffled-deck
   "Return a deck that is shuffled."
   []
-  (->> (sorted-deck)
-       strip-shuffle
-       riffle-shuffle
-       strip-shuffle
-       riffle-shuffle
-       riffle-shuffle
-       cut-deck
+  (->> (generate-sorted-deck)
+       strip
+       riffle
+       strip
+       riffle
+       riffle
+       cut
        vec))
 
 (defn generate-specific-deck [starting-cards]

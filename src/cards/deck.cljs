@@ -17,6 +17,7 @@
         K->A-diamonds-and-spades (for [suit [:diamond :spade] rank K->A-ranks] {:suit suit :rank rank})]
     (vec (concat A->K-hearts-and-clubs K->A-diamonds-and-spades))))
 
+;; TODO remove deck and clean up code
 (def deck (atom (generate-sorted-deck)))
 
 ;; deck helpers
@@ -134,15 +135,16 @@
   [n]
   (->> (repeatedly #(generate-sorted-deck)) (take n) (apply concat)))
 
-(defn generate-shuffled-shoe
-  "Return a shuffled shoe comprised of n decks. Roughly based on
+;; TODO add burn card
+;; TODO spearate 1-deck, 2-deck, and 3+ deck shuffles
+(defn shuffle-shoe
+  "Take a shoe and return it shuffled. Roughly based on
   https://www.youtube.com/watch?v=tpv5sqoveuc. 'Stack' refers to the two
   original divided shoe stacks that sit on the left and right. 'Chunk' refers to
   the cards that are either in the left hand or right hand that will be shuffled
   together in a given iteration."
-  [n]
-  (let [shoe (generate-shoe n)
-        [left right] (divide-cards shoe)
+  [shoe]
+  (let [[left right] (divide-cards shoe)
         ;; TODO make ctt (cards to take) vary, based on precision
         ctt 26]
     (println (count shoe) (count left) (count right))
@@ -176,6 +178,10 @@
               (vec (concat shuffled-chunks (drop ctt working-deck)))
               ;; alternate which hand will pull from the working deck
               (not is-working-left)))))))))
+
+(defn generate-shuffled-shoe
+  "Return a shuffled shoe comprised of n decks."
+  [n] (let [shoe (generate-shoe n)] (shuffle-shoe shoe)))
 
 (defn generate-shuffled-deck
   "Return a deck that is shuffled."

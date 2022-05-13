@@ -22,7 +22,7 @@
     [:div.button-group
      [:button {:class (if (> @options/num-decks-in-shoe 2) "inactive") :on-click #(swap! local-shoe deck/riffle)} "riffle"]
      [:button {:class (if (> @options/num-decks-in-shoe 2) "inactive") :on-click #(swap! local-shoe deck/strip)} "strip"]
-     [:button {:class (if (< @options/num-decks-in-shoe 3) "inactive") :on-click #(swap! local-shoe deck/strip)} "shuffle shoe"]]
+     [:button {:class (if (< @options/num-decks-in-shoe 3) "inactive") :on-click #(swap! local-shoe deck/shuffle-shoe)} "shuffle shoe"]]
     [:div.button-group
      [:button {:on-click #(swap! local-shoe deck/cut)} "cut"]
      [:button {:on-click #(swap! local-shoe deck/cut-one-third-top)} "cut top 1/3"]

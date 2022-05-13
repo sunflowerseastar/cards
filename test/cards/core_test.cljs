@@ -37,16 +37,18 @@
 (deftest riffle-shuffle-test
   ;; two perfect shuffles will match
   (is (= (deck/riffle-shuffle (deck/sorted-deck) 1) (deck/riffle-shuffle (deck/sorted-deck) 1)))
+
   ;; two imperfect shuffles will not match
   (is (not= (deck/riffle-shuffle (deck/sorted-deck) 0.9) (deck/riffle-shuffle (deck/sorted-deck) 0.9)))
+
   (are [x y] (= x y)
     (count (deck/riffle-shuffle (deck/sorted-deck))) 52))
 
 ;; "h-" stands for "hand-", or "sample-test-hand-"
 (def h-blackjack [(rs "a s") (rs "k s")])
 (def h-20 [(rs "10 c") (rs "11 c")])
-(def h-21 [{:suit :heart, :rank 10} {:suit :club, :rank 9} {:suit :club, :rank 2}])
-(def h-22 [{:suit :diamond, :rank 9} {:suit :diamond, :rank 8} {:suit :diamond, :rank 5}])
+(def h-21 [(rs "10 h") (rs "9 c") (rs "2 c")])
+(def h-22 [(rs "9 d") (rs "8 d") (rs "5 d")])
 
 ;; (combo/selections #{"h-20" "h-blackjack" "h-22"} 2) => possible hands
 (deftest hands->win-lose-push-test

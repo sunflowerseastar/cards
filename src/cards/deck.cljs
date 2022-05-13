@@ -52,6 +52,7 @@
 
 ;; deck actions
 
+;; TODO change this function to 'halve', and add function 'cut' that's anywhere within ex. 10 cards top/bottom for 1-deck shoe.
 (defn cut
   "A 'regular' cut: divide the cards in two (plus-minus precision), and stack the
   previously lower portion on top. See note about cut precision in
@@ -136,8 +137,7 @@
   (->> (repeatedly #(generate-sorted-deck)) (take n) (apply concat)))
 
 ;; TODO add burn card
-;; TODO spearate 1-deck, 2-deck, and 3+ deck shuffles
-(defn shuffle-shoe
+(defn shuffle-full-shoe
   "Take a shoe and return it shuffled. Roughly based on
   https://www.youtube.com/watch?v=tpv5sqoveuc. 'Stack' refers to the two
   original divided shoe stacks that sit on the left and right. 'Chunk' refers to
@@ -152,7 +152,6 @@
            right-stack right
            working-deck '()
            is-working-left false]
-
       (do
         ;; (println "--")
         ;; (println (count left-stack) (count right-stack))
@@ -165,6 +164,7 @@
                left-stack-remaining (if (and use-working-deck is-working-left) left-stack (drop ctt left-stack))
                right-chunk (vec (take ctt (if (and use-working-deck (not is-working-left)) working-deck right-stack)))
                right-stack-remaining (if (and use-working-deck (not is-working-left)) right-stack (drop ctt right-stack))
+               ;; TODO parameterize the individual shuffles
                shuffled-chunks (->> (riffle-lr [left-chunk right-chunk])
                                     strip
                                     riffle)]
@@ -179,21 +179,39 @@
               ;; alternate which hand will pull from the working deck
               (not is-working-left)))))))))
 
-(defn generate-shuffled-shoe
-  "Return a shuffled shoe comprised of n decks."
-  [n] (let [shoe (generate-shoe n)] (shuffle-shoe shoe)))
-
-(defn generate-shuffled-deck
-  "Return a deck that is shuffled."
-  []
-  (->> (generate-sorted-deck)
+(defn shuffle-max-two-deck-shoe
+  "Take one or two decks in a shoe, and return it shuffled."
+  [one-or-two-deck-shoe]
+  (->> one-or-two-deck-shoe
+       ;; TODO parameterize the individual shuffles
        strip
        riffle
        strip
        riffle
+       box
        riffle
        cut
        vec))
+
+(defn shuffle-shoe
+  "Take a shoe and return it shuffled by the appropriate overall shuffle.
+  1 or 2-deck shoes get shuffle-max-two-deck-shoe, 3+ deck shoes get shuffle-full-shoe. Roughly
+  based on https://www.youtube.com/watch?v=tpv5sqoveuc. 'Stack' refers to the
+  two original divided shoe stacks that sit on the left and right. 'Chunk'
+  refers to the cards that are either in the left hand or right hand that will
+  be shuffled together in a given iteration."
+  [shoe]
+  (let [num-decks-in-shoe (quot (count shoe) 52)
+        shuffle-mechanism (if (<= num-decks-in-shoe 2) shuffle-max-two-deck-shoe shuffle-full-shoe)]
+    (shuffle-mechanism shoe)))
+
+(defn generate-shuffled-shoe
+  "Return a shuffled shoe comprised of n decks."
+  [n] (let [shoe (generate-shoe n)] (shuffle shoe)))
+
+(defn generate-shuffled-deck
+  "Return a deck that is shuffled."
+  [] (shuffle-max-two-deck-shoe (generate-sorted-deck)))
 
 (defn generate-specific-deck [starting-cards]
   (->> (generate-shuffled-deck)

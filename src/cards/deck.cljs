@@ -19,6 +19,8 @@
 
 (def deck (atom (generate-sorted-deck)))
 
+;; deck helpers
+
 (defn plus-minus
   "Given an int and a precision, return a random int that's within plus/minus
   (* precision n) of n. Ex. n of 100 with 90% precision returns rand-int range
@@ -28,15 +30,54 @@
   (let [imprecision (->> n (* precision) (- n) (* 2) inc)] ; inc is because rand-int plus is exclusive
     (+ n (- (rand-int imprecision) (if (zero? imprecision) 0 (quot imprecision 2))))))
 
+(defn split-at-nth-with-precision
+  "Split the cards at a certain nth point, adjusted plus/minus per precision. For
+  most of deck.cljs, I avoid the word 'split' and stick to divide, but this
+  function talks about splits since it's using clojure.core's split-at. Just
+  note that these splits have nothing to with split hands, or splitting a hand
+  in gameplay. For those, see :current-split, split!, and related in db.cljs."
+  ([deck-or-shoe nth] (split-at-nth-with-precision deck-or-shoe nth @options/shuffle-precision))
+  ([deck-or-shoe nth precision]
+   (let [num-cards (count deck-or-shoe)
+         split-point (plus-minus nth precision)]
+     (split-at split-point deck-or-shoe))))
+
 (defn divide-cards
-  "Given a deck or shoe, split it in two and return the halves in a vector."
+  "Given a deck or shoe, divide it in two and return the halves in a vector."
   ([deck-or-shoe] (divide-cards deck-or-shoe @options/shuffle-precision))
   ([deck-or-shoe precision]
-   (let [num-cards (count deck-or-shoe)
-         num-half (quot num-cards 2)
-         imprecision (- num-cards (* precision num-cards))
-         separate-point (plus-minus num-half precision)]
-     (split-at separate-point deck-or-shoe))))
+   (let [half-point (quot (count deck-or-shoe) 2)]
+     (split-at-nth-with-precision deck-or-shoe half-point precision))))
+
+;; deck actions
+
+(defn cut
+  "A 'regular' cut: divide the cards in two (plus-minus precision), and stack the
+  previously lower portion on top. See note about cut precision in
+  core_test.cljs."
+  ([deck-or-shoe]
+   (cut deck-or-shoe @options/shuffle-precision))
+  ([deck-or-shoe precision]
+   (let [[top bottom] (divide-cards deck-or-shoe precision)]
+     (vec (concat bottom top)))))
+
+(defn cut-one-third-top
+  "Take top 1/3 cards (adjusted for precision), and place them on bottom."
+  ([deck-or-shoe] (cut-one-third-top deck-or-shoe @options/shuffle-precision))
+  ([deck-or-shoe precision]
+   (let [top-third-point (quot (count deck-or-shoe) 3)
+         [top bottom] (split-at-nth-with-precision deck-or-shoe top-third-point precision)] (vec (concat bottom top)))))
+
+;; Just an alias. The physical process of boxing versus bottom 1/3 cut are
+;; different, but they are the same, card programming-wise.
+(def box cut-one-third-top)
+
+(defn cut-one-third-bottom
+  "Take bottom 1/3 cards (adjusted for precision), and place them on top."
+  ([deck-or-shoe] (cut-one-third-top deck-or-shoe @options/shuffle-precision))
+  ([deck-or-shoe precision]
+   (let [bottom-third-point (-> deck-or-shoe count (quot 3) (* 2))
+         [top bottom] (split-at-nth-with-precision deck-or-shoe bottom-third-point precision)] (vec (concat bottom top)))))
 
 (defn riffle-lr
   "Given two halves of a deck, imprecisely zipper them together. A card is
@@ -49,16 +90,16 @@
    ;; 'is-card-l' means 'the bottom card of the left deck is going to go on top of the shuffled-deck
    (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) precision)]
      (let [;; this determines whether the shuffles alternates correctly,
-             ;; or if there's an "error," and the next iteration will place its
-             ;; card from the same side again.
+           ;; or if there's an "error," and the next iteration will place its
+           ;; card from the same side again.
            next-is-card-l (if (< (rand) precision) (not is-card-l) is-card-l)]
        (cond
-            ;; the first three cases are finishing a shuffle
+         ;; the first three cases are finishing a shuffle
          (and (empty? l) (empty? r)) shuffled-deck
          (empty? l) (apply conj shuffled-deck r)
          (empty? r) (apply conj shuffled-deck l)
 
-           ;; the last two cases are placing either the left card or right card & recurring
+         ;; the last two cases are placing either the left card or right card & recurring
          is-card-l (recur (rest l) r (conj shuffled-deck (first l)) next-is-card-l)
          :else (recur l (rest r) (conj shuffled-deck (first r)) next-is-card-l))))))
 
@@ -86,10 +127,7 @@
                   (drop cards-to-take remaining-deck)
                   (concat top-chunk shuffled-deck)))))))
 
-(defn cut
-  "Split a deck and stack the previously lower portion on top."
-  [deck]
-  (let [[top bottom] (divide-cards deck)] (vec (concat bottom top))))
+;; generators (as in, create a deck or shoe)
 
 (defn generate-shoe
   "Return n sorted decks, combined."

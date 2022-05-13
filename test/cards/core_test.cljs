@@ -31,26 +31,74 @@
     (as-> (repeatedly 10000 #(deck/plus-minus 100 0.5)) xs [(apply min xs) (apply max xs)]) [50 150]
     (as-> (repeatedly 10000 #(deck/plus-minus 100 0)) xs [(apply min xs) (apply max xs)]) [0 200]))
 
+(deftest split-at-nth-with-precision-test
+  (are [x y] (= x y)
+    (->> (deck/split-at-nth-with-precision (deck/generate-sorted-deck) 26 1) (map count)) '(26 26)
+    (->> (deck/split-at-nth-with-precision (deck/generate-sorted-deck) (quot 52 3) 1) (map count)) '(17 35)
+    (->> (deck/split-at-nth-with-precision (deck/generate-sorted-deck) (* 2 (quot 52 3)) 1) (map count)) '(34 18)))
+
 (deftest divide-cards-test
   (are [x y] (= x y)
     (->> (deck/divide-cards (deck/generate-sorted-deck) 1) (map count)) '(26 26)))
 
+(deftest cut-test
+  ;; perfect cuts are right
+  (is (not= (deck/cut (deck/generate-sorted-deck) 1) (deck/generate-sorted-deck)))
+  (is (= (nth (deck/cut (deck/generate-sorted-deck) 1) 25) bottom-card))
+  (is (= (nth (deck/cut (deck/generate-sorted-deck) 1) 26) top-card))
+  (is (= (nth (iterate #(deck/cut % 1) (deck/generate-sorted-deck)) 2) (deck/generate-sorted-deck)))
+  (is (= (nth (iterate #(deck/cut % 1) (deck/generate-sorted-deck)) 1000) (deck/generate-sorted-deck)))
+
+  ;; imperfect cuts won't line up
+  (is (not= (nth (iterate #(deck/cut % 0.7) (deck/generate-sorted-deck)) 2) (deck/generate-sorted-deck)))
+  ;; note that precision 0.9 in a cut gets perfect cuts a fair bit, since the
+  ;; plus/minus isn't that big (90% of 26, so a rand int in range 24 - 28).
+  ;; Also, there is only one possible error moment in a cut -- the selection of
+  ;; the split-point -- whereas a riffle has a possible plus/minus error
+  ;; opportunity for every card that gets riffled.
+  (is (not= (nth (iterate #(deck/cut % 0.8) (deck/generate-sorted-deck)) 100) (deck/generate-sorted-deck))))
+
+(deftest cut-one-third-top-test
+  (is (= (nth (deck/cut-one-third-top (deck/generate-sorted-deck) 1) 34) bottom-card))
+  (is (= (nth (deck/cut-one-third-top (deck/generate-sorted-deck) 1) 35) top-card))
+
+  (is (not= (deck/cut-one-third-top (deck/generate-sorted-deck) 1) (deck/generate-sorted-deck)))
+  (is (not= (nth (iterate #(deck/cut-one-third-top % 1) (deck/generate-sorted-deck)) 26) (deck/generate-sorted-deck)))
+  (is (= (nth (iterate #(deck/cut-one-third-top % 1) (deck/generate-sorted-deck)) 52) (deck/generate-sorted-deck)))
+  (is (not= (nth (iterate #(deck/cut-one-third-top % 1) (deck/generate-sorted-deck)) 53) (deck/generate-sorted-deck))))
+
+(deftest cut-one-third-bottom-test
+  (is (= (nth (deck/cut-one-third-bottom (deck/generate-sorted-deck) 1) 17) bottom-card))
+  (is (= (nth (deck/cut-one-third-bottom (deck/generate-sorted-deck) 1) 18) top-card))
+
+  (is (not= (deck/cut-one-third-bottom (deck/generate-sorted-deck) 1) (deck/generate-sorted-deck)))
+  (is (not= (nth (iterate #(deck/cut-one-third-bottom % 1) (deck/generate-sorted-deck)) 13) (deck/generate-sorted-deck)))
+  (is (not= (nth (iterate #(deck/cut-one-third-bottom % 1) (deck/generate-sorted-deck)) 25) (deck/generate-sorted-deck)))
+  (is (= (nth (iterate #(deck/cut-one-third-bottom % 1) (deck/generate-sorted-deck)) 26) (deck/generate-sorted-deck)))
+  (is (not= (nth (iterate #(deck/cut-one-third-bottom % 1) (deck/generate-sorted-deck)) 51) (deck/generate-sorted-deck)))
+  (is (= (nth (iterate #(deck/cut-one-third-bottom % 1) (deck/generate-sorted-deck)) 52) (deck/generate-sorted-deck)))
+  (is (not= (nth (iterate #(deck/cut-one-third-bottom % 1) (deck/generate-sorted-deck)) 53) (deck/generate-sorted-deck))))
+
+(deftest box
+  ;; same as cut-one-third-bottom-test
+  (is (= (nth (deck/cut-one-third-bottom (deck/generate-sorted-deck) 1) 17) bottom-card)))
+
 (deftest riffle-test
   ;; two perfect (faro) riffles will match
-  (is (= (deck/riffle (deck/generate-sorted-deck) 1) (deck/riffle (deck/generate-sorted-deck) 1)))
+  (is (= (deck/riffle (deck/generate-sorted-deck) 1.0) (deck/riffle (deck/generate-sorted-deck) 1.0)))
 
   ;; two imperfect riffles will not match
   (is (not= (deck/riffle (deck/generate-sorted-deck) 0.9) (deck/riffle (deck/generate-sorted-deck) 0.9)))
 
   ;; 52 perfect (faro) shuffles puts the deck in original order
-  (is (= (nth (iterate #(deck/riffle % 1) (deck/generate-sorted-deck)) 52) (deck/generate-sorted-deck)))
-  (is (not= (nth (iterate #(deck/riffle % 1) (deck/generate-sorted-deck)) 51) (deck/generate-sorted-deck)))
-  (is (not= (nth (iterate #(deck/riffle % 1) (deck/generate-sorted-deck)) 53) (deck/generate-sorted-deck)))
+  (is (= (nth (iterate #(deck/riffle % 1.0) (deck/generate-sorted-deck)) 52) (deck/generate-sorted-deck)))
+  (is (not= (nth (iterate #(deck/riffle % 1.0) (deck/generate-sorted-deck)) 51) (deck/generate-sorted-deck)))
+  (is (not= (nth (iterate #(deck/riffle % 1.0) (deck/generate-sorted-deck)) 53) (deck/generate-sorted-deck)))
 
   ;; 26 perfect deck/riffles puts the deck in reverse order
-  (is (= (nth (iterate #(deck/riffle % 1) (deck/generate-sorted-deck)) 26) (reverse (deck/generate-sorted-deck))))
-  (is (not= (nth (iterate #(deck/riffle % 1) (deck/generate-sorted-deck)) 25) (reverse (deck/generate-sorted-deck))))
-  (is (not= (nth (iterate #(deck/riffle % 1) (deck/generate-sorted-deck)) 27) (reverse (deck/generate-sorted-deck))))
+  (is (= (nth (iterate #(deck/riffle % 1.0) (deck/generate-sorted-deck)) 26) (reverse (deck/generate-sorted-deck))))
+  (is (not= (nth (iterate #(deck/riffle % 1.0) (deck/generate-sorted-deck)) 25) (reverse (deck/generate-sorted-deck))))
+  (is (not= (nth (iterate #(deck/riffle % 1.0) (deck/generate-sorted-deck)) 27) (reverse (deck/generate-sorted-deck))))
 
   ;; these last two ideas won't work with imprecise shuffles
   (is (not= (nth (iterate #(deck/riffle % 0.99) (deck/generate-sorted-deck)) 52) (deck/generate-sorted-deck)))

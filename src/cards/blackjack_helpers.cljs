@@ -18,38 +18,42 @@
       hard-value)))
 
 (defn hands->win-lose-push
-  "Given one of your hands and the dealer hand, return 1 of #{:win :lose :push}."
-  [your-hand dealer-hand]
+  "Given one of your hands and the dealer hand, return 1 of #{:win :lose :push}.
+  'you-have-split-hands' is used to distinguish natural blackjack from a 21 if
+  you're playing split hands."
+  ([your-hand dealer-hand] (hands->win-lose-push your-hand dealer-hand false))
+  ([your-hand dealer-hand you-have-split-hands]
 
-  (let [;; helpers
-        is-two-cards #(->> % count (= 2))
-        dealer-value (hand->value dealer-hand)
-        your-value (hand->value your-hand)
+   (let [;; helpers
+         is-two-cards #(->> % count (= 2))
+         dealer-value (hand->value dealer-hand)
+         your-value (hand->value your-hand)
 
-        ;; names for clarity/simplicity
-        ;; TODO don't consider A-[10] cards a blackjack for split hands
-        dealer-blackjack (and (= dealer-value 21) (is-two-cards dealer-hand))
-        you-blackjack (and (= your-value 21) (is-two-cards your-hand))
-        dealer-busts (> dealer-value 21)
-        you-bust (> your-value 21)
-        push (= your-value dealer-value)
-        dealer-is-higher (> dealer-value your-value)
-        you-are-higher (> your-value dealer-value)]
+         ;; names for clarity/simplicity
+         dealer-blackjack (and (= dealer-value 21) (is-two-cards dealer-hand))
+         you-blackjack (and (not you-have-split-hands)
+                            (= your-value 21)
+                            (is-two-cards your-hand))
+         dealer-busts (> dealer-value 21)
+         you-bust (> your-value 21)
+         push (= your-value dealer-value)
+         dealer-is-higher (> dealer-value your-value)
+         you-are-higher (> your-value dealer-value)]
 
-    (cond you-bust :lose
+     (cond you-bust :lose
 
-          (and dealer-blackjack you-blackjack) :push
-          you-blackjack :win
-          dealer-blackjack :lose
+           (and dealer-blackjack you-blackjack) :push
+           you-blackjack :win
+           dealer-blackjack :lose
 
-          dealer-busts :win
+           dealer-busts :win
 
-          dealer-is-higher :lose
-          you-are-higher :win
-          push :push
+           dealer-is-higher :lose
+           you-are-higher :win
+           push :push
 
-          ;; unreachable, TODO instrument
-          :else (throw (js/Error. "condition not handled ☠")))))
+           ;; unreachable, TODO instrument
+           :else (throw (js/Error. "condition not handled ☠"))))))
 
 (defn rs
   "Take a 'rank suit' (aka 'rs') card notation shorthand and return the regular

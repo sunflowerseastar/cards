@@ -45,6 +45,9 @@
     (count (deck/riffle-shuffle (deck/sorted-deck))) 52))
 
 ;; "h-" stands for "hand-", or "sample-test-hand-"
+
+;; This isn't a blackjack if you have split hands. Technically, this hand would
+;; be 'blackjack for any hand other than you if you have split hands.'
 (def h-blackjack [(rs "a s") (rs "k s")])
 (def h-20 [(rs "10 c") (rs "11 c")])
 (def h-21 [(rs "10 h") (rs "9 c") (rs "2 c")])
@@ -54,9 +57,14 @@
 (deftest hands->win-lose-push-test
   (are [x y] (= x y)
 
+    ;; The final optional 'true' means 'you-have-split-hands' (so again, your
+    ;; hand is not technically a blackjack). Hence the expected :lose result.
+    (hands->win-lose-push h-blackjack h-blackjack true) :lose
+    ;; Final optional bool defaults to 'false', as in 'not a split hand.'
     (hands->win-lose-push h-blackjack h-blackjack) :push
     (hands->win-lose-push h-blackjack h-20) :win
     (hands->win-lose-push h-blackjack h-21) :win
+    (hands->win-lose-push h-blackjack h-21 true) :push
     (hands->win-lose-push h-blackjack h-22) :win
 
     (hands->win-lose-push h-20 h-blackjack) :lose

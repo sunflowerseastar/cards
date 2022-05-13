@@ -119,8 +119,10 @@
 (defn conclude-game! []
   (do
     ;; update scoring
-    (doseq [outcome (map #(hands->win-lose-push % (:dealer @hands)) (:you @hands))]
-      (swap! outcomes update outcome inc))
+    (let [you-have-split-hands (->> (:you @hands) count (> 1))]
+      (doseq [outcome (map #(hands->win-lose-push % (:dealer @hands))
+                           (:you @hands))]
+        (swap! outcomes update outcome inc)))
     ;; end gameplay
     (swap! game assoc :state :stopped :turn :none)))
 

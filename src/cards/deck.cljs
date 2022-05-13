@@ -74,7 +74,7 @@
   is separate because it shuffles l/r chunks in a shoe."
   ([deck] (riffle deck @options/shuffle-precision))
   ([deck precision]
-   (riffle-lr (divide-cards deck) precision)))
+   (riffle-lr (divide-cards deck precision) precision)))
 
 (defn strip
   "Given a deck, keep taking 1/x of the top cards (3 to 7 times), and stacking

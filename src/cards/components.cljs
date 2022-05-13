@@ -142,6 +142,9 @@
      [:hr]
      (options/shuffle-precision-slider)
      (options/num-decks-in-shoe-slider)
+     [:p {:class (when (zero? @options/num-splits-permitted-ace) "light-gray")}
+      [:a.inline-toggle {:on-click #(swap! options/burn-a-card-after-shuffle not)}
+       (if @options/burn-a-card-after-shuffle "Burn" "Don't burn")] " a card after shuffle"]
 
      [:hr]
 

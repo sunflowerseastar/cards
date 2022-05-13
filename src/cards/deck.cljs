@@ -20,7 +20,9 @@
 ;; TODO remove deck and clean up code
 (def deck (atom (generate-sorted-deck)))
 
+
 ;; deck helpers
+
 
 (defn plus-minus
   "Given an int and a precision, return a random int that's within plus/minus
@@ -50,9 +52,12 @@
    (let [half-point (quot (count deck-or-shoe) 2)]
      (split-at-nth-with-precision deck-or-shoe half-point precision))))
 
-;; deck actions
+
+;; deck actions & individual shuffles
 
 ;; TODO change this function to 'halve', and add function 'cut' that's anywhere within ex. 10 cards top/bottom for 1-deck shoe.
+
+
 (defn cut
   "A 'regular' cut: divide the cards in two (plus-minus precision), and stack the
   previously lower portion on top. See note about cut precision in
@@ -129,14 +134,12 @@
                   (drop cards-to-take remaining-deck)
                   (concat top-chunk shuffled-deck)))))))
 
-;; generators (as in, create a deck or shoe)
 
-(defn generate-shoe
-  "Return n sorted decks, combined."
-  [n]
-  (->> (repeatedly #(generate-sorted-deck)) (take n) (apply concat)))
+;; shoe & deck shuffles (combinations of individual shuffles)
 
 ;; TODO add burn card
+
+
 (defn shuffle-full-shoe
   "Take a shoe and return it shuffled. Roughly based on
   https://www.youtube.com/watch?v=tpv5sqoveuc. 'Stack' refers to the two
@@ -204,6 +207,15 @@
   (let [num-decks-in-shoe (quot (count shoe) 52)
         shuffle-mechanism (if (<= num-decks-in-shoe 2) shuffle-max-two-deck-shoe shuffle-full-shoe)]
     (shuffle-mechanism shoe)))
+
+
+;; generators (as in, create a deck or shoe)
+
+
+(defn generate-shoe
+  "Return n sorted decks, combined."
+  [n]
+  (->> (repeatedly #(generate-sorted-deck)) (take n) (apply concat)))
 
 (defn generate-shuffled-shoe
   "Return a shuffled shoe comprised of n decks."

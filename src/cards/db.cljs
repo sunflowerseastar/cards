@@ -53,48 +53,65 @@
 ;; ----------------
 
 
+(defn burn-card! [] (swap! shoe-counter inc))
+
 (defn deal-shoe-hands!
   []
-  (if
-   ;; no shoe or shoe is exhausted - shuffle fresh shoe and deal from the top
-   (or (empty? @shoe) (>= @shoe-counter (count @shoe)))
-    (do (println "1 - no shoe or empty shoe, create new shoe and deal and bump counter")
+  (cond
+      ;; no shoe - generate shuffled shoe and deal
+    (empty? @shoe)
+    (do (println "1 - shoe is empty, create new shoe and deal and bump counter")
         (reset! shoe (generate-shuffled-shoe @options/num-decks-in-shoe))
-        (reset! hands {:you [[(first @shoe) (nth @shoe 2)]]
-                       :dealer [(second @shoe) (nth @shoe 3)]})
-        (reset! shoe-counter 4))
+        (reset! shoe-counter 0)
+        (when (true? @options/burn-a-card-after-shuffle) (burn-card!))
+        (reset! hands {:you [[(nth @shoe @shoe-counter) (nth @shoe (+ @shoe-counter 2))]]
+                       :dealer [(nth @shoe (inc @shoe-counter)) (nth @shoe (+ @shoe-counter 3))]})
+        (swap! shoe-counter #(+ % 4)))
+
+    ;; shoe is exhausted - shuffle shoe and then deal
+    (>= @shoe-counter (count @shoe))
+    (do (println "2 - reached the end of the shoe, shuffle the shoe and then deal")
+        (swap! shoe shuffle-shoe)
+        (reset! shoe-counter 0)
+        (when (true? @options/burn-a-card-after-shuffle) (burn-card!))
+        (reset! hands {:you [[(nth @shoe @shoe-counter) (nth @shoe (+ @shoe-counter 2))]]
+                       :dealer [(nth @shoe (inc @shoe-counter)) (nth @shoe (+ @shoe-counter 3))]})
+        (swap! shoe-counter #(+ % 4)))
 
     ;; shoe exists
-    (let [num-cards-remaining-in-shoe (- (count @shoe) @shoe-counter)]
-      (do
-        (println "2 - cards exist in shoe...: " num-cards-remaining-in-shoe)
-        (if
-         ;; okay to deal normally...
-         (>= num-cards-remaining-in-shoe 4)
-          (do
-            (println "2a - there are 4 or more cards left, deal those out")
-            (reset! hands {:you [[(nth @shoe @shoe-counter) (nth @shoe (+ @shoe-counter 2))]]
-                           :dealer [(nth @shoe (inc @shoe-counter)) (nth @shoe (+ @shoe-counter 3))]})
-            (swap! shoe-counter #(+ % 4))
-            (when (>= @shoe-counter (count @shoe))
-              (do
-                (println "there were exactly 4 cards left, so it is time to regenerate the shoe (now that those are dealt and shoe is empty)")
-                (swap! shoe shuffle-shoe)
-                (reset! shoe-counter 0))))
-
-          ;; ...otherwise, deal the remaining shoe + the first card(s) of a new, fresh shoe
-          (let [remaining-cards (take-last num-cards-remaining-in-shoe @shoe)
-                num-cards-needed-from-shuffled-shoe (- 4 num-cards-remaining-in-shoe)
-                shuffled-shoe (shuffle-shoe @shoe)
-                cards-from-shuffled-shoe (take num-cards-needed-from-shuffled-shoe shuffled-shoe)
-                cards-to-deal (vec (concat remaining-cards cards-from-shuffled-shoe))
-                [your-first-card dealer-first-card your-second-card dealer-second-card] cards-to-deal]
+    :else (let [num-cards-remaining-in-shoe (- (count @shoe) @shoe-counter)]
             (do
-              (println "2b - there are 3 or fewer cards")
-              (reset! shoe shuffled-shoe)
-              (reset! hands {:you [[your-first-card your-second-card]]
-                             :dealer [dealer-first-card dealer-second-card]})
-              (reset! shoe-counter num-cards-needed-from-shuffled-shoe))))))))
+              (println "3 - cards exist in shoe...: " num-cards-remaining-in-shoe)
+              (if
+               ;; okay to deal normally...
+               (>= num-cards-remaining-in-shoe 4)
+                (do
+                  (println "3a - there are 4 or more cards left, deal those out")
+                  (reset! hands {:you [[(nth @shoe @shoe-counter) (nth @shoe (+ @shoe-counter 2))]]
+                                 :dealer [(nth @shoe (inc @shoe-counter)) (nth @shoe (+ @shoe-counter 3))]})
+                  (swap! shoe-counter #(+ % 4))
+                  (when (>= @shoe-counter (count @shoe))
+                    (do
+                      (println "3a bonus - there were exactly 4 cards left, so it is time to shuffle the shoe (now that those are dealt and shoe is empty)")
+                      (swap! shoe shuffle-shoe)
+                      (reset! shoe-counter 0)
+                      (when (true? @options/burn-a-card-after-shuffle) (burn-card!)))))
+
+                ;; ...otherwise, deal the remaining shoe + the first card(s) of a new, fresh shoe
+                (let [remaining-cards (take-last num-cards-remaining-in-shoe @shoe)
+                      num-cards-needed-from-shuffled-shoe (- 4 num-cards-remaining-in-shoe)
+                      shuffled-shoe (shuffle-shoe @shoe)
+                      cards-from-shuffled-shoe (->> shuffled-shoe
+                                                    (drop (if (true? @options/burn-a-card-after-shuffle) 1 0))
+                                                    (take num-cards-needed-from-shuffled-shoe))
+                      cards-to-deal (vec (concat remaining-cards cards-from-shuffled-shoe))
+                      [your-first-card dealer-first-card your-second-card dealer-second-card] cards-to-deal]
+                  (do
+                    (println "3b - there are 3 or fewer cards")
+                    (reset! shoe shuffled-shoe)
+                    (reset! hands {:you [[your-first-card your-second-card]]
+                                   :dealer [dealer-first-card dealer-second-card]})
+                    (reset! shoe-counter (+ num-cards-needed-from-shuffled-shoe (if (true? @options/burn-a-card-after-shuffle) 1 0))))))))))
 
 (defn reset-shoe-and-hands! []
   (do (reset! shoe [])

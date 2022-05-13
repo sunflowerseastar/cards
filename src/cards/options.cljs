@@ -21,6 +21,9 @@
 (def num-decks-in-shoe-default 4)
 (defonce num-decks-in-shoe (local-storage (atom num-decks-in-shoe-default) :num-decks-in-shoe))
 
+(def burn-a-card-after-shuffle-default true)
+(defonce burn-a-card-after-shuffle (local-storage (atom burn-a-card-after-shuffle-default) :burn-a-card-after-shuffle))
+
 (defn reset-options-defaults!
   "Clear user changes to defaults."
   []
@@ -28,6 +31,7 @@
       (reset! num-splits-permitted-non-ace num-splits-permitted-non-ace-default)
       (reset! num-splits-permitted-ace num-splits-permitted-ace-default)
       (reset! num-decks-in-shoe num-decks-in-shoe-default)
+      (reset! burn-a-card-after-shuffle burn-a-card-after-shuffle-default)
       (reset! shuffle-precision shuffle-precision-default)))
 
 (defn range-slider-int [value min max step title cb]

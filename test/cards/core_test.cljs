@@ -60,6 +60,13 @@
     ;; sanity check
     (count (deck/riffle (deck/generate-sorted-deck))) 52))
 
+(deftest strip-test
+  ;; two perfect strips will match
+  (is (= (deck/strip (deck/generate-sorted-deck) 1) (deck/strip (deck/generate-sorted-deck) 1)))
+
+  ;; two imperfect strips will not match (note that )
+  (is (not= (deck/strip (deck/generate-sorted-deck) 0.9) (deck/strip (deck/generate-sorted-deck) 0.9))))
+
 (deftest generate-shoe-test
   (are [x y] (= x y)
     (count (deck/generate-shoe 1)) 52

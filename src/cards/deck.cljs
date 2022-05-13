@@ -28,13 +28,6 @@
   (let [imprecision (->> n (* precision) (- n) (* 2) inc)] ; inc is because rand-int plus is exclusive
     (+ n (- (rand-int imprecision) (if (zero? imprecision) 0 (quot imprecision 2))))))
 
-(defn num-adjusted-for-precision
-  "Given an int and a precision, return a random int that within plus/minus
-  (* precision n) of n."
-  [n precision]
-  (let [imprecision (- n (* precision n))]
-    (+ n (- (rand-int imprecision) (if (zero? imprecision) 0 (quot imprecision 2))))))
-
 (defn divide-cards
   "Given a deck or shoe, split it in two and return the halves in a vector."
   ([deck-or-shoe] (divide-cards deck-or-shoe @options/shuffle-precision))
@@ -42,7 +35,7 @@
    (let [num-cards (count deck-or-shoe)
          num-half (quot num-cards 2)
          imprecision (- num-cards (* precision num-cards))
-         separate-point (num-adjusted-for-precision num-half precision)]
+         separate-point (plus-minus num-half precision)]
      (split-at separate-point deck-or-shoe))))
 
 (defn riffle-lr
@@ -82,17 +75,16 @@
   cards have been placed on the shuffled-deck."
   ([deck] (strip deck @options/shuffle-precision))
   ([deck precision]
-   (let [strip-precision (* 0.8 precision) ; otherwise very little variation
-         rough-chunk-size (quot 52 (num-adjusted-for-precision 5 strip-precision))]
-     (loop [cards-to-take (num-adjusted-for-precision rough-chunk-size strip-precision)
+   (let [rough-chunk-size (quot 52 (plus-minus 5 precision))]
+     (loop [cards-to-take (plus-minus rough-chunk-size precision)
             top-chunk (take cards-to-take deck)
             remaining-deck (drop cards-to-take deck)
             shuffled-deck '()]
-       (if (empty? remaining-deck) (apply conj shuffled-deck top-chunk)
-           (recur (num-adjusted-for-precision rough-chunk-size strip-precision)
+       (if (empty? remaining-deck) (concat top-chunk shuffled-deck)
+           (recur (plus-minus rough-chunk-size precision)
                   (take cards-to-take remaining-deck)
                   (drop cards-to-take remaining-deck)
-                  (apply conj shuffled-deck top-chunk)))))))
+                  (concat top-chunk shuffled-deck)))))))
 
 (defn cut
   "Split a deck and stack the previously lower portion on top."

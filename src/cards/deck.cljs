@@ -27,7 +27,6 @@
     (+ n (- (rand-int imprecision) (if (zero? imprecision) 0 (quot imprecision 2))))))
 
 (defn divide-cards
-  ;; TODO replace with split?
   "Given a deck or shoe, split it in two and return the halves in a vector."
   ([deck-or-shoe] (divide-cards deck-or-shoe @options/shuffle-precision))
   ([deck-or-shoe precision]
@@ -35,7 +34,7 @@
          num-half (quot num-cards 2)
          imprecision (- num-cards (* precision num-cards))
          separate-point (num-adjusted-for-precision num-half precision)]
-     [(take separate-point deck-or-shoe) (drop separate-point deck-or-shoe)])))
+     (split-at separate-point deck-or-shoe))))
 
 (defn riffle-shuffle-lr
   "Given two halves of a deck, imprecisely zipper them together. A card is
@@ -90,9 +89,6 @@
   "Split a deck and stack the previously lower portion on top."
   [deck]
   (let [[top bottom] (divide-cards deck)] (vec (concat bottom top))))
-
-(defn shuffler [deck shuffle-fn]
-  (let [[top bottom] (divide-cards deck)] (shuffle-fn top bottom)))
 
 (defn generate-shoe
   "Return n sorted decks, combined."

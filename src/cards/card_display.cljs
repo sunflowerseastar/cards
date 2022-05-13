@@ -13,9 +13,6 @@
   []
   (reset! local-shoe (deck/generate-shoe @options/num-decks-in-shoe)))
 
-;; TODO see if there's something about this component that's not wanting to render..?? not sure
-
-
 (defn card-display-view
   "Show the cards, along with buttons to shuffle and sort."
   []

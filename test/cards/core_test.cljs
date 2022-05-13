@@ -24,6 +24,10 @@
     (first (deck/sorted-deck)) top-card
     (last (deck/sorted-deck)) bottom-card))
 
+(deftest divide-cards-test
+  (are [x y] (= x y)
+    (->> (deck/divide-cards (deck/sorted-deck) 1) (map count)) '(26 26)))
+
 (deftest generate-shoe-test
   (are [x y] (= x y)
     (count (deck/generate-shoe 1)) 52
@@ -35,10 +39,10 @@
     (last (deck/generate-shoe 4)) bottom-card))
 
 (deftest riffle-shuffle-test
-  ;; two perfect shuffles will match
+  ;; two perfect (faro) riffles will match
   (is (= (deck/riffle-shuffle (deck/sorted-deck) 1) (deck/riffle-shuffle (deck/sorted-deck) 1)))
 
-  ;; two imperfect shuffles will not match
+  ;; two imperfect riffles will not match
   (is (not= (deck/riffle-shuffle (deck/sorted-deck) 0.9) (deck/riffle-shuffle (deck/sorted-deck) 0.9)))
 
   (are [x y] (= x y)

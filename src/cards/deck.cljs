@@ -89,7 +89,7 @@
 (defn riffle-lr
   "Given two halves of a deck, imprecisely zipper them together. A card is
   selected from either side in alternation, except for 'errors' when (rand)
-  doesn't reach preicision, in which a card from the previous side is repeated.
+  doesn't reach precision, in which a card from the previous side is repeated.
   The intuition regarding left/right is that the card chunks are in the left &
   right hands."
   ([l-r-chunks] (riffle-lr l-r-chunks @options/shuffle-precision))

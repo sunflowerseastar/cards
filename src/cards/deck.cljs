@@ -89,16 +89,16 @@
 (defn riffle-lr
   "Given two halves of a deck, imprecisely zipper them together. A card is
   selected from either side in alternation, except for 'errors' when (rand)
-  doesn't reach precision, in which a card from the previous side is repeated.
-  The intuition regarding left/right is that the card chunks are in the left &
-  right hands."
+  doesn't reach precision, in which case a card from the previous side is
+  repeated. The intuition regarding left/right is that the card chunks are in
+  the left & right hands."
   ([l-r-chunks] (riffle-lr l-r-chunks @options/shuffle-precision))
   ([[left right] precision]
    ;; 'is-card-l' means 'the bottom card of the left deck is going to go on top of the shuffled-deck
    (loop [l (reverse left) r (reverse right) shuffled-deck '() is-card-l (< (rand) precision)]
-     (let [;; this determines whether the shuffles alternates correctly,
-           ;; or if there's an "error," and the next iteration will place its
-           ;; card from the same side again.
+     (let [;; this determines whether each iteration alternates correctly
+           ;; or there's an "error," in which case the next iteration will place
+           ;; its card from the same side again.
            next-is-card-l (if (< (rand) precision) (not is-card-l) is-card-l)]
        (cond
          ;; the first three cases are finishing a shuffle

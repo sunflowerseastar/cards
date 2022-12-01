@@ -1,0 +1,18 @@
+* blackjack
+
+This repo is aspirationally named 'cards,' although I've only written blackjack so far. Blackjack turned out to be quite fun to write, though, so I'll be back at some point for others. It uses [[https://reagent-project.github.io/][Reagent]].
+
+- multi-deck shoe
+- shoe-appropriate simulated shuffling
+- traditional card design
+- split and stand options
+
+The deck's face cards and numbers were pulled from [[https://totalnonsense.com/open-source-vector-playing-cards/][here]].
+
+#+begin_src sh
+lein fig:build # dev - localhost:9500
+# http://localhost:9500/figwheel-extra-main/auto-testing
+
+lein fig:min   # build
+lein fig:test  # test
+#+end_src
